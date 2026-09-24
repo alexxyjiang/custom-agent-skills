@@ -1,0 +1,16 @@
+{
+  "author": {
+    "name": "alexxyjiang (Alex Jiang)",
+    "email": "alexxyjiang@gmail.com"
+  },
+  "name": "crispe-commit-composer-plugin",
+  "description": "Turns a messy working tree into a clean, reviewable sequence of git commits. Groups changes code -> test -> doc, caps code/test commits at 10 files (doc uncapped), enforces a stable '[feature]: summary' message format per branch, verifies the build before code commits when a build system is detected, and keeps a safety tag + stash so any mid-sequence failure rolls back without losing work. Triggers on explicit commit requests: 'commit this', 'commit these changes', 'save this to git', 'check this in', 'create a commit', and Chinese equivalents like '提交代码', '提交这些改动', '帮我commit'.",
+  "keywords": [
+    "crispe",
+    "git",
+    "commit",
+    "release-engineering",
+    "version-control"
+  ],
+  "version": "1.0.0"
+}
