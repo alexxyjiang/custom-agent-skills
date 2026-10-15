@@ -1,7 +1,14 @@
 ---
 name: crispe-commit-composer
-description: Use when the user asks to commit changes, save work to git, check in code, create a commit, or ship the current changes -- e.g. "commit this", "let's commit", "commit these changes", "save this to git", "check this in", "create a commit for X". Also triggers on Chinese equivalents: "提交代码", "提交这些改动", "帮我commit", "创建一个commit", "把这些改动提交一下". Does NOT trigger on questions about commits or git history (e.g. "what does this commit do", "show me the last commit", "explain this diff") -- only on requests to persist current changes. Groups the working tree into logically ordered, size-capped commits (code -> test -> doc) under one stable "[feature]: summary" message format per branch, verifies the build before committing code when a build system is detected, and keeps a safety backup so any mid-sequence failure can be rolled back without losing work.
-version: 1.0.0
+description: >-
+  Use when asked to commit changes, save work to git, check in code, create a commit, or ship the
+  current changes -- e.g. commit this / let's commit / save this to git / create a commit for X.
+  支持中文触发，如提交代码、提交这些改动、帮我commit等同类表达。Does not trigger on questions about commit history (e.g. what
+  does this commit do, show me the last commit). Groups the working tree into logically ordered,
+  size-capped commits (code -> test -> doc) under one stable "[feature]: summary" format per branch,
+  verifies the build before committing code when detected, and keeps a safety backup so a
+  mid-sequence failure can be rolled back without losing work.
+version: 1.1.0
 ---
 
 # CRISPE Commit Composer

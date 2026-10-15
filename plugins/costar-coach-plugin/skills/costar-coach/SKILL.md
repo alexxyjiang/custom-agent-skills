@@ -1,7 +1,11 @@
 ---
 name: costar-coach
-description: This skill should be used when the user asks to "convert to COSTAR", "make this a COSTAR prompt", "rewrite as COSTAR", "improve this prompt", "structure this prompt", mentions "COSTAR framework", or wants to turn a plain description into a well-structured prompt using the COSTAR methodology (Context, Objective, Style, Tone, Audience, Response). Also triggers on Chinese equivalents: "转成COSTAR格式", "用COSTAR框架改写", "帮我用COSTAR写提示词", "把这个变成COSTAR提示词", "优化这个提示词", "结构化这个提示词", "用COSTAR框架整理", or any phrasing in Chinese about structuring or improving a prompt using the COSTAR methodology.
-version: 1.3.0
+description: >-
+  Use when asked to convert to COSTAR, make this a COSTAR prompt, rewrite / improve / structure this
+  prompt, or mentions the COSTAR framework, to turn a plain description into a well-structured
+  prompt using the COSTAR methodology (Context, Objective, Style, Tone, Audience, Response).
+  支持中文触发，如转成COSTAR格式、用COSTAR框架改写、优化/结构化这个提示词等同类表达。
+version: 1.4.0
 argument-hint: "[file-path] (optional) -- path to a prompt file to load and optimize using the COSTAR framework"
 ---
 

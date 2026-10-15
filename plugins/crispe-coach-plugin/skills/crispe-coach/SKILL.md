@@ -1,7 +1,11 @@
 ---
 name: crispe-coach
-description: This skill should be used when the user asks to "convert to CRISPE", "make this a CRISPE prompt", "rewrite as CRISPE", "improve this prompt", "structure this prompt", mentions "CRISPE framework", or wants to turn a plain description into a well-structured prompt using the CRISPE methodology (Context, Role, Instruction, Specification, Performance, Example). Also triggers on Chinese equivalents: "转成CRISPE格式", "用CRISPE框架改写", "帮我用CRISPE写提示词", "把这个变成CRISPE提示词", "优化这个提示词", "结构化这个提示词", "用CRISPE框架整理", or any phrasing in Chinese about structuring or improving a prompt using the CRISPE methodology.
-version: 1.3.0
+description: >-
+  Use when asked to convert to CRISPE, make this a CRISPE prompt, rewrite / improve / structure this
+  prompt, or mentions the CRISPE framework, to turn a plain description into a well-structured
+  prompt using the CRISPE methodology (Context, Role, Instruction, Specification, Performance,
+  Example). 支持中文触发，如转成CRISPE格式、用CRISPE框架改写、优化/结构化这个提示词等同类表达。
+version: 1.4.0
 argument-hint: "[file-path] (optional) -- path to a prompt file to load and optimize using the CRISPE framework"
 ---
 

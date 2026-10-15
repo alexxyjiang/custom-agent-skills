@@ -4,7 +4,7 @@
     "email": "alexxyjiang@gmail.com"
   },
   "name": "auto-skill-update-plugin",
-  "description": "Triggers proactively when the user signals any skill should be improved -- e.g., 'update the skill to cover X', 'add this case to skill', 'the skill missed this case'. Also triggers on Chinese equivalents: '更新这个skill', 'skill漏了这个情况', '给skill加上这个情况'. Applies minimal, surgical edits to skill definitions -- covering new trigger patterns, handling cases, or examples -- without rewriting wholesale.",
+  "description": "Use when asked to update, extend, or fix a skill definition -- e.g. update the skill to cover X / add this case to skill / the skill missed this case / fix the skill, or any phrasing about correcting a skill. 支持中文触发，如更新这个skill、给skill加上这个情况、skill漏了这个情况等同类表达。Invoke immediately on these signals; the worthiness assessment and confirmation happen inside the skill, not before invoking.",
   "keywords": [
     "skill",
     "skill-update",
@@ -14,5 +14,5 @@
     "meta-skill",
     "prompt-engineering"
   ],
-  "version": "1.2.0"
+  "version": "1.3.0"
 }

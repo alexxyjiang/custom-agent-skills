@@ -1,7 +1,11 @@
 ---
 name: auto-skill-update
-description: Trigger this skill proactively when the user signals any skill should be improved -- e.g., "update the skill to cover X", "add this case to skill", "the skill should also handle Y", "please update skill to include", "that should be in the skill", "fix the skill", "the skill missed this case", or any phrasing about correcting, extending, or improving a skill definition. Also triggers on Chinese equivalents: "更新这个skill", "给skill加上这个情况", "skill也应该处理这个", "请更新技能", "这个应该加到skill里", "修复skill", "skill漏了这个情况", "skill没处理这个", "改进这个技能", or any phrasing in Chinese about correcting, extending, or improving a skill definition. Invoke immediately on these signals -- do NOT pre-assess worthiness before invoking; that assessment happens inside this skill.
-version: 1.2.0
+description: >-
+  Use when asked to update, extend, or fix a skill definition -- e.g. update the skill to cover X /
+  add this case to skill / the skill missed this case / fix the skill, or any phrasing about
+  correcting a skill. 支持中文触发，如更新这个skill、给skill加上这个情况、skill漏了这个情况等同类表达。Invoke immediately on these
+  signals; the worthiness assessment and confirmation happen inside the skill, not before invoking.
+version: 1.3.0
 argument-hint: "[skill-name] (optional) -- name of the skill to update; inferred from context if omitted"
 ---
 

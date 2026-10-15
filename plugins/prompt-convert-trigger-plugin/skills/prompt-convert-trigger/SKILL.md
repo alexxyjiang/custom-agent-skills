@@ -1,7 +1,11 @@
 ---
 name: prompt-convert-trigger
-description: Automatically detects tasks that would benefit from structured prompt engineering and converts them into COSTAR or CRISPE prompts. Triggers proactively when the user's request involves complexity, vagueness, multi-step work, or spans multiple concerns. Make sure to use this skill whenever you notice the user's request would benefit from structured planning — don't wait for them to explicitly ask. Also applies to Chinese-language requests showing the same signals: multi-goal phrasing ("修复X同时让Y也能工作"), uncertainty markers ("我不确定怎么", "可能是", "我觉得"), vague action verbs ("改进", "优化", "整理", "搞定"), or requests spanning multiple files/systems.
-version: 1.2.0
+description: >-
+  Use proactively when a request would benefit from structured prompt engineering -- involves
+  complexity, vagueness, multi-step work, or spans multiple concerns -- converting it into a COSTAR
+  or CRISPE prompt before executing; don't wait for an explicit ask.
+  支持中文触发信号，如多目标表达（修复X同时让Y也能工作）、不确定表达（我不确定怎么、可能是）、模糊动词（改进、优化）等同类情况。
+version: 1.3.0
 argument-hint: "[framework] (optional) -- force a specific framework (costar|crispe); auto-detected from request signals if omitted"
 ---
 

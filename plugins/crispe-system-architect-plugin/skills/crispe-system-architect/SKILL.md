@@ -1,7 +1,12 @@
 ---
 name: crispe-system-architect
-description: Expert program architecture analyzer that generates documentation for any code repository. Supports three output styles -- Choice 1: CONTRIBUTING.md + STRUCTURE.md (contribution guide alongside a separate structure reference), Choice 2: CLAUDE.md (single merged AI context file), Choice 3: STRUCTURE.md only (structure reference without a contribution guide). STRUCTURE.md, ARCHITECTURE.md, and OVERVIEW.md are treated as equivalent -- update the one that already exists, or create STRUCTURE.md if none is present. Language-suffixed variants (e.g., STRUCTURE.zh-CN.md) are also equivalent; any one variant is sufficient to consider the document present. Trigger this skill proactively when the user requests a code change but no documentation file exists in the repo root. Also trigger explicitly when the user says "analyze this repo", "generate STRUCTURE.md", "generate CLAUDE.md", "generate CONTRIBUTING.md", "summarize the codebase", "document the project structure", "what is the architecture of this project", or any equivalent phrasing about understanding or mapping an unfamiliar codebase. Also triggers on Chinese equivalents: "分析这个仓库", "分析代码库", "生成STRUCTURE.md", "生成CLAUDE.md", "生成CONTRIBUTING.md", "生成架构文档", "生成项目文档", "总结代码库", "梳理项目结构", "整理项目结构", "文档化项目结构", "这个项目的架构是什么", "帮我了解这个代码库", "项目结构分析", or any equivalent phrasing in any language. When in doubt, trigger -- generating an architectural reference once saves every future contributor from re-discovering the same things.
-version: 1.4.0
+description: >-
+  Use when asked to analyze a repo, generate STRUCTURE.md / ARCHITECTURE.md / OVERVIEW.md /
+  CLAUDE.md / CONTRIBUTING.md, map architecture, or explain job inputs, outputs and data flows with
+  Mermaid diagrams. 支持分析仓库、梳理项目结构、生成架构文档、说明作业输入输出和流程图；支持中文、English 和中英双语输出。 Also offers
+  documentation before code changes when architecture/context docs are absent. Supports a structure
+  reference, a contribution guide plus structure reference, or an AI context file.
+version: 1.5.0
 argument-hint: "[1|2|3] (optional) -- documentation style: 1=CONTRIBUTING.md+STRUCTURE.md, 2=CLAUDE.md, 3=STRUCTURE.md only"
 ---
 
@@ -24,6 +29,7 @@ Analyzes the current repository and produces durable architecture documentation 
 Trigger when the user:
 - Says "analyze this repo", "generate STRUCTURE.md", "generate CLAUDE.md", "generate CONTRIBUTING.md", "summarize the codebase", "document the project structure", or any equivalent in any language
 - Asks "what is the architecture of this project" or wants a map of an unfamiliar codebase
+- Requests job/pipeline inputs, outputs, key steps or flowcharts: “explain this Spark job”, “diagram the data flow”, “理解作业的输入输出”, “关键步骤，用流程图说明”
 - Requests a code change but no documentation file exists in the repo root (proactive trigger)
 
 **Chinese trigger phrases (中文触发短语):**
@@ -36,6 +42,29 @@ Trigger when the user:
 
 When in doubt, trigger -- generating an architectural reference once saves every future contributor from re-discovering the same things.
 
+## Language and bilingual output / 语言与双语输出
+
+- Support Simplified Chinese and English equally for questions, headings, prose, tables, diagram labels, examples and final summaries. The English templates below define section semantics, not a mandatory output language.
+- An explicit language request wins: “中文 / Chinese / zh-CN”, “英文 / English / en”, or “中英双语 / bilingual”. Otherwise, for a newly created document use the language of the user request; for an existing document preserve its language unless translation is requested. Mixed-language requests follow the language of the main instruction; ask only if genuinely unclear.
+- Keep code identifiers, paths, field names, flags, commands, units and enum values unchanged. Explain technical terms in the chosen language, optionally giving the English term at first mention.
+- Single-language output produces only the selected artifact(s), without unsolicited translations. For bilingual structure output, preserve any existing language pair and add reciprocal links. If no pair exists, use English `STRUCTURE.md` and Chinese `STRUCTURE.zh-CN.md` (or the resolved ARCHITECTURE/OVERVIEW basename); explicit user filenames take precedence. Apply equivalent suffixes to CLAUDE/CONTRIBUTING only when those artifacts were selected.
+- In bilingual mode, keep both versions semantically aligned: identical defaults, contracts, branch conditions, source references and command behavior, with translated diagram labels and prose. Do not overwrite an existing Chinese base file as English; retain it and create an `.en.md` counterpart instead.
+- If language variants already exist, update them in their respective languages from the same verified architecture map. A language variant counts as existing documentation for the proactive check.
+- Localize unknown markers: English `Not documented -- check with the team.`; Chinese `未在仓库中找到说明，请与团队确认。` Localize inferred markers as `Inferred from code -- not formally documented.` / `根据代码推断，非正式约定。`
+
+| Section meaning | English heading | 中文标题 |
+| --- | --- | --- |
+| Purpose | Overview | 项目定位 |
+| Layout and ownership | Repository Structure / Module Responsibilities | 目录结构 / 模块职责 |
+| Coding rules | Code Style Guidelines | 代码风格与约定 |
+| Entry points and input contracts | API Surfaces / Input Contracts | 运行入口 / 输入契约 |
+| Processing | Core Request/Data Flow / Key Steps | 主处理流程 / 关键步骤 |
+| Domain state and results | Core Data Models / Output Contracts | 核心数据模型 / 输出契约 |
+| Continuation, when implemented | Incremental / Recovery Semantics | 增量续跑与恢复语义 |
+| Runtime | Build & Environment Setup | 构建与运行环境 |
+| Verification | Test Strategy | 测试与验证入口 |
+| Constraints | Notes for Contributors | 关键约束与注意事项 |
+
 ## Coaching Style
 
 - **Patient** -- inspect files carefully and build the full architecture map before writing any output; do not rush to generate documentation from assumptions.
@@ -47,7 +76,7 @@ When in doubt, trigger -- generating an architectural reference once saves every
 
 - Work patiently -- inspect and verify the repository before writing any file. Do not generate documentation from assumptions.
 - STOP if the documentation style choice is unresolved or if required information (build commands, test setup, API surfaces) cannot be verified. Ask exactly one focused question and wait for the answer before proceeding.
-- Do NOT guess build commands, test patterns, or environment requirements from insufficient evidence. Write `Not documented -- check with the team.` instead.
+- Do NOT guess build commands, test patterns, or environment requirements from insufficient evidence. Use the localized unknown marker instead.
 - Ask one question at a time -- bundle the style choice with other uncertainties into a single question, not a sequence of questions mid-generation.
 
 ---
@@ -68,7 +97,7 @@ Act as an **expert program architecture designer** with broad experience across 
 - Surfacing implicit coding conventions that experienced contributors follow but never wrote down
 - Extracting build, environment, and test information from config files and CI definitions
 - Tracing API entry points, request flows, capability/task systems, workflow definitions, and generated contract boundaries
-- Writing documentation that a new contributor can scan in under two minutes and act on immediately
+- Writing a concise architectural opening that a new contributor can scan in under two minutes, with precise detail sections for deeper investigation
 
 ---
 
@@ -133,7 +162,7 @@ Use directory listing to build the path tree. Apply these rules:
 - Go **2 - 3 directory levels** deep from the repo root
 - **Skip noise directories** automatically: `.git`, `node_modules`, `target`, `build`, `dist`, `out`, `bin`, `obj`, `__pycache__`, `.idea`, `.vscode`, `.DS_Store`, `*.egg-info`
 - **Collapse deep package paths**: for languages that use reverse-domain package conventions (Java, Kotlin, Scala), identify the common package prefix shared by all source files and treat it as the effective root. For example, if all source lives under `com/oxyjiang/search/`, show `com.oxyjiang.search/` as the single collapsed root, then list its immediate children (`query/`, `memory/`, `ranking/`). Do not expand all four levels as separate tree nodes.
-- Annotate key directories with a one-line description below the tree (not inline)
+- Annotate important files/directories with concise inline comments for compact repositories; for large trees use a separate key-directory table. Avoid repeating the same descriptions in both places.
 
 #### Step 3: Extract explicit documentation
 
@@ -142,6 +171,7 @@ Read these files if they exist: `README.md`, `CONTRIBUTING.md`, `CHANGELOG.md`, 
 - Project purpose and scope
 - Public API surfaces: HTTP routes, GraphQL queries/mutations, gRPC services, CLI commands, job entry points, or message consumers
 - Runtime request/data flows from entry point to domain service/task/capability to response/output model
+- For pipelines/jobs: actual input datasets and required columns, decoding and normalization, filtering/join/deduplication/sampling order, partitioning/sorting, output schemas, completion markers and incremental state contracts
 - Capability, plugin, workflow, pipeline, or job-task systems, including which implementations are active, registered-but-not-exposed, or implemented-but-not-wired
 - Explicit code style rules and formatting requirements
 - Contribution workflow (branch naming, PR process, review requirements)
@@ -176,7 +206,7 @@ From build files, CI configs (`.github/workflows/`, `Jenkinsfile`, `.travis.yml`
 
 #### Step 6: Write the chosen file(s) to the repo root
 
-Use the matching template(s) from the **Specification** section based on `$DOC_CHOICE`. Write only what you found. Do not pad sections with filler.
+Use the matching template(s) from the **Specification** section based on `$DOC_CHOICE`, localized with the language rules above. For pipeline/job repositories, adapt section order using the pipeline profile below. Write only what you found. Do not pad sections with filler.
 
 - If `$DOC_CHOICE` is 1: generate both `CONTRIBUTING.md` (using the **CONTRIBUTING.md template**) and `$STRUCTURE_FILE` (using the **STRUCTURE.md template**). Inside `CONTRIBUTING.md`, the `Code Structure` section must link to `$STRUCTURE_FILE` by its actual filename -- not a hardcoded `STRUCTURE.md` string.
 - If `$DOC_CHOICE` is 2: generate `CLAUDE.md` (using the **CLAUDE.md template**).
@@ -252,17 +282,17 @@ Key areas:
 
 *(When the repo exposes a single API surface, one diagram is sufficient. When multiple distinct API groups exist -- e.g., GraphQL, gRPC, REST -- add one named subsection per group. Highlight per-group divergence in error handling, response building, or auth.)*
 
-### [API Group Name, e.g., GraphQL]
+### [API or Job Group Name]
 
-\`\`\`text
-[client/input]
-  -> [entry point]
-  -> [adapter/validator/converter]
-  -> [domain service/workflow/task]
-  -> [response/output converter]
+\`\`\`mermaid
+flowchart TD
+    Input["Input / source"] --> Entry["Entry point"]
+    Entry --> Validate["Normalize and validate"]
+    Validate --> Process["Domain service / workflow / worker"]
+    Process --> Output["Output model / storage"]
 \`\`\`
 
-*(Add a ### subsection for each additional API group. Omit groups that share an identical flow path.)*
+[Explain key stages and decision branches; cite concrete implementation files/functions. Use one named subsection for each materially different flow.]
 
 ## Capabilities, Workflows, or Core Components
 
@@ -347,6 +377,64 @@ Key areas:
 
 [Gotchas, architectural constraints, patterns a new contributor must know before making changes. If none found: omit this section.]
 ```
+
+### Pipeline/job documentation profile and diagram style
+
+Apply this profile to Spark, ETL, batch inference, streaming, ingestion and other data pipelines. Keep the general template coverage (coding conventions, verified build/environment/test commands and CI status); reorganize it around the data lifecycle rather than forcing HTTP/API headings onto a job.
+
+**Recommended reading order:** project purpose → annotated repository tree and module collaboration → entry points and input contracts → end-to-end flow → numbered stage details → core algorithm decisions and defaults → output contracts → incremental/recovery semantics → auxiliary jobs and deployment → coding conventions and validation entry points. Include only applicable sections. The opening should be scannable in two minutes; deeper tables and diagrams may be longer when requested or needed to explain real contracts.
+
+**Flowcharts:**
+
+1. Use fenced `mermaid` blocks with `flowchart TD` for staged/branching processing and `flowchart LR` for module relationships or deployment. Use stable ASCII node IDs and quoted, localized labels. State once that rendering requires a Mermaid-capable Markdown viewer.
+2. Start with one end-to-end chart showing sources, normalization, quality gates, joins, selection/sampling, intermediate storage, workers, persisted outputs, validation and completion metadata as actually implemented.
+3. Add focused diagrams only for materially different concerns: per-event/core algorithm decisions, incremental restore/carry-forward, independent auxiliary jobs, module collaboration, deployment/submission. Do not target a fixed number of diagrams or duplicate the main chart.
+4. Draw decision diamonds and label outcomes. Show error/drop branches where they change results; distinguish optional inputs/checkpoints from required data. Explain loops and configurable thresholds using the current effective defaults, with the override mechanism nearby.
+5. Keep logical data flow distinct from physical execution. Explain the actual driver/executor or process boundaries, shuffle/partition/sort points, persistent cache vs temporary persistence, broadcasting/collecting and state bounds. Do not imply a write is sorted or globally atomic without evidence.
+6. Follow each important chart with numbered implementation steps and source pointers (`path: function/class`). Diagrams summarize behavior; tables provide exact fields and contracts.
+7. Plain-text arrow chains may supplement Mermaid as a quick summary or requested fallback. Never claim diagrams were rendered if only syntax/fences were checked.
+
+**Detail-writing rules:**
+
+- Input tables: dataset, format, path/config parameter, actual defaults, required columns/types, identity policy and time units. Distinguish missing columns from nullable values, directory date selection from event-time windows, and inclusive/exclusive boundaries.
+- Transformation order: document normalization, validation, invalid-row handling, join type/key, deduplication tie-breakers, missing-reference policy and sampling method/seed/cap in the order executed. Preserve duplicates unless the implementation removes them. Do not describe random sampling as latest-N truncation.
+- Algorithm section: state the active implementation, meaningful branch conditions, weights, effective thresholds, decay/merge/prune behavior, representative selection and snapshot timing. Separate wrapper-selected defaults from library defaults. Include short equations only when they clarify actual code.
+- Output tables/tree: storage locations, formats, row granularity, fields/types/meaning, nested structures and serialized payloads. Distinguish consumer snapshots from lossless continuation checkpoints; identify numeric encoding, format version and implementation coupling when relevant.
+- Recovery section: explain prior-state root vs subdirectory, compatibility checks, window overlap rules, new/inactive users, late data, cumulative vs current-run counters, sampling scope and snapshot advancement. Include only implemented behavior.
+- Metrics: define the counted population, pre/post-filter stage, overlapping counters, exact vs approximate aggregations, task-time sum vs elapsed time, and empty-input behavior where meaningful.
+- Completion: explain overwrite policy, persisted-data validation, completion markers and possible partial outputs. Do not infer whole-job transactional behavior from individual Spark writes.
+- Truth over stale docs: compare README examples and defaults with parser/config/source. Identify concrete mismatches and cite both sources; distinguish historical validation results from checks performed during the current task.
+- Scope: distinguish active features from merely present/unwired components. Reuse the documentation method across engines; derive every dimension, cap, threshold and other constant from the target repository.
+
+**Bilingual flow example (choose the requested language; do not emit both by default):**
+
+English:
+```mermaid
+flowchart TD
+    Events["Activity Parquet"] --> Clean["Normalize and filter invalid events"]
+    Catalog["Item vectors"] --> Join["Join by item_id"]
+    Clean --> Join
+    Join --> Cache["Prepared event cache + manifest"]
+    Cache --> Replay["Partition and sort by user; replay events"]
+    Previous["Optional previous checkpoint"] --> Replay
+    Replay --> States["User states + checkpoint"]
+    States --> Summary["Validate counts; write completion summary"]
+```
+
+中文：
+```mermaid
+flowchart TD
+    Events["行为 Parquet"] --> Clean["标准化并过滤无效事件"]
+    Catalog["商品向量"] --> Join["按 item_id 关联"]
+    Clean --> Join
+    Join --> Cache["准备好的事件缓存 + manifest"]
+    Cache --> Replay["按用户分区排序；逐事件回放"]
+    Previous["可选的上轮 checkpoint"] --> Replay
+    Replay --> States["用户状态 + checkpoint"]
+    States --> Summary["校验计数；写入完成汇总"]
+```
+
+These examples illustrate presentation only; inspect the target repository before describing any of these stages as implemented.
 
 ### CLAUDE.md template
 
@@ -507,8 +595,8 @@ available at [http://contributor-covenant.org/version/1/4][version].
 - **Document API and workflow truth, not intent**: distinguish schema-exposed/API-exposed features from backend-registered or implemented-but-not-wired components. Call out mismatches explicitly.
 - **Trace before summarizing**: for API, capability, workflow, or pipeline repos, identify the concrete path from entry point to service/task/capability to output model before writing architecture notes.
 - **Commands must match the target shell**: when a user requests shell verification, validate every documented command with that shell's parser where practical (for example, `zsh -n -c '...'`), use the matching code fence (`zsh`, `bash`, `sh`), and note what was verified.
-- **Flag unknowns**: if a section has no discoverable content, write `Not documented -- check with the team.` Do not omit the section header.
-- **Scannable in 2 minutes**: keep it tight. This is a reference, not an essay.
+- **Flag unknowns**: for applicable sections with no discoverable content, retain the header and use the localized unknown marker. Omit sections explicitly marked conditional when they do not apply; never invent a CI setup or service dependency.
+- **Scannable opening, precise depth**: make purpose/layout/main flow quickly scannable. Use layered diagrams and tables for requested input/output and algorithm detail; avoid repetition and arbitrary line-count limits.
 - **CLAUDE.md vs STRUCTURE.md**: `CLAUDE.md` is terse and action-oriented (commands first, bullet lists, things-to-avoid). `STRUCTURE.md` is prose-friendly with full tables and CI details. Do not mix the two formats.
 - **CONTRIBUTING.md structure file link**: the `Code Structure` section must reference `$STRUCTURE_FILE` by its actual resolved filename (`STRUCTURE.md`, `ARCHITECTURE.md`, or `OVERVIEW.md`) -- never hardcode `STRUCTURE.md` if the repo uses a different name.
 - **CONTRIBUTING.md is a template, not analysis**: its Code of Conduct and PR Process sections are largely standard. Fill in `[Project Name]` and `[INSERT EMAIL ADDRESS]` from what is discoverable (README, git config, package metadata); leave the placeholders intact if nothing is found. Do not fabricate project-specific PR rules beyond what is documented.
@@ -521,7 +609,7 @@ Use these priorities while applying the instructions and templates:
 
 - **Accurate over complete**: a shorter, correct file is more valuable than a long one that contains guesses.
 - **One bundled question**: bundle the style choice with any other uncertainties (e.g., two competing build systems, ambiguous primary language) into a single question -- not a sequence of questions mid-generation.
-- **Single-pass generation**: produce the full file (or both files for Choice 1) in one shot. Do not ask for approval section by section.
+- **Single-pass generation**: produce the selected artifact(s), including requested language counterparts, in one pass. Do not ask for approval section by section.
 - **Proactive but not pushy**: when detecting the absence of any documentation before a code change, ask once (including the three-choice selection) and respect the answer immediately.
 - **Respect the format**: `CLAUDE.md` must stay terse and command-first; `STRUCTURE.md` may be richer prose; `CONTRIBUTING.md` follows the standard template -- never mix these formats or merge them together unless the user explicitly chose Choice 2.
 
@@ -529,12 +617,21 @@ Use these priorities while applying the instructions and templates:
 
 ## [Example]
 
+### Verification before delivery
+
+- Confirm the selected artifact(s) and language(s), resolve existing variants, preserve unrelated content and check reciprocal links for bilingual pairs.
+- Recheck every documented default, unit, ordering rule, branch and schema against the source. Confirm code fences and referenced paths; use a Mermaid parser/renderer if already available, and report the actual level of diagram validation.
+- For documentation-only work, use focused document checks; do not run a remote deployment or expensive data job merely to describe it. List repository test commands separately from checks actually executed.
+- When editing this skill, keep frontmatter valid standard YAML (use a quoted or folded `description` for text containing colons). Validate `name` and nonempty string `description`; verify discovery with the host’s skill-list command when available. A loader’s permissive YAML fallback is not a substitute for valid metadata.
+
 ### Example Index
 
 - **Trigger routing**: when to infer a documentation choice and when to ask.
 - **Choice 1 compact example**: `CONTRIBUTING.md` + `STRUCTURE.md`.
 - **Choice 2 compact example**: `CLAUDE.md` only.
 - **Choice 3 compact example**: `STRUCTURE.md` only.
+- **Language routing**: Chinese request → Chinese artifact; English request → English artifact; explicit bilingual request → linked language counterparts.
+- **Pipeline profile**: Mermaid flowcharts, precise input/output tables and stage-by-stage explanation.
 - **Collapsed package tree example**: Java package tree formatting.
 
 ### Trigger routing

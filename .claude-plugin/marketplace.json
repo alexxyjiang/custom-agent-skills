@@ -8,32 +8,32 @@
     {
       "name": "costar-coach-plugin",
       "source": "./plugins/costar-coach-plugin",
-      "description": "Converts rough descriptions or ideas into well-structured prompts using the COSTAR framework (Context, Objective, Style, Tone, Audience, Response). Coaches patiently -- asks one focused question when a component is missing rather than guessing -- and embeds the same patient, ask-don't-guess behavior into every generated prompt. Offers to execute the prompt immediately after presenting it. Also triggers on Chinese equivalents: '转成COSTAR格式', '用COSTAR框架改写', '优化这个提示词'."
+      "description": "Use when asked to convert to COSTAR, make this a COSTAR prompt, rewrite / improve / structure this prompt, or mentions the COSTAR framework, to turn a plain description into a well-structured prompt using the COSTAR methodology (Context, Objective, Style, Tone, Audience, Response). 支持中文触发，如转成COSTAR格式、用COSTAR框架改写、优化/结构化这个提示词等同类表达。"
     },
     {
       "name": "crispe-coach-plugin",
       "source": "./plugins/crispe-coach-plugin",
-      "description": "Converts rough descriptions or ideas into well-structured prompts using the CRISPE framework (Context, Role, Instruction, Specification, Performance, Example). Coaches patiently -- asks one focused question when a component is missing rather than guessing -- and embeds the same patient, ask-don't-guess behavior into every generated prompt. Offers to execute the prompt immediately after presenting it. Also triggers on Chinese equivalents: '转成CRISPE格式', '用CRISPE框架改写', '优化这个提示词'."
+      "description": "Use when asked to convert to CRISPE, make this a CRISPE prompt, rewrite / improve / structure this prompt, or mentions the CRISPE framework, to turn a plain description into a well-structured prompt using the CRISPE methodology (Context, Role, Instruction, Specification, Performance, Example). 支持中文触发，如转成CRISPE格式、用CRISPE框架改写、优化/结构化这个提示词等同类表达。"
     },
     {
       "name": "auto-skill-update-plugin",
       "source": "./plugins/auto-skill-update-plugin",
-      "description": "Triggers proactively when the user signals any skill should be improved -- e.g., 'update the skill to cover X', 'add this case to skill', 'the skill missed this case'. Also triggers on Chinese equivalents: '更新这个skill', 'skill漏了这个情况', '给skill加上这个情况'. Applies minimal, surgical edits to skill definitions -- covering new trigger patterns, handling cases, or examples -- without rewriting wholesale."
+      "description": "Use when asked to update, extend, or fix a skill definition -- e.g. update the skill to cover X / add this case to skill / the skill missed this case / fix the skill, or any phrasing about correcting a skill. 支持中文触发，如更新这个skill、给skill加上这个情况、skill漏了这个情况等同类表达。Invoke immediately on these signals; the worthiness assessment and confirmation happen inside the skill, not before invoking."
     },
     {
       "name": "prompt-convert-trigger-plugin",
       "source": "./plugins/prompt-convert-trigger-plugin",
-      "description": "Automatically detects complex or multi-step tasks and converts them into structured COSTAR or CRISPE prompts. Triggers proactively when user requests involve 3+ steps, multiple conditions, vague requirements, multi-file scope, or research plus implementation work. Also applies to Chinese-language requests with the same signals: multi-goal phrasing, uncertainty markers ('我不确定', '可能是'), or vague action verbs ('改进', '优化', '搞定')."
+      "description": "Use proactively when a request would benefit from structured prompt engineering -- involves complexity, vagueness, multi-step work, or spans multiple concerns -- converting it into a COSTAR or CRISPE prompt before executing; don't wait for an explicit ask. 支持中文触发信号，如多目标表达（修复X同时让Y也能工作）、不确定表达（我不确定怎么、可能是）、模糊动词（改进、优化）等同类情况。"
     },
     {
       "name": "crispe-system-architect-plugin",
       "source": "./plugins/crispe-system-architect-plugin",
-      "description": "Expert program architecture analyzer that generates documentation for any code repository. Supports three output styles -- Choice 1: CONTRIBUTING.md + STRUCTURE.md (contribution guide alongside a separate structure reference), Choice 2: CLAUDE.md (single merged AI context file), Choice 3: STRUCTURE.md only (structure reference without a contribution guide). STRUCTURE.md, ARCHITECTURE.md, and OVERVIEW.md are treated as equivalent -- update the one that already exists, or create STRUCTURE.md if none is present. Language-suffixed variants (e.g., STRUCTURE.zh-CN.md) are also equivalent; any one variant is sufficient to consider the document present. Trigger this skill proactively when the user requests a code change but no documentation file exists in the repo root. Also trigger explicitly when the user says \"analyze this repo\", \"generate STRUCTURE.md\", \"generate CLAUDE.md\", \"generate CONTRIBUTING.md\", \"summarize the codebase\", \"document the project structure\", \"what is the architecture of this project\", or any equivalent phrasing about understanding or mapping an unfamiliar codebase. Also triggers on Chinese equivalents: \"分析这个仓库\", \"分析代码库\", \"生成STRUCTURE.md\", \"生成CLAUDE.md\", \"生成CONTRIBUTING.md\", \"生成架构文档\", \"生成项目文档\", \"总结代码库\", \"梳理项目结构\", \"整理项目结构\", \"文档化项目结构\", \"这个项目的架构是什么\", \"帮我了解这个代码库\", \"项目结构分析\", or any equivalent phrasing in any language. When in doubt, trigger -- generating an architectural reference once saves every future contributor from re-discovering the same things."
+      "description": "Use when asked to analyze a repo, generate STRUCTURE.md / ARCHITECTURE.md / OVERVIEW.md / CLAUDE.md / CONTRIBUTING.md, map architecture, or explain job inputs, outputs and data flows with Mermaid diagrams. 支持分析仓库、梳理项目结构、生成架构文档、说明作业输入输出和流程图；支持中文、English 和中英双语输出。 Also offers documentation before code changes when architecture/context docs are absent. Supports a structure reference, a contribution guide plus structure reference, or an AI context file."
     },
     {
       "name": "crispe-commit-composer-plugin",
       "source": "./plugins/crispe-commit-composer-plugin",
-      "description": "Turns a messy working tree into a clean, reviewable sequence of git commits. Groups changes code -> test -> doc, caps code/test commits at 10 files (doc uncapped), enforces a stable '[feature]: summary' message format per branch, verifies the build before code commits when a build system is detected, and keeps a safety tag + stash so any mid-sequence failure rolls back without losing work. Triggers on explicit commit requests: 'commit this', 'commit these changes', 'save this to git', 'check this in', 'create a commit', and Chinese equivalents like '提交代码', '提交这些改动', '帮我commit'."
+      "description": "Use when asked to commit changes, save work to git, check in code, create a commit, or ship the current changes -- e.g. commit this / let's commit / save this to git / create a commit for X. 支持中文触发，如提交代码、提交这些改动、帮我commit等同类表达。Does not trigger on questions about commit history (e.g. what does this commit do, show me the last commit). Groups the working tree into logically ordered, size-capped commits (code -> test -> doc) under one stable \"[feature]: summary\" format per branch, verifies the build before committing code when detected, and keeps a safety backup so a mid-sequence failure can be rolled back without losing work."
     }
   ]
 }
