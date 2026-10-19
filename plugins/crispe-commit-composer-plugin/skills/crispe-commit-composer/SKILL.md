@@ -8,7 +8,8 @@ description: >-
   size-capped commits (code -> test -> doc) under one stable "[feature]: summary" format per branch,
   verifies the build before committing code when detected, and keeps a safety backup so a
   mid-sequence failure can be rolled back without losing work.
-version: 1.1.0
+version: 1.1.1
+argument-hint: "[feature-tag] (optional) -- feature/scope tag to use for all commits on this branch; derived from branch name or asked for if omitted"
 ---
 
 # CRISPE Commit Composer
