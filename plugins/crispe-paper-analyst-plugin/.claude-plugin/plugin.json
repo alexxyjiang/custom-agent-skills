@@ -1,0 +1,19 @@
+{
+  "author": {
+    "name": "alexxyjiang (Alex Jiang)",
+    "email": "alexxyjiang@gmail.com"
+  },
+  "name": "crispe-paper-analyst-plugin",
+  "description": "Use when the user gives an academic paper -- a local PDF path, a bare arXiv ID like \"2504.19874\", an arxiv.org URL, or \"下一篇\"/\"next one\" meaning the next paper in a reading queue -- and wants an analysis report covering the core idea, key sections, and whether it's worth reading in depth, in Chinese or English. Trigger on \"分析这篇论文\", \"读一下这个paper\", \"下一篇\", \"next paper\", \"analyze this paper\", \"summarize this arxiv paper\", a bare arXiv id or arxiv.org link pasted on its own, \"解析 <arxiv-id>.pdf\", \"帮我看看这篇论文\", \"这篇论文讲了什么\", or any request to summarize / evaluate an arXiv or conference paper. Can fetch the requested paper itself directly from arxiv.org when only given an ID/URL -- but never auto-downloads cited/reference papers without asking first. Also trigger proactively whenever the user points at a PDF in ~/Downloads/arxiv/ or similar, or pastes an arXiv id/link, and the ask is clearly \"understand/evaluate this paper\" rather than a narrow lookup (e.g. \"what's the loss function on page 4\"). Make sure to use this skill even if the user doesn't name it explicitly -- the point is to stop the model from skimming the abstract and calling it done.",
+  "keywords": [
+    "crispe",
+    "paper-analysis",
+    "arxiv",
+    "research",
+    "academic-paper",
+    "literature-review",
+    "paper-summary",
+    "reading-queue"
+  ],
+  "version": "1.0.0"
+}
