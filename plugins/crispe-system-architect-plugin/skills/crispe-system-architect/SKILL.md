@@ -6,7 +6,7 @@ description: >-
   Mermaid diagrams. 支持分析仓库、梳理项目结构、生成架构文档、说明作业输入输出和流程图；支持中文、English 和中英双语输出。 Also offers
   documentation before code changes when architecture/context docs are absent. Supports a structure
   reference, a contribution guide plus structure reference, or an AI context file.
-version: 1.5.0
+version: 1.5.1
 argument-hint: "[1|2|3] (optional) -- documentation style: 1=CONTRIBUTING.md+STRUCTURE.md, 2=CLAUDE.md, 3=STRUCTURE.md only"
 ---
 
@@ -62,6 +62,7 @@ When in doubt, trigger -- generating an architectural reference once saves every
 | Domain state and results | Core Data Models / Output Contracts | 核心数据模型 / 输出契约 |
 | Continuation, when implemented | Incremental / Recovery Semantics | 增量续跑与恢复语义 |
 | Runtime | Build & Environment Setup | 构建与运行环境 |
+| Onboarding from existing guides | Getting Started | 初次上手 |
 | Verification | Test Strategy | 测试与验证入口 |
 | Constraints | Notes for Contributors | 关键约束与注意事项 |
 
@@ -165,6 +166,10 @@ Use directory listing to build the path tree. Apply these rules:
 - Annotate important files/directories with concise inline comments for compact repositories; for large trees use a separate key-directory table. Avoid repeating the same descriptions in both places.
 
 #### Step 3: Extract explicit documentation
+
+- **Read existing guides thoroughly / 充分阅读已有指南:** When README files, `docs/`, a documentation site, or other project guides exist, use navigation configuration, indexes, and actual paths to locate and read the relevant content, especially installation, Getting Started, initial configuration, example configurations, first-application tutorials, API references, and migration guides; do not stop at documentation-site build metadata. / 发现 README、`docs/`、文档站或其他项目指南时，通过导航配置、索引和实际路径定位并充分阅读相关正文，重点覆盖安装、Getting Started、初次配置、示例配置、首次应用教程、API 与迁移指南，不能只检查文档站构建元数据。
+- **Extract an actionable onboarding path / 提炼可操作的初次上手路径:** Include verified prerequisites and dependency installation, initial config locations/required parameters, a minimal or representative example configuration with an explanation, required resources/extension registration/host code, and startup/invocation/result checks in the generated structure reference, with command working directories, source links, and recommended reading order. Summarize enough to understand and begin operating, rather than providing only a documentation index; use a focused flowchart when it clarifies a multistep tutorial. / 将已核实的前置条件与依赖安装、初次配置位置和必需参数、最小或代表性示例配置及其说明、必需资源/扩展注册/宿主代码、启动/调用/结果验证方式纳入生成的结构文档，注明命令执行目录、来源链接与推荐阅读顺序；提炼足够理解并开始操作的内容，不仅提供文档索引，多步骤教程可用针对性流程图说明。
+- **Cross-check tutorial boundaries / 交叉核验教程边界:** Verify guide versions, defaults, branches, and interfaces against source/build configuration; distinguish built-in framework implementations, host-supplied code, and illustrative snippets, example values versus actual defaults, and recommended development toolchains versus compilation targets. Cite concrete sources for stale, conflicting, or incomplete guidance; do not present unexecuted examples as tested. Keep onboarding content semantically aligned across all selected language variants. / 对照源码和构建配置核验指南的版本、默认值、分支及接口，区分框架自带实现、宿主代码与教学片段、示例参数与实际默认值、推荐开发工具链与编译目标；过时、冲突或不完整内容需注明具体来源，不把未执行的示例描述为已验证通过；所有选定语言版本的上手内容保持语义同步。
 
 Read these files if they exist: `README.md`, `CONTRIBUTING.md`, `CHANGELOG.md`, `LICENSE`, `.editorconfig`, `Makefile`, `pom.xml`, `build.gradle`, `package.json`, `pyproject.toml`, `Cargo.toml`, `go.mod`, `CMakeLists.txt`, API specs (`openapi.yaml`, `*.graphqls`, `*.proto`), workflow/orchestration configs, or any equivalent. Extract:
 
@@ -372,6 +377,12 @@ flowchart TD
 - **Local dev command**: `npm run dev` (with any proxy target)
 - **Key dependencies**: framework, routing, state management, UI library
 - **Active routes / modules**: one line per route or page module
+
+## Getting Started / 初次上手
+
+*(Include when existing guides provide onboarding content; localize the heading and prose to the selected language. / 已有指南包含上手内容时纳入，并按所选语言输出标题和正文。)*
+
+[Summarize verified prerequisites/dependency installation → initial config paths and required parameters → minimal or representative configuration with explanation → required resources, extension registration and host code → startup/invocation and expected-result checks. State command working directories, link original guides in reading order, and identify tutorial/source differences. Reuse earlier build/environment details through links instead of duplicating them; a documentation index alone is insufficient. Keep all language variants aligned. / 提炼已核实的前置条件/依赖安装 → 初次配置路径与必需参数 → 最小或代表性配置及解释 → 必需资源、扩展注册与宿主代码 → 启动/调用及预期结果检查；注明命令执行目录，按阅读顺序链接原始指南，标注教程与源码差异；通过链接复用前面的构建/环境说明，避免重复，仅有文档索引不够；各语言版本保持一致。]
 
 ## Notes for Contributors
 
