@@ -28,7 +28,7 @@
     {
       "name": "crispe-system-architect-plugin",
       "source": "./plugins/crispe-system-architect-plugin",
-      "description": "Use when asked to analyze a repo, generate STRUCTURE.md / ARCHITECTURE.md / OVERVIEW.md / CLAUDE.md / CONTRIBUTING.md, map architecture, or explain job inputs, outputs and data flows with Mermaid diagrams. 支持分析仓库、梳理项目结构、生成架构文档、说明作业输入输出和流程图；支持中文、English 和中英双语输出。 Also offers documentation before code changes when architecture/context docs are absent. Supports a structure reference, a contribution guide plus structure reference, or an AI context file."
+      "description": "Use when asked to analyze a repo, generate STRUCTURE.md / ARCHITECTURE.md / OVERVIEW.md / CLAUDE.md / CONTRIBUTING.md, map architecture or explain job inputs, outputs and data flows with Mermaid diagrams. Also use for deep code reading, module design and modification guides, verified reusable skills or selected-component skill extraction from a local repo or GitHub URL. Defaults to Quick documentation; supports Deep verified skills and Mix (Quick first, then Deep reusing Quick outputs). 支持分析仓库、架构文档、作业流程图、深度理解代码库、生成可复用 skill、抽取组件；支持中文、English 和中英双语。 Offers documentation before code changes when architecture/context docs are absent."
     },
     {
       "name": "crispe-commit-composer-plugin",
