@@ -26,8 +26,8 @@ Follow Source Version, Deployment and Shared Rules: inspect the repository, norm
 URL 克隆位置先确认，不放入生成 skill 目录，不盲目复用未知 checkout；本地工作树只读。未提交 Code / Doc / Config / Other 逐类独立确认，以 SHA-256 清单冻结批准覆盖和删除。
 Confirm URL checkout location before cloning, outside generated skill directories; inspect unknown checkouts before reuse. Keep local worktrees read-only; independently confirm dirty Code / Doc / Config / Other and freeze approved overlays/deletions with SHA-256 manifests.
 
-每次确认实际项目 skill 目录，推荐 `.agent/skills/`；默认部署 1 全部项目级，显式部署 2 仅 DR 索引置于 `~/.agent/skills/`。确认前不写入。
-Confirm actual project skill storage each run; recommend `.agent/skills/`. Default deployment 1 is all-project; explicit deployment 2 globalizes only the DR index in `~/.agent/skills/`. Wait before writing.
+每次确认实际项目 skill 目录，推荐 `<repo>/.agents/skills/`；默认部署 1 全部项目级，显式部署 2 仅 DR 索引置于 `~/.agent/skills/`。确认前不写入。
+Confirm actual project skill storage each run; recommend `<repo>/.agents/skills/`. Default deployment 1 is all-project; explicit deployment 2 globalizes only the DR index in `~/.agent/skills/`. Wait before writing.
 
 Mix 复用 Quick 前锁定的来源，来源／范围／目标不变则不重问；若 Deep 目标尚未确认，在开始 Deep 前确认。
 Mix reuses the identity locked before Quick; re-ask only on source/scope/destination changes. Confirm any unresolved Deep destination before starting Deep.
@@ -105,8 +105,8 @@ Dispatch Questioner with a model capable of accurate module tracing; choose cost
 显式输入 / Explicit inputs: `{source-dir}`, `{module-dir}`, `{module-name}`, `{source-sha}`, `{source-identity}`, `{source-manifest}`, `{snapshot-dir}`; `{mode}` = `regression`.
 `{previous_questions}` 为所有先前问题仅含 `id` / `question` 的 JSON 对象；首轮 `[]` / JSON objects containing only `id`/`question` for all prior questions; `[]` initially.
 
-Questioner 返回 `verification` / `recommended` 数组；Coordinator 分配稳定新 ID，保留推荐题供验收。首轮 **5–8** 题，后续每轮新增 **3–5** 题。
-Questioner returns `verification`/`recommended` arrays; Coordinator assigns stable new IDs and retains recommendations for acceptance. Generate **5–8 initial questions**, then **3–5 additions** per later round.
+Questioner 返回 `verification` / `recommended` 数组；Coordinator 分配稳定新 ID，保留推荐题供验收。首轮 **5–8 ** 题，后续每轮新增 ** 3–5** 题。
+Questioner returns `verification`/`recommended` arrays; Coordinator assigns stable new IDs and retains recommendations for acceptance. Generate **5–8 initial questions **, then ** 3–5 additions** per later round.
 
 保留所有先前有效题，包括通过／失败的终考题；新增只扩充，绝不替换题库。不得为通过而删除旧失败题。
 Retain every previously validated question, including passing/failed holdout questions; new output extends, never replaces the bank. Never remove an earlier failed question to obtain a pass.
@@ -134,9 +134,9 @@ Require exactly one answer per supplied ID; missing/duplicate/unknown IDs invali
 Coordinator 对照核查事实并验证技能引用，记录覆盖／缺失／矛盾及理由；语义评分必须有依据，关键词命中不够。
 Coordinator compares checked facts and verifies skill citations, recording coverage, omissions, contradictions and reasons; semantic grading needs reasoned support, not keywords alone.
 
-- **PASS：**全部必需事实有候选支持，答案无实质错误／矛盾。 / All required facts are candidate-supported, with no materially incorrect/contradictory answer claims.
-- **FAIL：**缺事实、违背源码、实质虚假论断、无技能证据或 `CANNOT_ANSWER`。 / Missing required facts, source contradictions, materially false claims, missing skill evidence or `CANNOT_ANSWER`.
-- **DISPUTED：**题／键歧义或源码支持不足；先按 4B 有界纠正／替代，未解决则阻塞。 / Ambiguous question/key or inadequate source support; resolve through bounded 4B correction/replacement before scoring, otherwise block.
+- **PASS：** 全部必需事实有候选支持，答案无实质错误／矛盾。 / All required facts are candidate-supported, with no materially incorrect/contradictory answer claims.
+- **FAIL：** 缺事实、违背源码、实质虚假论断、无技能证据或 `CANNOT_ANSWER`。 / Missing required facts, source contradictions, materially false claims, missing skill evidence or `CANNOT_ANSWER`.
+- **DISPUTED：** 题／键歧义或源码支持不足；先按 4B 有界纠正／替代，未解决则阻塞。 / Ambiguous question/key or inadequate source support; resolve through bounded 4B correction/replacement before scoring, otherwise block.
 
 回归／终考分别报告 `passed / all valid questions`；空考试不通过；无效、替代、争议题均在记录中可见。
 Report `passed / all valid questions` separately for regression/holdout; empty exams cannot pass. Keep invalid, replaced and disputed questions visible in records.
@@ -156,10 +156,10 @@ Coordinator validates keys and overlap, then a fresh Verifier answers/is graded 
 
 - 全回归／终考通过且哈希不变：`enforced` / `observed` 标 `verified`；`prompt_only` 标 `partial_validated`，说明闭卷隔离无法独立核查。记录来源、候选、两项分数和主题，非穷尽覆盖证明。
   All regression/holdout pass with unchanged hashes: `verified` for `enforced`/`observed`; `partial_validated` for `prompt_only`, explicitly reporting unchecked isolation. Record source/candidate identities, both scores and topics; this is sampled verification, not exhaustive proof.
-- 任一有效题失败：候选未验证；尝试过终考则将**整个有效终考**追加回归。轮次 < 3 时，Reader 收失败题、核查证据／键和 Verifier 答案来核实补充；Author 仅据核查修复交接修订。
+- 任一有效题失败：候选未验证；尝试过终考则将 **整个有效终考** 追加回归。轮次 < 3 时，Reader 收失败题、核查证据／键和 Verifier 答案来核实补充；Author 仅据核查修复交接修订。
   Any valid failure leaves the candidate unverified; append the **entire validated holdout** if attempted. Below round 3, Reader checks/supplements failed questions, checked evidence/keys and Verifier answers; Author revises from the checked repair handoff.
-- 下一轮重跑**完整题库**，通过后用**新终考**；第 3 轮失败直接 `needs_review`，不再调度修复。
-  Next round reruns the **complete bank**, then a **new holdout** after passing; round-3 failures go directly to `needs_review`, without another repair dispatch.
+- 下一轮重跑 **完整题库 **，通过后用 ** 新终考**；第 3 轮失败直接 `needs_review`，不再调度修复。
+  Next round reruns the **complete bank **, then a ** new holdout** after passing; round-3 failures go directly to `needs_review`, without another repair dispatch.
 - 第 3 轮前候选编辑：丢弃本轮评分，保留被丢弃考试全部有效题为回归材料，下一轮测试改动候选。
   Candidate edits before round 3 discard that round's grades, retain every validated question from discarded exams as regression material and test the changed candidate next round.
 - 第 3 轮失败／编辑：`needs_review`，展示缺口与分数并停止。已向 Author 暴露的终考不再作为独立验收证据；**绝不自动重启三轮循环**。
@@ -215,5 +215,5 @@ Retain clones containing project skills/docs/evidence and explain path dependenc
 源码始终只读；技能须自足并报告测试范围／缺口。名称／目录小写 kebab-case 且匹配 YAML；Markdown basename 大写（含 `REFERENCE.md`），验证前检查 frontmatter／相对链接。
 Keep source read-only; skills must be self-sufficient and report tested coverage/gaps. Names/directories use lowercase kebab-case matching YAML; uppercase Markdown basenames (including `REFERENCE.md`); check frontmatter/relative links before exams.
 
-默认中文／英文在同一 skill／支持文件内按章节配对，显式语言优先，不生成语言后缀 skill 文件。核对两语选中范围、来源、契约／默认值、示例与状态一致，检查支持链接，对**完整双语文件**计算候选哈希。
+默认中文／英文在同一 skill／支持文件内按章节配对，显式语言优先，不生成语言后缀 skill 文件。核对两语选中范围、来源、契约／默认值、示例与状态一致，检查支持链接，对 **完整双语文件** 计算候选哈希。
 Default to section-paired Chinese/English in the same skill/support files; explicit language wins, with no language-suffixed skill files. Reconcile selections, source identity, contracts/defaults, examples and statuses, check support links and hash each **complete bilingual file** as a candidate.

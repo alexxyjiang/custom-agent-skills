@@ -23,7 +23,7 @@ Inspect committed files through the pinned Git commit and approved overlays/dele
 | 证据 / Evidence | 仅用有证据的 Reader 发现；必需信息缺失时向 Coordinator 提聚焦问题，不编造 / use evidence-backed Reader findings; ask Coordinator focused questions for required gaps, never invent facts |
 | 呈现 / Presentation | 保留原产物模板、流水线、Mermaid、双语规则；详略只调深度，可选按适用性及产物要求 / retain original artifact templates, pipeline, Mermaid and bilingual rules; depth profiles and optional applicability preserve artifact requirements |
 | 保留 / Preserve | 保留无关已有内容；大写文档 basename，保留语言后缀、原始源码标识符 / preserve unrelated existing content; uppercase document basenames, retain language suffixes and original source identifiers |
-| 检查 / Check | 默认值、契约、代码围栏、源码路径、生成链接、语言对齐；区分语法检查／实际 Mermaid 渲染、列出／实际执行命令 / defaults, contracts, fences, source paths, generated links, language alignment; distinguish syntax checks from actual Mermaid rendering and listed from executed commands |
+| 检查 / Check | 默认值、契约、代码围栏、源码路径、生成链接、语言对齐；按 DOCUMENT-TEMPLATES.md 检查加粗／斜体／行内代码边界空格、列表换行及块／表格／围栏结构；区分语法检查／实际 Mermaid 渲染、列出／实际执行命令 / defaults, contracts, fences, source paths, generated links, language alignment; apply DOCUMENT-TEMPLATES.md rendering rules (bold/italic/inline-code boundary spacing, list line breaks, block/table/fence structure); distinguish syntax checks from actual Mermaid rendering and listed from executed commands |
 | 返回 / Return | 已完成路径、来源身份、实际检查、未解决项；Mix 在 Deep 前提供私有 Quick 交接 / completed paths, source identity, actual checks, unresolved items; private Quick handoff before Mix Deep |
 
 ## 更新保护 / Update Preservation

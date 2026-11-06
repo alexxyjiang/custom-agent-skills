@@ -100,3 +100,6 @@ Validate YAML and all support/module links; compare paired languages for identic
 
 向 Coordinator 返回实际路径、候选文件清单、未解决缺口；编写完成不等于已验证。
 Return actual paths, candidate inventory and unresolved gaps to Coordinator; authoring completion is not verified status.
+
+生成和修订时遵循 DOCUMENT-TEMPLATES.md 的 Markdown 渲染兼容规则，交付前检查加粗／斜体／行内代码边界空格、列表换行、表格／围栏和链接；格式修正同样属于候选修改，须遵循冻结失效规则。
+Apply DOCUMENT-TEMPLATES.md rendering rules during authoring/repair; check bold/italic/inline-code boundary spacing, lists, tables/fences and links. Formatting edits also invalidate frozen candidates under the normal rules.

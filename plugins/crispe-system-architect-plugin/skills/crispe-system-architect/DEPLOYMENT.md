@@ -5,12 +5,12 @@ Applies to generated repo-specific skills, not relocation of this tool; follow s
 
 ## 路径选择 / Paths
 
-先检查项目约定，一次确认实际目录；推荐 `<repo>/.agent/skills/`，未确认不写入。明确自定义路径优先，并确认发现映射；只有显式选择才启用方式 2。
+先检查项目约定，一次确认实际目录；推荐 `<repo>/.agents/skills/`，未确认不写入。明确自定义路径优先，并确认发现映射；只有显式选择才启用方式 2。
 Inspect conventions and confirm actual paths before writing. Custom paths require discovery mapping; option 2 requires explicit selection.
 
 | 方式 / Option | 模块 skill / Modules | DR 索引 / Index |
 | --- | --- | --- |
-| 1（默认 / default） | `<repo>/.agent/skills/<project>-dr-<module>/` | `<repo>/.agent/skills/<project>-dr/` |
+| 1（默认 / default） | `<repo>/.agents/skills/<project>-dr-<module>/` | `<repo>/.agents/skills/<project>-dr/` |
 | 2（仅索引全局 / index-global） | 同项目路径 / same project storage | `~/.agent/skills/<project>-dr/` |
 
 全局索引仍专属该 repo，记录路径／URL、来源身份和实际模块路径；不授予外部目录权限。移动／失效路径应报告。
@@ -18,11 +18,11 @@ Global indexes remain repo-specific and carry actual locations/source identity; 
 
 ## 兼容发现 / Discovery
 
-`.agent/skills/` 只是存储，通过逐 skill 相对目录软链暴露：
-Storage alone is not discovery; expose per-skill relative directory links:
+项目级 `.agents/skills/` 可由 OpenCode 直接发现；为 Claude Code 保留逐 skill 相对目录软链。全局方式 2 继续使用 `~/.agent/skills/` 存储与对应软链：
+OpenCode discovers project `.agents/skills/` directly; retain per-skill relative links for Claude Code. Global option 2 continues using `~/.agent/skills/` storage and its discovery links:
 
 ```text
-<repo>/.claude/skills/<name> -> ../../.agent/skills/<name>
+<repo>/.claude/skills/<name> -> ../../.agents/skills/<name>
 ~/.claude/skills/<name>      -> ../../.agent/skills/<name>
 ```
 

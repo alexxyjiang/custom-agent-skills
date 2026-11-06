@@ -18,9 +18,9 @@ Inspect patiently before writing; make the architectural opening scannable in tw
 | **2** | `CLAUDE.md` only / 仅 AI 上下文 | Terse, command-first context / 简短、命令优先的上下文 |
 | **3** | `CONTRIBUTING.md` + `$STRUCTURE_FILE` | Standard contribution guide plus separate structure reference / 标准贡献指南加独立结构参考 |
 
-Follow [SKILL.md Shared Rules](./SKILL.md): synchronized English/Chinese by default, explicit language requests win. This skill, its resources, generated skills/indexes and knowledge supports stay **bilingual in one file**, never language-split. / 遵循主技能通用规则：默认中英文同步，显式语言要求优先。本技能、资源、生成的模块/索引技能及支持知识均**单文件双语**，不拆语言文件。
+Follow [SKILL.md Shared Rules](./SKILL.md): synchronized English/Chinese by default, explicit language requests win. This skill, its resources, generated skills/indexes and knowledge supports stay **bilingual in one file **, never language-split. / 遵循主技能通用规则：默认中英文同步，显式语言要求优先。本技能、资源、生成的模块/索引技能及支持知识均 ** 单文件双语**，不拆语言文件。
 
-Only **non-skill repository documents** use a base navigation entry plus `.en.md` and `.zh-CN.md` bodies by default. Explicit language requests produce only the requested body and required entry. Keep essential loading context in base `CLAUDE.md`; it must not become an empty language index. / 只有**非 skill 的仓库文档**默认使用基础导航入口加英文、中文正文；显式语言要求仅生成所需正文及必要入口。基础 `CLAUDE.md` 必须保留必要加载上下文，不能成为空的语言索引。
+Only **non-skill repository documents ** use a base navigation entry plus `.en.md` and `.zh-CN.md` bodies by default. Explicit language requests produce only the requested body and required entry. Keep essential loading context in base `CLAUDE.md`; it must not become an empty language index. / 只有 ** 非 skill 的仓库文档**默认使用基础导航入口加英文、中文正文；显式语言要求仅生成所需正文及必要入口。基础 `CLAUDE.md` 必须保留必要加载上下文，不能成为空的语言索引。
 
 | Selected family / 所选产物组 | Default root inventory / 默认根目录清单 |
 | --- | --- |
@@ -53,7 +53,7 @@ Follow [SOURCE-VERSION.md](./SOURCE-VERSION.md); keep the source workspace read-
 
 Pass `$DOC_CHOICE`, language(s), concise/detailed profile, exact root output inventory, update/regeneration decisions, Reader map/evidence, private handoff location and `{source-dir}`, `{source-sha}`, `{source-manifest}`, `{snapshot-dir}`. Documenter verifies questionable claims against that same locked resolver. / 交接方案、语言、详略、准确根目录清单、更新/重生成决定、Reader 图谱/证据、私有交接位置及来源参数；Documenter 使用同一锁定来源核查存疑论断。
 
-For updates, separately capture an immutable **destination-preservation snapshot** and expected destination SHA-256 hashes. It preserves unrelated existing content; it is **not architectural evidence**. Rejected Doc overlays do not authorize overwriting live edits: Coordinator must clarify update/inclusion conflicts. / 更新时另存不可变的**目标内容保留快照**及预期目标 SHA-256；它用于保留无关现有内容，**不作为架构证据**。拒绝 Doc 覆盖不等于允许覆盖现存编辑；更新/纳入冲突由协调者确认。
+For updates, separately capture an immutable **destination-preservation snapshot ** and expected destination SHA-256 hashes. It preserves unrelated existing content; it is ** not architectural evidence **. Rejected Doc overlays do not authorize overwriting live edits: Coordinator must clarify update/inclusion conflicts. / 更新时另存不可变的 ** 目标内容保留快照 **及预期目标 SHA-256；它用于保留无关现有内容，** 不作为架构证据**。拒绝 Doc 覆盖不等于允许覆盖现存编辑；更新/纳入冲突由协调者确认。
 
 Check current destination hashes immediately before replacement; stop if approved destinations changed. Confirm absent/new paths as well as existing files. Report completed paths, source identity, actual checks and unresolved items. / 替换前立即检查当前目标哈希；批准后目标变化则停止，同时核对新建路径仍未存在。返回完成路径、来源身份、实际检查及未解决事项。
 
@@ -61,27 +61,27 @@ Quick generates repository documents, not module skills/supports/DR indexes, and
 
 ## Instruction: ordered workflow / 指令：顺序工作流
 
-Follow Steps 0–6 in order where applicable: **A choose → B map → C write/verify**. Do not generate from assumptions. If style is unresolved or required build/test/API/environment information cannot be verified, stop, ask one focused question and wait; do not bundle independent uncertainties. / 按适用情况依次执行步骤 0–6：**A 选择 → B 梳理 → C 编写/验证**。不得基于假设生成；风格未定或必需构建/测试/API/环境信息无法核实时，停止并一次问一个聚焦问题，等待答复，不捆绑独立疑问。
+Follow Steps 0–6 in order where applicable: **A choose → B map → C write/verify **. Do not generate from assumptions. If style is unresolved or required build/test/API/environment information cannot be verified, stop, ask one focused question and wait; do not bundle independent uncertainties. / 按适用情况依次执行步骤 0–6：** A 选择 → B 梳理 → C 编写/验证**。不得基于假设生成；风格未定或必需构建/测试/API/环境信息无法核实时，停止并一次问一个聚焦问题，等待答复，不捆绑独立疑问。
 
 ### Phase A — Step 0: proactive offer / 阶段 A — 步骤 0：主动提议
 
 Only when triggered by a code-change request: scan root documentation and language variants. If no `STRUCTURE.md`, `ARCHITECTURE.md`, `OVERVIEW.md`, `CLAUDE.md`, `CONTRIBUTING.md` or equivalent exists, pause before code edits and ask once using this paired prompt (localize to the user): / 仅代码变更请求触发时，扫描根目录文档及语言变体；上述文件或同类文档均不存在时，在修改代码前暂停并按用户语言询问一次：
 
 > I don't see documentation (`STRUCTURE.md`, `CLAUDE.md`, `CONTRIBUTING.md` or equivalent) in this repo. Would you like me to generate it first? If yes, which style? / 我没有看到这个仓库中有结构/上下文/贡献文档或同类文档。要先生成吗？如果需要，选择哪种风格？
-> - **Choice 1: structure only** — architecture reference, no separate contribution guide. / **方案 1：仅结构参考**，无独立贡献指南。
-> - **Choice 2: CLAUDE.md** — AI context: commands, key files, conventions and things to avoid. / **方案 2：CLAUDE.md**，AI 上下文：命令、关键文件、约定及应避免事项。
-> - **Choice 3: CONTRIBUTING.md + structure** — PR process/CoC/link plus separate architecture reference. / **方案 3：贡献指南 + 结构参考**，PR 流程/行为准则/链接加独立架构文档。
+> - **Choice 1: structure only ** — architecture reference, no separate contribution guide. / ** 方案 1：仅结构参考**，无独立贡献指南。
+> - **Choice 2: CLAUDE.md ** — AI context: commands, key files, conventions and things to avoid. / ** 方案 2：CLAUDE.md**，AI 上下文：命令、关键文件、约定及应避免事项。
+> - **Choice 3: CONTRIBUTING.md + structure ** — PR process/CoC/link plus separate architecture reference. / ** 方案 3：贡献指南 + 结构参考**，PR 流程/行为准则/链接加独立架构文档。
 > Or skip this and start the change directly? / 或跳过，直接开始修改？
 
 Explain that verified module/component skills are available later through explicit Deep selection. Record a selected answer as `$DOC_CHOICE` (1/2/3) and continue; if skipped, immediately resume the code task. Never auto-expand into Deep/Mix. / 说明之后明确选择 Deep 可生成经过核实的模块/组件技能；选择后记录方案并继续，跳过则立即回到代码任务，不自动扩展至 Deep/Mix。
 
 ### Phase A — Step 1: existing docs and choice / 阶段 A — 步骤 1：已有文档与方案
 
-**1a. Scan** root base names and all language-suffixed variants. **1b. Resolve `$STRUCTURE_FILE`** by family priority: `STRUCTURE` → `ARCHITECTURE` → `OVERVIEW`; if none exists use `STRUCTURE.md`. Preserve the first existing family's basename and update its existing variants in place; do not switch to another family. / **1a 扫描**根目录基础文件及所有语言后缀变体；**1b 确定结构文件**，优先结构、架构、概览三组，均无则用 `STRUCTURE.md`。保留首个已有组的基础名称并原地更新其已有变体，不切换组。
+**1a. Scan ** root base names and all language-suffixed variants. ** 1b. Resolve `$STRUCTURE_FILE`** by family priority: `STRUCTURE` → `ARCHITECTURE` → `OVERVIEW`; if none exists use `STRUCTURE.md`. Preserve the first existing family's basename and update its existing variants in place; do not switch to another family. / ** 1a 扫描 **根目录基础文件及所有语言后缀变体；** 1b 确定结构文件**，优先结构、架构、概览三组，均无则用 `STRUCTURE.md`。保留首个已有组的基础名称并原地更新其已有变体，不切换组。
 
 The final inventory resolves actual base/body paths from that family and selected language policy; existing same-family variants must be accounted for. Default updates synchronize all variants; explicit language wins, and any conflicting variant/update scope needs confirmation. / 最终清单按该组与语言规则解析实际基础/正文路径，必须处理同组已有变体；默认更新同步全部变体，显式语言优先，变体/更新范围冲突须确认。
 
-**1c. Confirm `$DOC_CHOICE` before choosing update/regeneration behavior.** Reuse Step 0 or any already confirmed choice; otherwise use this table, not guesses: / **1c 先确认方案，再决定更新/重生成方式。** 复用步骤 0 或已确认的选择，否则严格按表处理：
+**1c. Confirm `$DOC_CHOICE` before choosing update/regeneration behavior.** Reuse Step 0 or any already confirmed choice; otherwise use this table, not guesses: / ** 1c 先确认方案，再决定更新/重生成方式。** 复用步骤 0 或已确认的选择，否则严格按表处理：
 
 | Request / 请求 | Action / 处理 |
 | --- | --- |
@@ -91,15 +91,15 @@ The final inventory resolves actual base/body paths from that family and selecte
 | Structure alone (STRUCTURE/ARCHITECTURE/OVERVIEW), CONTRIBUTING alone, repo analysis/documentation or other ambiguous phrasing / 单独结构文件、单独贡献文件、分析/文档化仓库等歧义表述 | Ask / 询问 |
 
 > Which documentation style would you like? / 你希望采用哪种文档风格？
-> - **1: `$STRUCTURE_FILE` only** — structure reference, no contribution guide. / **1：仅结构参考**，无贡献指南。
-> - **2: CLAUDE.md** — merged, command-first AI context. / **2：CLAUDE.md**，合并、命令优先的 AI 上下文。
-> - **3: CONTRIBUTING.md + `$STRUCTURE_FILE`** — two document families. / **3：贡献指南 + 结构参考**，两组文档。
+> - **1: `$STRUCTURE_FILE` only ** — structure reference, no contribution guide. / ** 1：仅结构参考**，无贡献指南。
+> - **2: CLAUDE.md ** — merged, command-first AI context. / ** 2：CLAUDE.md**，合并、命令优先的 AI 上下文。
+> - **3: CONTRIBUTING.md + `$STRUCTURE_FILE`** — two document families. / ** 3：贡献指南 + 结构参考**，两组文档。
 
-**1d. After choice confirmation:** / **1d 方案确认后：**
+**1d. After choice confirmation:** / ** 1d 方案确认后：**
 
 - Choice 3 with an existing CONTRIBUTING family: “A CONTRIBUTING document already exists — update it or regenerate from the template?” / 方案 3 已有贡献文档时：“已有贡献文档，要更新还是按模板重新生成？”
 - Choice 2 with an existing CLAUDE family: “A CLAUDE document already exists — update it or regenerate from scratch?” / 方案 2 已有上下文时：“已有 CLAUDE 文档，要更新还是从头重新生成？”
-- Choice **1 or 3** with an existing structure family: update in place; the choice implies that update, so no extra style question. Destination-preservation/conflict checks still apply. / 方案 **1 或 3** 已有结构组时原地更新，选择已隐含更新意图，无需另问风格；仍执行目标保护及冲突检查。
+- Choice **1 or 3 ** with an existing structure family: update in place; the choice implies that update, so no extra style question. Destination-preservation/conflict checks still apply. / 方案 ** 1 或 3** 已有结构组时原地更新，选择已隐含更新意图，无需另问风格；仍执行目标保护及冲突检查。
 
 Ask independent existing-file questions sequentially. Preserve unrelated content and original suffixes; revisit confirmed decisions only when source/scope/paths change. Before writing, print and confirm exact paths, languages, author role, required/optional status and destination inventory. / 独立的已有文件问题依次询问；保留无关内容和原后缀，仅来源/范围/路径变化时重问已确认决定。写入前打印并确认准确路径、语言、作者角色、必选/可选状态及目标清单。
 
@@ -111,7 +111,7 @@ Ask independent existing-file questions sequentially. Preserve unrelated content
 
 ### Phase B — Step 3: explicit guides and contracts / 阶段 B — 步骤 3：显式指南与契约
 
-**Read existing guides thoroughly, not just doc-site metadata.** Use README, `docs/`, site navigation/configuration, indexes and actual paths to read relevant installation, Getting Started, initial config, example config, first-application tutorials, API references and migrations. / **充分阅读已有指南，不止文档站元数据。** 通过 README、`docs/`、站点导航/配置、索引及实际路径定位安装、上手、初次配置、示例、首次应用教程、API 与迁移正文。
+**Read existing guides thoroughly, not just doc-site metadata.** Use README, `docs/`, site navigation/configuration, indexes and actual paths to read relevant installation, Getting Started, initial config, example config, first-application tutorials, API references and migrations. / ** 充分阅读已有指南，不止文档站元数据。** 通过 README、`docs/`、站点导航/配置、索引及实际路径定位安装、上手、初次配置、示例、首次应用教程、API 与迁移正文。
 
 Read available `CONTRIBUTING.md`, `CHANGELOG.md`, `LICENSE`, `.editorconfig`, `Makefile`, `pom.xml`, `build.gradle`, `package.json`, `pyproject.toml`, `Cargo.toml`, `go.mod`, `CMakeLists.txt`, CI, API specs (`openapi.yaml`, `*.graphqls`, `*.proto`) and workflow/orchestration equivalents. Extract: / 阅读现存贡献/变更/许可、格式配置、各类构建文件、CI、API 规范及工作流/编排等对应文件，提取：
 
@@ -125,13 +125,13 @@ Read available `CONTRIBUTING.md`, `CHANGELOG.md`, `LICENSE`, `.editorconfig`, `M
 | Rules / 规则 | Explicit style/formatting, branch/PR/review conventions, dependency direction and forbidden patterns, with sources / 显式风格/格式、分支/PR/评审、依赖方向及禁止模式，附来源 |
 | Embedded frontend / 嵌入前端 | Subdirectory package name, npm `dev`/`build`/`preview`, framework dependencies, routes and backend artifact integration / 子目录包名、npm 脚本、框架依赖、路由及后端产物合并方式 |
 
-**Actionable onboarding is required when guides provide it.** Summarize verified prerequisites/dependency installation → initial config paths/required parameters → minimal or representative configuration **with explanation** → required resources/extension registration/host code → startup/invocation/result checks. Include command working directories, source links and recommended reading order; a guide index alone is insufficient. Use a focused flowchart if it clarifies a multistep tutorial. / **已有指南提供上手内容时，必须提炼可操作路径。** 依次说明已核实前置条件/依赖安装、配置位置/必需参数、最小或代表性配置及解释、资源/扩展注册/宿主代码、启动/调用/结果检查；注明命令目录、来源链接和阅读顺序，不可仅列索引；多步骤教程可用聚焦图。
+**Actionable onboarding is required when guides provide it.** Summarize verified prerequisites/dependency installation → initial config paths/required parameters → minimal or representative configuration ** with explanation ** → required resources/extension registration/host code → startup/invocation/result checks. Include command working directories, source links and recommended reading order; a guide index alone is insufficient. Use a focused flowchart if it clarifies a multistep tutorial. / ** 已有指南提供上手内容时，必须提炼可操作路径。** 依次说明已核实前置条件/依赖安装、配置位置/必需参数、最小或代表性配置及解释、资源/扩展注册/宿主代码、启动/调用/结果检查；注明命令目录、来源链接和阅读顺序，不可仅列索引；多步骤教程可用聚焦图。
 
 Cross-check guide versions, defaults, branches and interfaces against source/build configuration. Distinguish built-in framework implementation, host-supplied code and illustrative snippets; example values vs actual defaults; recommended dev toolchains vs compilation targets. Cite both concrete sources for stale/conflicting/incomplete guidance; unexecuted examples are not tested. Synchronize onboarding across language variants. / 对照源码/构建核验指南版本、默认值、分支及接口；区分框架内置、宿主代码与教学片段，示例值与实际默认值，推荐开发工具链与编译目标；过时/冲突/不完整处引用具体双方来源，不把未执行示例称为已测试，各语言上手语义同步。
 
 ### Phase B — Step 4: implicit conventions / 阶段 B — 步骤 4：隐含约定
 
-Sample **3–5 representative, nontrivial source files** across modules/packages. Include relevant API entry, capability/task/plugin, workflow and generated-contract areas; this convention sample does not replace tracing applicable contracts. / 跨模块/包抽样 **3–5 个有代表性、非琐碎的源码文件**，覆盖相关 API 入口、能力/任务/插件、工作流与生成契约；约定抽样不能替代适用契约追踪。
+Sample **3–5 representative, nontrivial source files ** across modules/packages. Include relevant API entry, capability/task/plugin, workflow and generated-contract areas; this convention sample does not replace tracing applicable contracts. / 跨模块/包抽样 ** 3–5 个有代表性、非琐碎的源码文件**，覆盖相关 API 入口、能力/任务/插件、工作流与生成契约；约定抽样不能替代适用契约追踪。
 
 Look for consistent naming (class/method/variable/file), feature/layer/flat organization, annotations/decorators/idioms, errors, hand-written request/response converters around generated models, task versioning/registration/dependencies/skip/aggregation/data-source selection, and test names/placement. / 查找一致的类/方法/变量/文件命名、功能/分层/扁平组织、注解/装饰器/惯用法、错误处理、生成模型周边手写转换器、任务版本/注册/依赖/跳过/聚合/数据源选择及测试命名/位置。
 
@@ -141,11 +141,11 @@ Label every inference: **“Inferred from code — not formally documented.” /
 
 From permitted build files, guides and non-excluded automation (e.g. Jenkinsfile), identify prerequisites/versions, build commands, environment/local services, test organization/commands and documented CI status. Never inspect excluded hosting/CI paths; unavailable details remain unknown. / 从允许的构建文件、指南和未排除的自动化文件（如 Jenkinsfile）提取工具/版本、构建命令、环境/本地服务、测试组织/命令及已记录 CI 状态；不读取已排除托管/CI 路径，无法核实的细节标注未知。
 
-Identify the assumed command shell. If the user requests `zsh` or another shell, validate **each documented command** with that parser where practical (e.g. `zsh -n -c 'command ...'`), label fences accordingly (`zsh`, `bash`, `sh`), and report parser verification separately from execution. Include working directories. / 识别命令预设 shell；用户要求特定 shell 时，在可行范围内用其解析器核验**每条文档命令**，使用对应围栏标签，区分语法验证与执行并注明目录。
+Identify the assumed command shell. If the user requests `zsh` or another shell, validate **each documented command ** with that parser where practical (e.g. `zsh -n -c 'command ...'`), label fences accordingly (`zsh`, `bash`, `sh`), and report parser verification separately from execution. Include working directories. / 识别命令预设 shell；用户要求特定 shell 时，在可行范围内用其解析器核验 ** 每条文档命令**，使用对应围栏标签，区分语法验证与执行并注明目录。
 
 ### Phase C — Step 6: write and verify / 阶段 C — 步骤 6：编写与验证
 
-Documenter writes the confirmed file families **at the repository root** in one pass, including all selected language counterparts; no section-by-section approval. Match Choice 1/2/3 to the templates below, localize bodies, and apply the pipeline profile where relevant. / Documenter 一次性在**仓库根目录**写入已确认产物组及全部所选语言配套，不逐节请求批准；按方案匹配下方模板，本地化正文并按需应用流水线规范。
+Documenter writes the confirmed file families **at the repository root ** in one pass, including all selected language counterparts; no section-by-section approval. Match Choice 1/2/3 to the templates below, localize bodies, and apply the pipeline profile where relevant. / Documenter 一次性在 ** 仓库根目录**写入已确认产物组及全部所选语言配套，不逐节请求批准；按方案匹配下方模板，本地化正文并按需应用流水线规范。
 
 Use only verified findings. For applicable sections without discoverable content, retain the heading with **“Not documented — check with the team.” / “未在仓库中找到说明，请与团队确认。”** Required missing facts go to Coordinator as a focused question; do not replace them with guesses. Omit explicitly conditional sections only when inapplicable (or when their template permits omission). / 仅写已核实发现；适用但无可发现内容的章节保留标题及未知标记。必需缺失信息提交协调者聚焦询问，不猜测；明确条件性章节仅在不适用或模板允许时省略。
 

@@ -118,3 +118,18 @@ The detailed template is a superset of the concise template: keep the five requi
 
 语言布局按 SKILL.md：仅非 skill 文档使用基础导航＋完整英文／中文语言文件；skill、支持文件和索引双语在文件内，不创建语言拆分 skill；显式语言优先。
 Use SKILL.md language layout: only non-skill documents split into base navigation plus full English/Chinese files; skills, supports and indexes are bilingual in-file with no language-split skills; explicit language wins.
+
+## Markdown 渲染兼容 / Markdown Rendering Compatibility
+
+- 加粗、斜体和行内代码采用同一边界保护：与相邻正文或其他行内格式之间保留一个普通 ASCII 空格，如 加载 **重点** 内容、使用 *术语* 说明、调用 `Loader` 方法、**加载：** `Loader`。空格在完整标记外，不插入标记内部或代码内容；行首／行尾不额外加空格。
+  Apply the same boundary protection to bold, italic and inline code: one ASCII space between a complete span and adjacent prose/other inline spans. Keep spacing outside delimiters, preserve code bytes and avoid extra leading/trailing spaces.
+- 强调使用成对 ASCII 标记（加粗为两个星号、斜体为一个星号），内部首尾不留空白；行内代码使用成对、等长反引号，内容含反引号时选更长分隔符。检查渲染结构，不用全局替换误改代码围栏、列表星号、链接目标、路径或转义字符。
+  Use paired ASCII emphasis markers with whitespace-free inner edges and matching-length backtick delimiters; use longer delimiters for embedded backticks. Check parsed structure rather than blindly rewriting fences, list markers, link targets, paths or escapes.
+- 有序／无序列表每项独占一行，编号后留空格；不把下一项接到前一段末尾。嵌套项及续段正确缩进，列表、标题、表格、引用与代码块之间留空行；需要硬换行时明确使用 Markdown 换行语法。
+  Put each list item on its own line with a space after its marker; indent nested/continued content, separate blocks with blank lines and use explicit syntax for intended hard breaks.
+- 表格有表头分隔行，列数一致；单元格中的 `|` 转义为 `\|`，包含管道的命令优先放表格外的代码块。代码围栏独占行、成对且缩进一致，内容包含围栏时使用更长围栏；正文行内代码的反引号也须配对。
+  Use valid table separators/column counts and escape literal pipes; place pipe-heavy commands outside tables. Pair standalone consistent fences, use longer fences around embedded fences, and pair inline backticks.
+- 链接目标含空格或括号时使用兼容的 URL 编码或尖括号目标，不依赖自定义 HTML/CSS 或特定扩展排版。Mermaid 是否显示取决于查看器支持。
+  Encode or angle-wrap link targets with spaces/parentheses; avoid renderer-specific HTML/CSS formatting. Mermaid requires viewer support.
+- 写入后检查这些格式；已有 Markdown 解析器／目标浏览器查看器时做实际渲染核对，记录实际检查级别。Chrome 本身不解析 Markdown，语法检查不能宣称所有 Chrome 查看器渲染通过。
+  Check formatting after writing and use an available parser/target browser viewer for rendering; report actual validation. Chrome does not natively parse Markdown, so syntax checks alone do not establish compatibility with every viewer.

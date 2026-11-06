@@ -10,10 +10,10 @@ description: >-
   then Deep reusing Quick outputs). 支持分析仓库、架构文档、作业流程图、深度理解代码库、
   生成可复用 skill、抽取组件；支持中文、English 和中英双语。
   Offers documentation before code changes when architecture/context docs are absent.
-version: 2.0.0
+version: 2.0.1
 argument-hint: "[Quick|Deep|Mix] [source] — Quick artifact 1|2|3; confirm source, scope and deployment interactively"
 metadata:
-  version: "2.0.0"
+  version: "2.0.1"
 compatibility: "Claude Code and OpenCode; Git and SHA-256 hashing; fresh-context subagents for Deep verification."
 ---
 
@@ -35,19 +35,19 @@ Before code changes without root architecture/context docs, offer Quick's three 
 
 ## 通用规则 / Shared Rules
 
-1. **证据与确认 / Evidence and confirmation：**先检查，后写入；不猜命令、默认值或设计意图。有歧义一次问一个问题并等待，已确认事项只在来源／范围／路径变化时重问。
+1. **证据与确认 / Evidence and confirmation：** 先检查，后写入；不猜命令、默认值或设计意图。有歧义一次问一个问题并等待，已确认事项只在来源／范围／路径变化时重问。
    Inspect before writing; do not invent commands, defaults or intent. Ask one focused question and wait; revisit confirmed decisions only when inputs/scope/paths change.
-2. **来源 / Source：**已提交内容从确认 commit 的 Git 对象读取；timestamp 记录时间。未提交 Code / Doc / Config / Other 逐类确认，纳入内容以不可变快照和 SHA-256 锁定。Mix 在 Quick 前锁定同一来源。保持源码工作区只读，生成输出不作为本轮输入。
+2. **来源 / Source：** 已提交内容从确认 commit 的 Git 对象读取；timestamp 记录时间。未提交 Code / Doc / Config / Other 逐类确认，纳入内容以不可变快照和 SHA-256 锁定。Mix 在 Quick 前锁定同一来源。保持源码工作区只读，生成输出不作为本轮输入。
    Pin committed content to Git; record timestamps. Confirm dirty categories independently and hash accepted immutable snapshots. Lock one source before Mix Quick; keep source unchanged and exclude generated outputs from input monitoring.
-3. **模块 / Modules：**按源码边界列主要模块，独立 Config/Doc 目录单列。默认全选但须确认；Mix 在 Quick 后选择。确认前只做有限扫描，未选模块跳过 Deep 阅读／生成／考试，索引注明范围。模块选择与未提交内容纳入是独立决策。
+3. **模块 / Modules：** 按源码边界列主要模块，独立 Config/Doc 目录单列。默认全选但须确认；Mix 在 Quick 后选择。确认前只做有限扫描，未选模块跳过 Deep 阅读／生成／考试，索引注明范围。模块选择与未提交内容纳入是独立决策。
    List code-boundary modules plus independent Config/Doc directories. Default all, wait for confirmation; select after Quick in Mix. Use bounded discovery before selection; exclude unselected modules from full Deep work and report scope separately from dirty-file decisions.
-4. **生成风格 / Authoring：**新 skill 默认 CRISPE（Context / Role / Instruction / Specification / Performance / Example）。文件 basename 大写，skill 名称／目录小写 kebab-case，与 YAML name 一致。详略模板中的 Optional 按适用性，不降低 Deep 覆盖或验证要求。
+4. **生成风格 / Authoring：** 新 skill 默认 CRISPE（Context / Role / Instruction / Specification / Performance / Example）。文件 basename 大写，skill 名称／目录小写 kebab-case，与 YAML name 一致。详略模板中的 Optional 按适用性，不降低 Deep 覆盖或验证要求。
    Default new skills to CRISPE; uppercase file basenames and lowercase kebab-case skill names matching YAML. Optional means applicability, not reduced Deep coverage.
-5. **双语 / Languages：**默认中英文同步，显式语言优先。工具自身、生成的模块／索引 skill 及支持知识（如 REFERENCE.md）均单文件双语；只有非 skill 文档使用基础导航 + `.en.md` + `.zh-CN.md`。SKILL.md 保留有效 YAML 和完整知识；CLAUDE.md 保留必要加载上下文。两种语言的事实、示例和验证状态一致，标识符／命令／路径不翻译。
+5. **双语 / Languages：** 默认中英文同步，显式语言优先。工具自身、生成的模块／索引 skill 及支持知识（如 REFERENCE.md）均单文件双语；只有非 skill 文档使用基础导航 + `.en.md` + `.zh-CN.md`。SKILL.md 保留有效 YAML 和完整知识；CLAUDE.md 保留必要加载上下文。两种语言的事实、示例和验证状态一致，标识符／命令／路径不翻译。
    Default synchronized English/Chinese, explicit language wins. This skill and its resources, generated skills/indexes and knowledge supports are bilingual in-file. Only non-skill docs split into base navigation and language bodies. Keep YAML/complete skill knowledge, essential CLAUDE context and identical facts/examples/status; preserve identifiers, commands and paths.
-6. **部署 / Deployment：**默认全部项目级 `.agent/skills/`；方式 2 仅 DR 索引存 `~/.agent/skills/`。每次确认项目实际目录，通过同级 `.claude/skills/<name>` 相对软链暴露；既有同名内容先核实。工具自身保持既有安装位置。
+6. **部署 / Deployment：** 默认全部项目级 `<repo>/.agents/skills/`；方式 2 仅 DR 索引存 `~/.agent/skills/`。每次确认项目实际目录，通过同级 `.claude/skills/<name>` 相对软链暴露；既有同名内容先核实。工具自身保持既有安装位置。
    Default all-project; option 2 globalizes only the index. Confirm actual paths and expose per-skill relative links in `.claude/skills/`; inspect collisions. Keep this tool's existing installation.
-7. **验证与发布 / Verification and publication：**候选在私有目录生成／冻结／验证，验证后核对准确文件清单与哈希再发布。原始分析、快照、题库、答案和评分留在发布目录外。不把 Quick 文档或综合索引场景宣称为闭卷验证。
+7. **验证与发布 / Verification and publication：** 候选在私有目录生成／冻结／验证，验证后核对准确文件清单与哈希再发布。原始分析、快照、题库、答案和评分留在发布目录外。不把 Quick 文档或综合索引场景宣称为闭卷验证。
    Generate/freeze/verify private candidates; publish the exact checked inventory/hashes. Keep analysis/snapshots/exams private. Quick docs and synthesized index scenarios are not module-exam verified.
 
 ### 分析排除项 / Analysis Exclusions
