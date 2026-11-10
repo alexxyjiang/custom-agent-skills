@@ -129,7 +129,59 @@ Use SKILL.md language layout: only non-skill documents split into base navigatio
   Put each list item on its own line with a space after its marker; indent nested/continued content, separate blocks with blank lines and use explicit syntax for intended hard breaks.
 - 表格有表头分隔行，列数一致；单元格中的 `|` 转义为 `\|`，包含管道的命令优先放表格外的代码块。代码围栏独占行、成对且缩进一致，内容包含围栏时使用更长围栏；正文行内代码的反引号也须配对。
   Use valid table separators/column counts and escape literal pipes; place pipe-heavy commands outside tables. Pair standalone consistent fences, use longer fences around embedded fences, and pair inline backticks.
-- 链接目标含空格或括号时使用兼容的 URL 编码或尖括号目标，不依赖自定义 HTML/CSS 或特定扩展排版。Mermaid 是否显示取决于查看器支持。
-  Encode or angle-wrap link targets with spaces/parentheses; avoid renderer-specific HTML/CSS formatting. Mermaid requires viewer support.
+- 链接目标含空格或括号时使用兼容的 URL 编码或尖括号目标，正文不依赖自定义 HTML/CSS 或特定扩展排版；Mermaid 标签的格式化按下方共享规则与实际查看器能力处理。Mermaid 是否显示取决于查看器支持。
+  Encode or angle-wrap link targets with spaces/parentheses; avoid renderer-specific HTML/CSS in prose; Mermaid label formatting follows the shared rules below and actual viewer capabilities. Mermaid requires viewer support.
 - 写入后检查这些格式；已有 Markdown 解析器／目标浏览器查看器时做实际渲染核对，记录实际检查级别。Chrome 本身不解析 Markdown，语法检查不能宣称所有 Chrome 查看器渲染通过。
   Check formatting after writing and use an available parser/target browser viewer for rendering; report actual validation. Chrome does not natively parse Markdown, so syntax checks alone do not establish compatibility with every viewer.
+
+
+## Mermaid 生成风格 / Mermaid Authoring Style
+
+适用于 Quick / Deep / Mix 中的所有 Mermaid 图，覆盖上方模板的简略示例；显式用户要求优先。只统一表达方式，不引入特定仓库的业务流程、问题分类或本机部署配置。
+Apply to every Mermaid diagram in Quick / Deep / Mix, including the abbreviated examples above; explicit user instructions win. Standardize presentation without importing repository-specific workflows, question categories or machine-local deployment configuration.
+
+### 字体、连线与布局 / Fonts, Edges and Layout
+
+- 默认字体栈为 `Iosevka Aile, Noto Sans CJK SC, sans-serif`，根配置和主题配置保持一致。英文/Latin 优先 Iosevka Aile；中文等缺失字形回退 Noto Sans CJK SC，其他不支持的字形继续回退系统字体；这是逐字形覆盖回退，不是语言识别。
+  Use `Iosevka Aile, Noto Sans CJK SC, sans-serif` in both root and theme configuration. Latin prefers Iosevka Aile; missing glyphs such as CJK fall back to Noto Sans CJK SC, then system fonts for unsupported glyphs. This is glyph fallback, not language detection.
+- 流程连线默认采用直线段与圆角转弯（`curve: "rounded"`），避免大幅连续弧线。先核对目标 Mermaid 版本是否支持；不支持时说明并采用可验证的兼容配置，不把某个远端服务当前版本硬编码为长期要求。
+  Prefer straight edge sections with rounded bends (`curve: "rounded"`) over broad continuous curves. Check target-version support; disclose unsupported settings and use a verified compatible configuration instead of hard-coding a remote service's current version as a permanent requirement.
+- 不设置固定节点宽高、任意 `wrappingWidth`、全局 `nowrap` 或用于掩盖裁切的 overflow/padding 补丁。使用 Mermaid 默认尺寸计算；包名、类名、方法名分行，多方法逐行，较长节点说明和连线标签用 `<br/>` 在语义边界折行。默认保留查看器的响应式行为，只有明确的预览/导出需求才调整容器策略。
+  Keep Mermaid's default sizing; do not impose fixed node dimensions, arbitrary `wrappingWidth`, global `nowrap`, or overflow/padding patches to hide clipping. Put package, class and methods on separate lines, list multiple methods on separate lines, and break long node/edge labels at semantic boundaries with `<br/>`. Preserve viewer responsiveness unless an explicit preview/export requirement justifies a container override.
+
+在支持圆角连线和 HTML 标签的目标渲染器中使用以下基线；`htmlLabels` 用于保留下划线等标签样式，不代表所有查看器均支持。
+Use this baseline when the target renderer supports rounded edges and HTML labels; `htmlLabels` preserves label styling such as underlines, without implying universal viewer support.
+
+```json
+{
+  "fontFamily": "Iosevka Aile, Noto Sans CJK SC, sans-serif",
+  "themeVariables": {
+    "fontFamily": "Iosevka Aile, Noto Sans CJK SC, sans-serif"
+  },
+  "flowchart": {
+    "htmlLabels": true,
+    "curve": "rounded"
+  }
+}
+```
+
+将基线放入 Mermaid 支持的 init directive 或渲染端配置；不得把配置文本误作图节点。
+Apply through a supported Mermaid init directive or renderer configuration, never as graph nodes.
+
+### 类级节点与标注 / Class-Level Nodes and Annotations
+
+- 类级调用图标题统一为 `(完整包名) 类名 :: 方法名`，显示时允许换行；多个方法以换行加 `/` 分隔。类名、接口名、方法名用 `<u>…</u>` 下划线；数据/类型节点无具体方法时省略 `::`，不补造方法。函数式/脚本项目使用真实模块与函数，不虚构 class。
+  Use `(full.package) ClassName :: methodName` for class-level call diagrams, allowing line breaks and separating multiple methods with a line break and `/`. Underline type/interface/method names with `<u>…</u>`; omit `::` for type/data nodes without a specific method. Use actual modules/functions for functional or script projects instead of inventing classes.
+- 从锁定源码的定义、import 或已核实依赖定义确认包名/类型/方法。区分本仓库实现、外部接口、宿主代码与教学示例；不要把示例类当作已接入实现。回调属性、字段和方法分别如实标注。同一类可按方法职责拆成多个节点，但需说明这不代表新增组件或执行阶段。
+  Verify packages/types/methods against pinned definitions, imports or inspected dependency definitions. Distinguish repository implementations, external interfaces, host code and examples; do not promote example classes to wired implementations. Identify callback properties, fields and methods accurately. A class may appear as multiple responsibility slices, with an explicit note that these are not additional components or execution stages.
+- 概览/流水线图可保留真实阶段、数据集、服务名；仅类级调用图要求上述标签格式。所有图使用稳定 ASCII ID 和加引号的标签。用户要求标出问题/修改范围时，用图例定义专属、共享及其他边界，按方法/字段职责着色，不照搬其他项目的分类；短标注用 `<b><i>…</i></b>` 加粗斜体，长连线标签加引号并折行。
+  Overview/pipeline diagrams may retain actual stages, datasets and service names; class headers apply only to class-level call diagrams. Use stable ASCII IDs and quoted labels throughout. For requested question/change overlays, define exclusive/shared/other boundaries in a legend, color by method/field responsibility, and derive categories from the current task. Format short annotations with `<b><i>…</i></b>`; quote and break long edge labels.
+
+### 字体测量与导出验证 / Font Measurement and Export Checks
+
+- 用户报告裁切时，先确认真实渲染链路：网页客户端渲染、编辑器导出、服务端生成 SVG，还是 `<img>` 加载已有 SVG；Chrome 本身不内建 Mermaid 渲染器。比较渲染器版本、字体和实际 SVG/图片请求，不连续盲调 box 宽度。
+  Diagnose the actual pipeline before fixing clipping: browser-side rendering, editor export, server-generated SVG, or an existing SVG loaded via `<img>`. Chrome does not itself supply Mermaid rendering. Inspect renderer versions, fonts and actual SVG/image responses instead of repeatedly guessing box widths.
+- 能控制渲染端时，先定义/加载所需字体及粗体/斜体，再等待 `document.fonts.load(...)` 与 `document.fonts.ready`，最后运行 Mermaid。服务器生成后在另一环境显示时，两端字体度量须一致；按需要嵌入获准字体或输出自包含 SVG。等待消费页面字体不能修复已用错误度量生成的 SVG。
+  When controlling rendering, define/load the required font faces and weights/styles, await `document.fonts.load(...)` and `document.fonts.ready`, then run Mermaid. Server-generated SVG displayed elsewhere needs consistent font metrics; embed permitted fonts or produce self-contained SVG when appropriate. Waiting on the consuming page cannot repair SVG already laid out with wrong metrics.
+- SVG 通过 `<img>` 展示时检查 decode、固有尺寸和 viewBox；导出器可从实际布局 viewBox 写入固有宽高，这不等于给 Markdown 设置固定节点尺寸。缓存键应包含渲染器版本、配置和字体身份，避免旧 SVG 或失败请求被复用。验证实际节点/连线标签边界、字体和图像加载；区分结构/语法、浏览器几何检查与人工视觉验证，不宣称未执行的检查。
+  For SVG embedded through `<img>`, check decoding, intrinsic dimensions and viewBox; exporters may derive intrinsic width/height from the actual layout without fixing Markdown node dimensions. Cache identity should include renderer version, configuration and fonts to avoid stale SVGs or failed-request reuse. Check node/edge bounds, fonts and image loading; distinguish structure/syntax, browser geometry checks and human visual review, reporting only checks actually performed.

@@ -10,10 +10,10 @@ description: >-
   then Deep reusing Quick outputs). 支持分析仓库、架构文档、作业流程图、深度理解代码库、
   生成可复用 skill、抽取组件；支持中文、English 和中英双语。
   Offers documentation before code changes when architecture/context docs are absent.
-version: 2.0.1
+version: 2.0.2
 argument-hint: "[Quick|Deep|Mix] [source] — Quick artifact 1|2|3; confirm source, scope and deployment interactively"
 metadata:
-  version: "2.0.1"
+  version: "2.0.2"
 compatibility: "Claude Code and OpenCode; Git and SHA-256 hashing; fresh-context subagents for Deep verification."
 ---
 
@@ -93,7 +93,7 @@ Print and confirm actual paths, languages, authors, required/optional status and
 - [MIX-MODE.md](./MIX-MODE.md)：Quick 完成后的版本化交接与 Deep 复用 / versioned sequential handoff.
 - [SOURCE-VERSION.md](./SOURCE-VERSION.md)：Git／工作区选择、快照、来源新鲜度和候选冻结 / source resolution, snapshots, freshness and freezing.
 - [DEPLOYMENT.md](./DEPLOYMENT.md)：路径、相对软链、发布及 host 发现检查 / paths, symlinks, publication and host discovery.
-- [DOCUMENT-TEMPLATES.md](./DOCUMENT-TEMPLATES.md)：详略表达与 Optional 适用规则 / concise/detailed presentation and applicability.
+- [DOCUMENT-TEMPLATES.md](./DOCUMENT-TEMPLATES.md)：详略表达、Optional 适用规则与共享 Mermaid 风格 / concise/detailed presentation, applicability and shared Mermaid style.
 
 检查 YAML、description 长度（1–1024 字符）、资源链接、实际发现和验证状态；不宣称未执行的检查。新鲜度仅提供来源／候选变更停止机制，不实现完整 diff 增量更新服务。
 Validate YAML, description length, links, discovery and actual verification state; report only performed checks. Freshness stops on relevant changes; no comprehensive diff-based incremental service is provided.

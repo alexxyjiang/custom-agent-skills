@@ -270,7 +270,7 @@ Apply to Spark, ETL, batch inference, streaming, ingestion and other pipelines. 
 
 #### Diagram rules / 图表规则
 
-1. Use fenced `mermaid`, `flowchart TD` for stages/branches, `flowchart LR` for module/deployment relationships, stable ASCII IDs and quoted localized labels. State once that rendering needs a Mermaid-capable Markdown viewer. / 阶段/分支用 TD，模块/部署关系用 LR，使用稳定 ASCII ID 与加引号的本地化标签，统一说明渲染需 Mermaid 查看器。
+1. Use fenced `mermaid`, `flowchart TD` for stages/branches, `flowchart LR` for module/deployment relationships, stable ASCII IDs and quoted localized labels. State once that rendering needs a Mermaid-capable Markdown viewer. / 阶段/分支用 TD，模块/部署关系用 LR，使用稳定 ASCII ID 与加引号的本地化标签，统一说明渲染需 Mermaid 查看器。 Apply [DOCUMENT-TEMPLATES.md shared Mermaid style](./DOCUMENT-TEMPLATES.md#mermaid-生成风格--mermaid-authoring-style) to every diagram. / 所有图统一应用共享 Mermaid 风格。
 2. Begin with one actual end-to-end chart: sources → normalization/quality gates → joins/selection/sampling → intermediate storage/workers → persisted outputs/validation/completion metadata. / 先绘制一张实际端到端图，涵盖来源、标准化/质量、关联/选择/采样、中间存储/工作进程及持久化输出/验证/完成元数据。
 3. Add focused charts only for materially distinct algorithm/event decisions, restore/carry-forward, independent auxiliary jobs, module collaboration or deployment/submission; no fixed diagram quota or duplication. / 仅为实质不同的算法/事件决策、恢复/结转、独立辅助作业、模块协作或部署/提交补图，不定配额、不重复主图。
 4. Use decision diamonds with outcomes, result-changing error/drop branches and clearly optional vs required inputs/checkpoints. Explain loops/thresholds with **effective defaults and nearby override mechanisms**. / 用菱形及结果标签表示决策，展示改变结果的错误/丢弃分支，区分可选与必需输入/检查点；用**实际默认值及附近覆盖机制**解释循环/阈值。
