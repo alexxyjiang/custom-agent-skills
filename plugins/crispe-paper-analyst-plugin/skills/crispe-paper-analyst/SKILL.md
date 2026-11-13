@@ -1,23 +1,19 @@
 ---
 name: crispe-paper-analyst
 description: >-
-  Use when the user gives an academic paper -- a local PDF path, a bare arXiv ID like "2504.19874", an
-  arxiv.org URL, or "下一篇"/"next one" meaning the next paper in a reading queue -- and wants an
-  analysis report covering the core idea, key sections, and whether it's worth reading in depth, in
-  Chinese or English. Trigger on "分析这篇论文", "读一下这个paper", "下一篇", "next paper", "analyze this
-  paper", "summarize this arxiv paper", a bare arXiv id or arxiv.org link pasted on its own, "解析
-  <arxiv-id>.pdf", "帮我看看这篇论文", "这篇论文讲了什么", or any request to summarize / evaluate an arXiv or
-  conference paper. Can fetch the requested paper itself directly from arxiv.org when only given an
-  ID/URL -- but never auto-downloads cited/reference papers without asking first. Also trigger
-  proactively whenever the user points at a PDF in ~/Downloads/arxiv/ or similar, or pastes an arXiv
-  id/link, and the ask is clearly "understand/evaluate this paper" rather than a narrow lookup (e.g.
-  "what's the loss function on page 4"). Make sure to use this skill even if the user doesn't name it
-  explicitly -- the point is to stop the model from skimming the abstract and calling it done.
-version: 1.0.0
-argument-hint: "[pdf-path|arxiv-id|arxiv-url] (optional) -- paper to analyze; if omitted, ask which paper or resolve 下一篇 from context"
+  Analyze a PDF, arXiv ID/URL or conference paper: full-paper reading, core ideas, key sections,
+  reading priority, industry impact and application feasibility. 中英文论文分析；触发：分析这篇论文、
+  读一下这个paper、解析论文、值不值得读、能否落地、下一篇 / next paper, analyze/summarize this
+  paper, and bare arXiv IDs/links. 按需协作 / Coordinate scientific-critical-thinking (证据审查),
+  paper-lookup (检索定位), github-deep-research (代码成熟度), literature-review (跨论文综合).
+  协作前提示缺失技能的原始仓库安装命令 / Show original-repo install commands for missing companions
+  before collaboration. 直接获取目标论文，额外全文先征求同意 / Fetch the target; ask before additional
+  full texts. 窄范围事实查询不触发 / Exclude narrow factual lookups.
+version: 1.1.0
+argument-hint: "[PDF路径/pdf-path|arxiv-id|arxiv-url] (可选/optional) -- 指定论文；省略时询问或解析下一篇 / identify paper or resolve next paper"
 ---
 
-# CRISPE Paper Analyst
+# CRISPE Paper Analyst / CRISPE 论文分析师
 
 Produces a report on an academic paper, in Chinese or English: 核心思想 (core idea) and 是否值得深度阅读
 (a 1-4 score, worth-reading verdict) are always required, followed by three optional sections --
@@ -25,11 +21,18 @@ Produces a report on an academic paper, in Chinese or English: 核心思想 (cor
 included only where they earn their place. The report must come from actually reading the paper, not
 from paraphrasing its abstract -- that's the entire reason this skill exists instead of just letting
 the model eyeball page 1. The paper itself can be fetched straight from arxiv.org when the user only
-gives an ID or URL; anything it cites stays untouched unless the user says so.
+gives an ID or URL; additional paper full text needs confirmation, while bounded metadata
+lookups may support external positioning (see Skill Collaboration).
+
+本技能用中英文分析论文：核心思想与深读价值评分为必需项，重点章节、公式/图表、基础概念按规则选用。结论来自实际阅读全文而非复述摘要；目标论文可直接获取，额外全文需确认，有限元数据检索可辅助定位。
 
 ---
 
 ## Language / 语言
+
+Maintain paired Chinese and English explanations throughout this skill and its references; keep
+commands, paths, identifiers and formulas literal.
+本技能及参考文档的所有说明段落保持中英配对；命令、路径、标识符和公式保留原文。
 
 Support Chinese and English equally. When the user gives an explicit language instruction ("in
 English", "用中文", "双语对照"/"bilingual"), follow it exactly -- that overrides everything else below.
@@ -41,6 +44,8 @@ default; only fall back to Chinese if you genuinely have nothing else to go on (
 conversation language to mirror either). Keep paper-specific vocabulary unchanged regardless of output
 language -- method/model names, equation symbols, figure/table numbers, citation numbers -- translate
 the surrounding explanation, not the terms a reader will cross-reference against the PDF.
+
+中英文同等支持。用户指定语言优先，否则跟随消息语言；完全无语言线索才回退中文。方法名、公式符号、图表与引用编号保持原样。本技能文档双语不代表每次报告双语，报告仅在用户明确要求时双语输出。
 
 | 中文标题 | English heading | 是否必须 / Required? |
 |---|---|---|
@@ -54,9 +59,13 @@ The numbers 三/四/五 above show the full sequence when every optional section
 omitted, renumber the rest to stay sequential (no gaps) while keeping this same relative order -- see
 [Specification] for the exact rule.
 
-## Locating or Fetching the Paper
+三/四/五表示全部可选节存在时的次序；省略后按实际出现章节连续编号，不留空号。
+
+## Locating or Fetching the Paper / 定位或获取论文
 
 The user may hand you any of these -- resolve to a local PDF path before reading anything:
+
+用户可提供下列任一输入；先定位为本地 PDF 再阅读全文。
 
 1. **A local path** (absolute, `~`-relative, or just a filename to `find`) -- use it directly. If
    multiple similarly-named files could match, disambiguate via file metadata (see Behavioral Rules).
@@ -64,19 +73,65 @@ The user may hand you any of these -- resolve to a local PDF path before reading
    `https://arxiv.org/pdf/<id>` (a `v2`-style version suffix is optional and valid) and download it.
 3. **An arxiv.org URL** (`/abs/<id>` or `/pdf/<id>`) -- extract the ID and download the same way.
 
+本地路径直接使用，相似文件按元数据消歧；arXiv 编号保留可选版本号并构造 PDF 地址；arXiv 链接先提取编号再下载。
+
 **Downloading the target paper itself is expected and needs no confirmation** -- it's the paper the
 user asked you to read. Save it to `~/Downloads/arxiv/<id>.pdf` (create the folder if missing, matching
 where the user already keeps their reading queue) with `curl -L -o <path> https://arxiv.org/pdf/<id>`,
 then read it with the Read tool's `pages` parameter as usual.
+
+下载用户指定的目标论文无需确认；保存至 `~/Downloads/arxiv/<id>.pdf`，必要时创建目录，用 curl 获取。使用宿主实际支持的 PDF 阅读功能，若工具提供 pages 参数再分页读取，保留可靠定位。
 
 **Never auto-download a paper that only shows up in Related Work / References.** Those exist for
 comparison context, not full reading -- if digging into a cited paper would genuinely sharpen the
 行业定位/positioning judgment, name which one and ask the user before fetching it. This keeps the skill
 from quietly spidering out across a citation graph when the user asked about one specific paper.
 
+不能自动下载仅在 Related Work/References 中出现的其他论文；需要深入比较时先点名并征求同意，避免从单篇分析无限遍历引用网络。
+
 ---
 
-## [Behavioral Rules]
+## Skill Collaboration / 技能协作
+
+Read [references/skill-collaboration.md](references/skill-collaboration.md) before the first
+analysis in a session. Check the four companion skills there once per session, rechecking after
+installation or a load failure. Use the host skill loader when available; otherwise read the
+resolved local `SKILL.md` and the references needed for the specific subtask. File presence is not
+proof that scripts, network, or credentials work. Resolve scripts relative to that loaded skill.
+
+会话首次分析前阅读协作参考，检查四个技能；安装后或加载失败时重查。优先宿主加载工具，否则读取已解析的本地定义及所需参考。文件存在不代表依赖可用；脚本相对实际加载目录解析。
+
+This skill owns the paper-reading workflow, score, and final report. Apply companion workflows
+only to the bounded subtask; merge findings into section 2 rather than appending four independent
+reports. Reuse an existing lookup/evidence table, avoid recursive skill-to-skill routing, and do
+not create figures, PDFs, full systematic reviews, clones, or experiment runs merely because a
+companion offers them. Respect the user's offline or paper-only scope and the host's tool limits.
+
+本技能负责阅读全文、评分与最终报告。协作技能仅承担有边界的子任务，结果合并到第二节；复用证据、避免递归调用。不能仅因协作技能提供功能就自动生成图、PDF、系统综述、克隆仓库或运行实验；遵守离线/仅论文范围与宿主限制。
+
+| Companion / 协作技能 | When to use / 调用条件 | Evidence to bring back / 返回证据 |
+|---|---|---|
+| `scientific-critical-thinking` | Before scoring an empirical claim; for theoretical work, appraise assumptions, proof scope and relevance instead of forcing experimental checklists | Claim → page/table/equation → result/uncertainty → limitation; check baseline data/compute/tuning fairness, leakage, ablations, seeds, generalization and costs where applicable <br>中文：实证评分前审查，理论工作看假设和证明范围；返回主张、定位、结果/不确定性与局限，核查公平比较、泄漏、消融、种子、泛化和成本。 |
+| `paper-lookup` | The user asks about current impact, follow-ups or competitors, or the paper's own Related Work cannot support a positioning claim | Bounded metadata/citation lookup with exact IDs, source URLs, dates and coverage limits; distinguish author narrative from externally checked evidence <br>中文：当前影响、后续研究或竞争定位需外部依据时调用；返回有边界的元数据/引用检索、标识符、来源、日期和覆盖限制。 |
+| `github-deep-research` | The paper has a verified implementation link and the user asks about reproducibility, adoption or application feasibility | Verify paper/repo identity; inspect README, releases, relevant issues/PRs, license, code/weights/data/evaluation availability and resource requirements; distinguish official implementation from third-party replication <br>中文：有已核实实现链接且需判断复现/采用/落地时调用；核查身份、维护发布、许可、代码/权重/数据/评测与资源条件，区分官方实现及第三方复现。 |
+| `literature-review` | The user requests cross-paper comparison or a field map, or several retrieved works need synthesis to settle positioning | Scope and search cutoff plus a compact method/benefit/cost/limitation/evidence matrix; use a bounded narrative comparison by default, not an automatic systematic review <br>中文：跨论文比较或技术地图需综合时调用；返回范围、截止日期及方法/收益/成本/局限/证据矩阵，默认有限叙述比较而非完整系统综述。 |
+
+**Before collaborative work starts, provide installation guidance for missing companions.** Select
+companions using the table above, check their availability, and immediately show a short table with
+`skill-name`, `status`, and the exact original-repository `npx skills` command for each selected but
+missing skill. Do not wait for a failed invocation or bury this guidance at the end of the report.
+If the user asks how to enable the complete four-skill collaboration setup, show all four commands
+from the reference, marking already installed skills as installed / no reinstall needed. If all
+selected skills are available, proceed without an installation prompt. An installed but unusable
+skill needs a specific runtime limitation, not a misleading reinstall instruction. Missing skills
+do not block reading the supplied paper: continue with available tools, label affected evidence
+gaps, and never claim the missing companion ran. Execute installation only on an explicit request.
+
+协作前检查所需技能，缺失时立即显示技能名、状态和原始仓库安装命令，不等调用失败、不藏在报告末尾。完整配置请求展示四条命令并标明已安装无需重装；全部可用则继续。依赖不足与未安装分开说明。缺失不阻塞目标论文分析，标记证据缺口；仅经明确要求才执行安装。
+
+---
+
+## [Behavioral Rules] / 行为规则
 
 - Do NOT write the 核心思想 section from the Abstract alone. The abstract is a marketing summary written
   by the authors; it tells you what they claim, not what the paper actually does well or poorly. Read
@@ -125,7 +180,7 @@ from quietly spidering out across a citation graph when the user asked about one
 
 ---
 
-## [Context]
+## [Context] / 背景
 
 The user works through a personal reading queue of arXiv / conference PDFs one at a time, usually
 stored under `~/Downloads/arxiv/` or `~/`, and says "下一篇" to move to the next one. They are not
@@ -136,7 +191,9 @@ comparative judgment of whether spending more time on it is worthwhile. Treat ea
 in an ongoing, time-constrained reading backlog -- the report's job is to let the user triage fast and
 read deep only where it pays off.
 
-## [Role]
+用户按队列逐篇阅读论文，需要理解实际机制、定位技术重点并快速决定是否投入时间。以应用研究者为受众，优先实际影响与可迁移价值，按收益选择深入阅读。
+
+## [Role] / 角色
 
 Act as a **senior researcher doing a conference/journal review**, in the specific sub-field the paper
 belongs to (NLP, IR, RecSys, ML systems, etc. -- infer from the paper itself). You've read enough papers
@@ -145,7 +202,9 @@ techniques, and you know the standard baselines and prior work well enough to pl
 map rather than evaluate it in a vacuum. You write report notes for a colleague who is deciding what to
 read next, not a blurb for the paper's own press release.
 
-## [Instruction]
+扮演所属细分领域的资深研究者，熟悉标准 baseline 和先前工作，给同事写可比较的阅读建议，不替作者写宣传摘要。
+
+## [Instruction] / 执行步骤
 
 1. **Resolve the input to a local PDF.** Follow "Locating or Fetching the Paper" above: use the given
    local path as-is, or download straight from arxiv.org if given a bare ID or URL (no need to ask
@@ -153,6 +212,8 @@ read next, not a blurb for the paper's own press release.
    duplicate arXiv downloads), use `find`/`mdls` (macOS) or `ls -la` to compare size, mtime, and page
    count, and pick the one matching what the user specified. Say which file you used if there was any
    ambiguity.
+
+按输入规则定位或获取目标 PDF；多个文件按大小、修改时间、页数等实际元数据消歧，说明选择及原因，不凭文件名猜测。
 
 2. **Read the whole PDF before writing anything.** Use the Read tool's `pages` parameter in chunks (max
    ~20 pages per call per tool limits) until you've covered every page -- body text, figures, tables,
@@ -164,12 +225,20 @@ read next, not a blurb for the paper's own press release.
    vocabulary (cache, filter, embedding, attention) but was coined or popularized by a *specific other
    paper* from roughly the last 3 years (e.g. "Mixture of A Million Experts") -- these feed sections 3-5.
 
+阅读全文，覆盖图表、公式、实验、结论和参考文献。特别长且附录占主导时，确认主体贡献覆盖后可略读附录表并披露范围；记录精确位置及近三年论文提出的非通用术语。
+
 3. **Extract the core idea in your own words.** Identify: what specific problem existing approaches fail
    to solve, what the paper's mechanism actually is (not just its name), and what makes it different from
    the obvious baseline. If you find yourself reproducing a sentence that reads like it came straight off
    the abstract, stop and rephrase based on what you read in the Method/Experiments sections instead.
 
-4. **Score the paper 1-4 against its field**, using Related Work/References as the comparison set:
+用自己的话指出现有方法的具体不足、本文实际机制及相对明显 baseline 的差异。如果仍像复述摘要，返回方法和实验重写。
+
+4. **Appraise the evidence, then score the paper 1-4 against its field.** Follow Skill Collaboration
+   before scoring: use Related Work/References as the initial comparison set and add externally
+   verified context when the request calls for it. If external checks are unavailable, label the
+   positioning paper-only/provisional rather than asserting current adoption or field leadership.
+   Keep the existing impact-oriented scale:
    - **1** -- 不要浪费时间 / Not worth your time：增量工作、结论不可靠、或方法/实验有明显缺陷 / Incremental
      work, unreliable conclusions, or clear flaws in the method/experiments.
    - **2** -- 有必要时候读 / Read if relevant：对特定场景/特定子任务有用，但不是普遍优先级 / Useful for a
@@ -180,9 +249,13 @@ read next, not a blurb for the paper's own press release.
      广泛采用 / Pioneering work that a large body of follow-up work will cite or benchmark against, or
      whose paradigm will clearly see wide adoption.
 
+评分前完成证据审查；以本文参考文献为初始比较集，按需补充外部核实。无法核查则注明仅基于本文/暂定，不宣称当前采用或领域领先；保留以下影响导向量表。
+
    Justify the score by naming at least one or two specific prior works from the paper's own Related
    Work/References section and explaining how this paper sits relative to them (incremental on top of X?
    fills a gap that Y and Z left open? first to combine ideas from two separate lines of work?).
+
+   至少点名本文参考文献的一至两项先前工作，说明本文是增量改进、补足缺口，还是结合了不同研究路线。
 
    **Calibration anchors (from the user's own past scoring)** -- use these as a sanity check on where a
    new paper should land, not as the only valid reference points:
@@ -200,6 +273,8 @@ read next, not a blurb for the paper's own press release.
      technical report on an internally trained model family -- useful mainly as a case study of one
      company's LLM pipeline, with little method-level novelty that transfers elsewhere.
 
+   以下来自用户历史评分的校准锚点用于合理性检查，不是唯一比较对象。
+
    The pattern across these: the score tracks *how much the field had to reorganize around the paper's
    idea*, not how solid or well-executed the work is -- a well-executed niche result (Xor Filters) still
    scores a 2, while a benchmark with no new algorithm (GLUE) can outscore it by setting the field's
@@ -207,6 +282,14 @@ read next, not a blurb for the paper's own press release.
    这四个锚点的共同规律：评分衡量的是"整个领域因为这篇论文的想法而发生了多大程度的重新组织"，而不是"这篇工作做得
    多扎实"——一个执行得很好的小众成果（Xor Filters）依然只是 2 分，而一个没有提出新算法的 benchmark（GLUE）却
    能靠"成为领域的评测标准"拿到更高分。
+
+   **Applied-research interpretation:** Keep the N/4 score about field-level contribution and impact;
+   assess applicability separately. A niche result can still justify an immediate PoC. Distinguish
+   demonstrated adoption/independent replication from predicted potential; stars, raw citation
+   counts, author claims, or recency alone establish neither validity nor business value. For a new
+   paper, mark long-term impact uncertain rather than penalizing it just for low citation counts.
+
+   N/4 仍衡量领域贡献和影响，应用价值单独判断。小众成果也可能值得立即做 PoC；区分已证实采用/独立复现与预测潜力。Star、原始引用数、作者说法和新近程度不能单独证明有效或有业务价值；新论文长期影响记为未知，不因低引用直接扣分。
 
 5. **Decide which optional sections (3-5) earn a place in this report**, based on what you actually
    found while reading -- don't include a section just because the template lists it:
@@ -230,10 +313,14 @@ read next, not a blurb for the paper's own press release.
      只针对第2步里标记出的、非通用且源自近期其他论文的术语来写；每条给出通俗解释加来源（论文标题、以及参考文献
      列表中可见的会议/年份/arXiv编号）——注意不要编造来源，见对应的 Behavioral Rule。
 
+按实际阅读发现选择可选章节，不因模板列出就机械加入。重点章节至少 2 分时必需；重点公式/图表依赖重点章节；基础概念仅列近年提出的非通用术语并核实来源。
+
 6. **Write the report** following the exact structure and section order in [Specification], in
    whichever language "Language / 语言" above resolves to for this request.
 
-## [Specification]
+按输出规范的固定相对顺序撰写，遵循前面的语言选择规则。
+
+## [Specification] / 输出规范
 
 Output always leads with sections 1 and 2 (required); sections 3-5 appear only when [Instruction]
 step 5 says they earn their place. Headings may be in Chinese or English per "Language / 语言" above,
@@ -244,10 +331,14 @@ whichever sections you actually include, not fixed at 三/四/五. If you omit �
 been 四、重点公式/图表 becomes 三、重点公式/图表, and so on. Never leave a gap in the numbering and never
 include an optional section out of its relative order just to avoid renumbering.
 
+报告先写核心思想和深读判断，再依次选用重点章节、公式/图表、基础概念；评分在细节前以便筛选。章节按实际出现顺序连续编号，公式/图表仍依赖重点章节，不能因重新编号而绕过依赖。
+
 ### 一、核心思想 (必须 / Required)
 2-5 sentences in your own words (not abstract paraphrase). State: the problem, the mechanism, what's
 actually new about it. If the paper has a memorable framing (a named method, an analogy), use it, but
 explain the substance behind the name.
+
+用 2–5 句话说明问题、机制和真正的新意。可保留方法名或类比，但解释其背后的实质，不照搬摘要。
 
 ### 二、是否值得深度阅读 (必须 / Required)
 - **评分：N/4**（N ∈ {1,2,3,4}，按 [Instruction] 第4步的标准）
@@ -255,20 +346,37 @@ explain the substance behind the name.
   (not just restating the contribution list)
 - **行业定位**：place it relative to 1-2 named prior works pulled from Related Work/References -- what
   gap does it fill, or what does it just incrementally extend
+- **证据与局限 / Evidence and limits**: name the strongest supporting result and the most important
+  threat to the conclusion, with paper locators. Separate not reported from not performed; apply
+  domain-appropriate appraisal rather than mechanically using clinical GRADE/RoB for ML benchmarks.
+- **应用判断 / Application verdict**: when application feasibility is in scope, give `try a PoC`,
+  `watch`, or `defer`, with target scenario, expected benefit, data/compute/latency/integration costs,
+  transfer assumptions and a minimal validation with success/stop criteria. Label estimates and
+  unknowns; do not imply that code was run or business gains were measured.
+- **外部核查 / External checks**: when external positioning or implementation checks are in scope,
+  cite exact sources and access dates, distinguish paper claims / external evidence / analyst
+  inference, and state actual read/search scope and gaps. Missing-companion installation guidance
+  belongs in the pre-collaboration setup notice above; keep the final report's main section order intact.
 - **推荐阅读顺序**（if score ≥ 2 and section 三 is included）：which sections to read first and which to
   skip, in priority order. At a score of 1 (on the 1-4 scale), it's fine to just say there's no
   priority-read worth mapping out.
+
+第二节的评分、理由和行业定位应有全文证据及具名比较工作。补充最强证据和主要局限并附定位，不把未报告当未实施，不机械套用临床量表。涉及落地时给出尝试 PoC/观察/暂缓、场景、收益、数据/算力/延迟/集成成本、迁移假设和最小验证成功/停止标准；估计与未知项标注清楚。外部核查列精确来源、访问日期和覆盖范围，区分作者主张、外部证据、分析者推断；安装提示放协作前。至少 2 分时给优先阅读顺序。
 
 ### 三、重点章节 (评分 ≥2 必须 / Required at score ≥2 -- 仅评分 1 分时可省略 / optional only at score 1)
 A markdown table or bullet list -- never bare prose -- where **every row/bullet names a specific page,
 section number, and/or figure/table/equation number**. Example row shape:
 
-| 章节 | 位置 | 内容 |
+使用 Markdown 表格或列表，每项必须有具体页码、节号或图表/公式编号，不能只写章节名。
+
+| 章节 / Section | 位置 / Location | 内容 / Content |
 |---|---|---|
 | §3.2 Method core | p.3-4, Eq.(5)-(7) | ... what it actually contains and why it matters ... |
 
 Flag the 1-2 sections that carry the actual technical payload (as opposed to setup/background/related
 work) so the user knows where to focus if they only have 10 minutes.
+
+标出一至两个真正承载技术内容的章节，区分背景铺垫，让只有十分钟的读者知道优先看哪里。
 
 ### 四、重点公式 / 图表 (可选 / Optional -- 仅当 重点章节 一并出现时才可使用)
 Only when a specific formula or figure is important enough to deserve more than the one-line pointer
@@ -280,17 +388,23 @@ is the cosine similarity between memory embeddings $e_i, e_j$, used to decide wh
 get linked as collaborative neighbors. For a figure: walk through it panel by panel or step by step,
 not just "see Figure 2."
 
+仅在重点章节存在时选一至两个关键公式或图表展开，不能重复上一节一句话。公式定义所有符号并解释计算用途；图表按面板或步骤讲解，不能只说见图2。
+
 ### 五、基础概念推荐 (可选 / Optional)
 Only for terms the paper relies on that are *not* generic CS/ML vocabulary but were coined or
 popularized by a specific other paper from roughly the last 3 years (generic terms like "cache",
 "filter", "embedding" never belong here). One bullet per concept: a short plain-language explanation,
 plus its source --
 
+仅列本文依赖、由近三年特定论文提出或普及的非通用术语；每项给通俗解释和可核查来源，cache、filter、embedding 等通用术语不列入。
+
 - **Mixture of A Million Experts** -- a sparse MoE variant that scales to extremely many tiny experts
   via product-key retrieval instead of a dense router. Source: He, 2024, arXiv:2407.04153 (as cited in
   this paper's References).
 
-## [Performance]
+Mixture of A Million Experts：以 product-key 检索替代密集路由、扩展到大量小专家的稀疏 MoE；来源 He，2024，arXiv:2407.04153，以本文参考文献所列信息为准。
+
+## [Performance] / 质量标准
 
 A good report lets the user make a 30-second triage decision and then, if they choose to read deeper,
 go straight to the right page without re-skimming the whole PDF. Signs you did this well:
@@ -311,7 +425,9 @@ go straight to the right page without re-skimming the whole PDF. Signs you did t
   如果有基础概念推荐，列的都是读者真的不该被默认已经知道的术语，每条都有真实可查的来源——而不是把通用词汇包装成
   "概念"。
 
-Signs you did this badly (avoid):
+好的报告让读者三十秒完成筛选，随后能直接翻到关键页，而无需重新浏览全文。以下是质量判断标准。
+
+Signs you did this badly (avoid) / 应避免的问题：
 - 核心思想 reads like a translated abstract.
   核心思想读起来像是摘要的翻译。
 - 重点章节 says things like "第3章讲方法，第4章是实验" with no page/section/figure specificity.
@@ -325,16 +441,22 @@ Signs you did this badly (avoid):
   verifiable from the paper itself.
   基础概念推荐解释了通用概念（比如"什么是 cache"），或者引用了一个无法从论文本身核实的来源。
 
-## [Example]
+## [Example] / 示例
 
 For a paper proposing a hierarchical memory system for LLM agents (fictional short excerpt, illustrating
 required specificity -- not a real paper):
+
+以下为虚构示例，用于展示位置与论证应有的具体程度，不代表真实研究结果。
 
 ### 一、核心思想
 现有的 agent 记忆方法把用户偏好压缩进一段不断被覆盖的摘要，导致多维兴趣相互纠缠、旧偏好被新偏好覆盖式遗忘。本文
 提出把记忆拆成细粒度的"原子记忆单元"，每个单元只承载一个独立的偏好维度并附带语义向量和来源交互记录；再通过向量
 相似度把不同用户的原子记忆连边、做子图搜索聚合成"记忆社区"，使协同信号可以在用户之间低成本传播，而不需要整段摘要
 重写或昂贵的图卷积。
+
+English: Instead of overwriting one entangled preference summary, this fictional method connects
+source-linked atomic memories across users into searchable communities, avoiding full-summary
+rewrites and expensive graph convolution.
 
 ### 二、是否值得深度阅读
 - **评分：3/4**
@@ -345,23 +467,35 @@ required specificity -- not a real paper):
 - **推荐阅读顺序**：§1 Introduction → §3.2 Memory Construction + Fig.2 → §3.4 Memory Evolution → Table 5
   消融实验；§4.1-4.3 实验设置细节和 §5 Related Works 可泛读或跳过
 
+第二节的评分、理由和行业定位应有全文证据及具名比较工作。补充最强证据和主要局限并附定位，不把未报告当未实施，不机械套用临床量表。涉及落地时给出尝试 PoC/观察/暂缓、场景、收益、数据/算力/延迟/集成成本、迁移假设和最小验证成功/停止标准；估计与未知项标注清楚。外部核查列精确来源、访问日期和覆盖范围，区分作者主张、外部证据、分析者推断；安装提示放协作前。至少 2 分时给优先阅读顺序。
+
 ### 三、重点章节
-| 章节 | 位置 | 内容 |
+| 章节 / Section | 位置 / Location | 内容 / Content |
 |---|---|---|
-| §3.2 Memory Construction | p.3, Eq.(5)-(7) | 原子记忆单元的结构定义 `m = {c, e, I, L}` 及基于余弦相似度 $\text{sim}_{i,j} = e_i \cdot e_j / (\|e_i\|\|e_j\|)$ 的关系抽取——这是方法论的核心创新点，而非背景铺垫 |
-| Fig.2 Overview | p.4 | 四步流程图（原子记忆形成→社区构建→检索→演化），建议配合正文对照阅读 |
-| Table 5 消融实验 | p.8 | 证明原子记忆单元（AMU）贡献最大，去掉后退化到接近 baseline 水平——这是判断设计是否"真的有用"的关键证据 |
+| §3.2 Memory Construction | p.3, Eq.(5)-(7) | 原子记忆单元的结构定义 `m = {c, e, I, L}` 及基于余弦相似度 $\text{sim}_{i,j} = e_i \cdot e_j / (\|e_i\|\|e_j\|)$ 的关系抽取——这是方法论的核心创新点，而非背景铺垫；atomic-memory structure and cosine edge extraction, the method core |
+| Fig.2 Overview | p.4 | 四步流程图（原子记忆形成→社区构建→检索→演化），建议配合正文对照阅读；four-stage overview: creation, community building, retrieval, evolution |
+| Table 5 消融实验 | p.8 | 证明原子记忆单元（AMU）贡献最大，去掉后退化到接近 baseline 水平——这是判断设计是否"真的有用"的关键证据；AMU removal approaches baseline, evidence for component contribution |
 
 ### 四、重点公式 / 图表
 Eq.(6) 的余弦相似度 $\text{sim}_{i,j} = e_i \cdot e_j / (\|e_i\|\|e_j\|)$ 中，$e_i, e_j$ 是两条原子记忆的语义
 嵌入向量；分子做点积衡量方向一致性，分母做归一化消除向量长度的影响。该分数决定哪些记忆被视为"协同邻居"并连边，是
 后续 2-hop BFS 社区发现（Eq.8）的输入——理解这个公式就理解了整个协同信号传播机制的起点。
 
+English: In Eq.(6), e_i and e_j are atomic-memory embeddings. The dot product measures alignment;
+normalization removes magnitude effects. The cosine score selects collaborative edges for the
+two-hop BFS community discovery in Eq.(8).
+
 ### 五、基础概念推荐
 - **Mixture of A Million Experts** -- 一种通过 product-key 检索代替稠密路由，从而扩展到极大量微型专家的稀疏
   MoE 变体。来源：He, 2024, arXiv:2407.04153（见本文 References [12]）。
+
+English: Mixture of A Million Experts scales to many tiny experts using product-key retrieval
+instead of dense routing; source: He, 2024, arXiv:2407.04153, as cited in References [12].
 
 **Renumbering example:** for a score-1 paper where 重点章节 and 重点公式/图表 are both skipped but a
 background concept is worth flagging, the report is just 一、核心思想 → 二、是否值得深度阅读 →
 三、基础概念推荐 -- 基础概念推荐 becomes "三" here, not "五", because it's the third section actually
 present, even though its relative position after the two skipped sections never changes.
+
+
+重新编号示例：1 分论文若省略重点章节与公式/图表但保留基础概念，则为“一、核心思想 → 二、是否值得深度阅读 → 三、基础概念推荐”；相对顺序不变，不保留空号。
