@@ -1,0 +1,17 @@
+{
+  "skill_name": "crispe-paper-cross-link",
+  "evals": [
+    {
+      "id": 1,
+      "prompt": "EN: Review this proposed edge without fetching new papers: A v2 explicitly cites B v1 and links an author demo; no independent investigators, aligned protocol or executed results have been checked. The existing bundle has A slide method and B slide baseline. I want a verified independent-replication edge and a method→baseline link. Explain which edges can be verified, evidence endpoints, status and exact navigation ownership. Use optional local companions only if available. ZH: 不新增全文审查：A v2引用B v1并附作者演示，独立性/协议/执行未核查；A有method页，B有baseline页。请求已核实独立重复验证边和互链，请给真实状态及双端证据/导航归属。",
+      "expected_output": "Does not verify replication from citation/demo. Citation verification conditional on inspected citation/identity evidence, not assumed facts. Replication unresolved/provisional with explicit missing checks; both endpoint claim references versioned/located; source method belongs A, target baseline belongs B, A links target B/baseline with truthful status; no entire HTML ownership or path prerequisite.",
+      "files": []
+    },
+    {
+      "id": 2,
+      "prompt": "EN: A reports 92% on dataset X; B reports 89% on dataset Y with an unknown split and budget. B has only abstract coverage. Rank them, mark A contradicts B as verified, and write all HTML. Instead of inventing missing details, return the scientifically justified graph/writer handoff and fields that remain unresolved. No additional full texts are approved. ZH: A在X为92%，B在Y为89%，划分/预算未知且仅摘要；要求排名、核实矛盾及写完整HTML。请不编缺失信息，交科学合理的图与writer交接，额外全文未授权。",
+      "expected_output": "No unsupported numeric ranking or verified contradiction; comparability not-comparable or not-assessed with reasons, metadata-only B read/unread honesty, unresolved edge not verified, evidence gaps explicit. Typed relations/valid endpoint navigation or report deferral per v1 contract, writer owns HTML and builder deterministic; no extra full-text retrieval.",
+      "files": []
+    }
+  ]
+}

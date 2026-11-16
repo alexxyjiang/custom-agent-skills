@@ -9,7 +9,9 @@ description: >-
   协作前提示缺失技能的原始仓库安装命令 / Show original-repo install commands for missing companions
   before collaboration. 直接获取目标论文，额外全文先征求同意 / Fetch the target; ask before additional
   full texts. 窄范围事实查询不触发 / Exclude narrow factual lookups.
-version: 1.1.0
+  Opt-in worked examples and teaching code/functions; structured orchestrator handoff.
+  按需提供具体示例、教学代码/函数与面向编排器的结构化交接。
+version: 1.3.0
 argument-hint: "[PDF路径/pdf-path|arxiv-id|arxiv-url] (可选/optional) -- 指定论文；省略时询问或解析下一篇 / identify paper or resolve next paper"
 ---
 
@@ -320,6 +322,10 @@ read next, not a blurb for the paper's own press release.
 
 按输出规范的固定相对顺序撰写，遵循前面的语言选择规则。
 
+7. **On request, add code/examples or a structured handoff** using [references/code-examples.md](references/code-examples.md); preserve the existing report and reading requirements.
+
+仅在请求示例/函数或编排器交接时，按上述参考追加示例或结构化交接；保留现有报告与阅读要求。
+
 ## [Specification] / 输出规范
 
 Output always leads with sections 1 and 2 (required); sections 3-5 appear only when [Instruction]
@@ -499,3 +505,7 @@ present, even though its relative position after the two skipped sections never 
 
 
 重新编号示例：1 分论文若省略重点章节与公式/图表但保留基础概念，则为“一、核心思想 → 二、是否值得深度阅读 → 三、基础概念推荐”；相对顺序不变，不保留空号。
+
+## Documentation languages / 技能文档语言
+Write this skill and its explanatory references in paired Chinese and English. Currently support only zh-CN and en-US output; do not add another documentation or output language. Generated websites use a bilingual root index.html entry, with all Chinese collection/deck pages under zh-CN/ and all English pages under en-US/. Any future approved locale must follow the same locale-directory convention.
+本技能及说明性参考文档保持中文、英文对照。目前仅支持 zh-CN 和 en-US，不新增其他文档或输出语言。生成网站使用双语根 index.html 入口，中文集合/论文页面全部放 zh-CN/，英文全部放 en-US/；未来获准增加语言时也按地区语言目录组织。

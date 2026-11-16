@@ -47,3 +47,23 @@ npx skills add alexxyjiang/custom-agent-skills --skill <skill-name> -a claude-co
 ```
 
 See `skills/` for the list of available skill names.
+
+## Deep paper reading / 深度论文阅读
+
+A bilingual workflow for bounded paper discovery, full-paper analysis with teaching functions,
+evidence-backed cross-paper links, and offline HTML reading slides.
+双语工作流覆盖有界检索、带教学函数的全文分析、跨论文证据连接及离线 HTML 精读页面。
+
+All four skills are bundled under `plugins/crispe-deep-paper-reading-plugin/skills/`:
+`crispe-deep-paper-reading`, `crispe-paper-analyst`, `crispe-paper-cross-link`, and `crispe-slides-writer`.
+四个技能统一打包在 `crispe-deep-paper-reading-plugin`，顶层 `skills/` 符号链接仍支持单独安装。
+
+```text
+/plugin install crispe-deep-paper-reading-plugin@custom-claude-skills
+```
+
+- [Workflow and usage / 工作流与使用](docs/paper-reading/README.md)
+- [Validation / 验证记录](docs/paper-reading/VALIDATION.md)
+- [Language entry / 语言入口](examples/deep-paper-reading/site/index.html)
+- [中文示例](examples/deep-paper-reading/site/zh-CN/index.html)
+- [English example](examples/deep-paper-reading/site/en-US/index.html)

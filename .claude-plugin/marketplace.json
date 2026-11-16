@@ -36,9 +36,9 @@
       "description": "Use when asked to commit changes, save work to git, check in code, create a commit, or ship the current changes -- e.g. commit this / let's commit / save this to git / create a commit for X. 支持中文触发，如提交代码、提交这些改动、帮我commit等同类表达。Does not trigger on questions about commit history (e.g. what does this commit do, show me the last commit). Groups the working tree into logically ordered, size-capped commits (code -> test -> doc) under one stable \"[feature]: summary\" format per branch, verifies the build before committing code when detected, and keeps a safety backup so a mid-sequence failure can be rolled back without losing work."
     },
     {
-      "name": "crispe-paper-analyst-plugin",
-      "source": "./plugins/crispe-paper-analyst-plugin",
-      "description": "Analyze a PDF, arXiv ID/URL or conference paper: full-paper reading, core ideas, key sections, reading priority, industry impact and application feasibility. 中英文论文分析；触发：分析这篇论文、 读一下这个paper、解析论文、值不值得读、能否落地、下一篇 / next paper, analyze/summarize this paper, and bare arXiv IDs/links. 按需协作 / Coordinate scientific-critical-thinking (证据审查), paper-lookup (检索定位), github-deep-research (代码成熟度), literature-review (跨论文综合). 协作前提示缺失技能的原始仓库安装命令 / Show original-repo install commands for missing companions before collaboration. 直接获取目标论文，额外全文先征求同意 / Fetch the target; ask before additional full texts. 窄范围事实查询不触发 / Exclude narrow factual lookups."
+      "name": "crispe-deep-paper-reading-plugin",
+      "source": "./plugins/crispe-deep-paper-reading-plugin",
+      "description": "Bilingual paper-reading suite: bounded research orchestration, full-paper analysis with worked examples and teaching functions, evidence-backed cross-paper links, and offline HTML reading slides. 双语论文精读套件：有界研究编排、保留原有阅读要素的单篇分析与教学函数、跨论文证据连接及离线 HTML 幻灯片。 Includes crispe-deep-paper-reading, crispe-paper-analyst, crispe-paper-cross-link, and crispe-slides-writer."
     }
   ]
 }
