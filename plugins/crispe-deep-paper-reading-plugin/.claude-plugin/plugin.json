@@ -14,5 +14,5 @@
     "bilingual"
   ],
   "description": "Bilingual paper-reading suite: bounded research orchestration, full-paper analysis with worked examples and teaching functions, evidence-backed cross-paper links, and offline HTML reading slides. 双语论文精读套件：有界研究编排、保留原有阅读要素的单篇分析与教学函数、跨论文证据连接及离线 HTML 幻灯片。 Includes crispe-deep-paper-reading, crispe-paper-analyst, crispe-paper-cross-link, and crispe-slides-writer.",
-  "version": "1.3.1"
+  "version": "1.3.2"
 }

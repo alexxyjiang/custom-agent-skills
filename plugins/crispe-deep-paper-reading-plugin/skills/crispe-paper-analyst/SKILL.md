@@ -11,127 +11,11 @@ description: >-
   full texts. 窄范围事实查询不触发 / Exclude narrow factual lookups.
   Opt-in worked examples and teaching code/functions; structured orchestrator handoff.
   按需提供具体示例、教学代码/函数与面向编排器的结构化交接。
-version: 1.3.1
+version: 1.3.2
 argument-hint: "[PDF路径/pdf-path|arxiv-id|arxiv-url] (可选/optional) -- 指定论文；省略时询问或解析下一篇 / identify paper or resolve next paper"
 ---
 
 # CRISPE Paper Analyst / CRISPE 论文分析师
-
-Produces a report on an academic paper, in Chinese or English: 核心思想 (core idea) and 是否值得深度阅读
-(a 1-4 score, worth-reading verdict) are always required, followed by three optional sections --
-重点章节 (key sections), 重点公式/图表 (key formulas/figures), and 基础概念推荐 (background concepts) --
-included only where they earn their place. The report must come from actually reading the paper, not
-from paraphrasing its abstract -- that's the entire reason this skill exists instead of just letting
-the model eyeball page 1. The paper itself can be fetched straight from arxiv.org when the user only
-gives an ID or URL; additional paper full text needs confirmation, while bounded metadata
-lookups may support external positioning (see Skill Collaboration).
-
-本技能用中英文分析论文：核心思想与深读价值评分为必需项，重点章节、公式/图表、基础概念按规则选用。结论来自实际阅读全文而非复述摘要；目标论文可直接获取，额外全文需确认，有限元数据检索可辅助定位。
-
----
-
-## Language / 语言
-
-Maintain paired Chinese and English explanations throughout this skill and its references; keep
-commands, paths, identifiers and formulas literal.
-本技能及参考文档的所有说明段落保持中英配对；命令、路径、标识符和公式保留原文。
-
-Support Chinese and English equally. When the user gives an explicit language instruction ("in
-English", "用中文", "双语对照"/"bilingual"), follow it exactly -- that overrides everything else below.
-Absent an explicit instruction, mirror whichever language the user's own message is written in: a
-Chinese prompt gets a Chinese report, an English prompt gets an English report. If the request carries
-no language signal at all (e.g. a bare arXiv ID or URL pasted with no surrounding sentence), stay
-compatible with both -- keep headings/structure language-neutral where possible and don't force a
-default; only fall back to Chinese if you genuinely have nothing else to go on (e.g. no prior
-conversation language to mirror either). Keep paper-specific vocabulary unchanged regardless of output
-language -- method/model names, equation symbols, figure/table numbers, citation numbers -- translate
-the surrounding explanation, not the terms a reader will cross-reference against the PDF.
-
-中英文同等支持。用户指定语言优先，否则跟随消息语言；完全无语言线索才回退中文。方法名、公式符号、图表与引用编号保持原样。本技能文档双语不代表每次报告双语，报告仅在用户明确要求时双语输出。
-
-| 中文标题 | English heading | 是否必须 / Required? |
-|---|---|---|
-| 一、核心思想 | 1. Core Idea | 必须 / Required |
-| 二、是否值得深度阅读 | 2. Worth Reading In-Depth | 必须 / Required |
-| 三、重点章节 | 3. Key Sections | 评分 ≥2 必须写；评分 1 分可选省略 / Required for score ≥2, optional only at score 1 |
-| 四、重点公式 / 图表 | 4. Key Formulas / Figures | 可选 / Optional -- 需要深入讲解时才写 |
-| 五、基础概念推荐 | 5. Background Concepts | 可选 / Optional -- 用到近期论文提出的专有概念时才写 |
-
-The numbers 三/四/五 above show the full sequence when every optional section is included. When one is
-omitted, renumber the rest to stay sequential (no gaps) while keeping this same relative order -- see
-[Specification] for the exact rule.
-
-三/四/五表示全部可选节存在时的次序；省略后按实际出现章节连续编号，不留空号。
-
-## Locating or Fetching the Paper / 定位或获取论文
-
-The user may hand you any of these -- resolve to a local PDF path before reading anything:
-
-用户可提供下列任一输入；先定位为本地 PDF 再阅读全文。
-
-1. **A local path** (absolute, `~`-relative, or just a filename to `find`) -- use it directly. If
-   multiple similarly-named files could match, disambiguate via file metadata (see Behavioral Rules).
-2. **A bare arXiv ID**, e.g. `2504.19874` or `2504.19874v2` -- build the PDF URL
-   `https://arxiv.org/pdf/<id>` (a `v2`-style version suffix is optional and valid) and download it.
-3. **An arxiv.org URL** (`/abs/<id>` or `/pdf/<id>`) -- extract the ID and download the same way.
-
-本地路径直接使用，相似文件按元数据消歧；arXiv 编号保留可选版本号并构造 PDF 地址；arXiv 链接先提取编号再下载。
-
-**Downloading the target paper itself is expected and needs no confirmation** -- it's the paper the
-user asked you to read. Save it to `~/Downloads/arxiv/<id>.pdf` (create the folder if missing, matching
-where the user already keeps their reading queue) with `curl -L -o <path> https://arxiv.org/pdf/<id>`,
-then read it with the Read tool's `pages` parameter as usual.
-
-下载用户指定的目标论文无需确认；保存至 `~/Downloads/arxiv/<id>.pdf`，必要时创建目录，用 curl 获取。使用宿主实际支持的 PDF 阅读功能，若工具提供 pages 参数再分页读取，保留可靠定位。
-
-**Never auto-download a paper that only shows up in Related Work / References.** Those exist for
-comparison context, not full reading -- if digging into a cited paper would genuinely sharpen the
-行业定位/positioning judgment, name which one and ask the user before fetching it. This keeps the skill
-from quietly spidering out across a citation graph when the user asked about one specific paper.
-
-不能自动下载仅在 Related Work/References 中出现的其他论文；需要深入比较时先点名并征求同意，避免从单篇分析无限遍历引用网络。
-
----
-
-## Skill Collaboration / 技能协作
-
-Read [references/skill-collaboration.md](references/skill-collaboration.md) before the first
-analysis in a session. Check the four companion skills there once per session, rechecking after
-installation or a load failure. Use the host skill loader when available; otherwise read the
-resolved local `SKILL.md` and the references needed for the specific subtask. File presence is not
-proof that scripts, network, or credentials work. Resolve scripts relative to that loaded skill.
-
-会话首次分析前阅读协作参考，检查四个技能；安装后或加载失败时重查。优先宿主加载工具，否则读取已解析的本地定义及所需参考。文件存在不代表依赖可用；脚本相对实际加载目录解析。
-
-This skill owns the paper-reading workflow, score, and final report. Apply companion workflows
-only to the bounded subtask; merge findings into section 2 rather than appending four independent
-reports. Reuse an existing lookup/evidence table, avoid recursive skill-to-skill routing, and do
-not create figures, PDFs, full systematic reviews, clones, or experiment runs merely because a
-companion offers them. Respect the user's offline or paper-only scope and the host's tool limits.
-
-本技能负责阅读全文、评分与最终报告。协作技能仅承担有边界的子任务，结果合并到第二节；复用证据、避免递归调用。不能仅因协作技能提供功能就自动生成图、PDF、系统综述、克隆仓库或运行实验；遵守离线/仅论文范围与宿主限制。
-
-| Companion / 协作技能 | When to use / 调用条件 | Evidence to bring back / 返回证据 |
-|---|---|---|
-| `scientific-critical-thinking` | Before scoring an empirical claim; for theoretical work, appraise assumptions, proof scope and relevance instead of forcing experimental checklists | Claim → page/table/equation → result/uncertainty → limitation; check baseline data/compute/tuning fairness, leakage, ablations, seeds, generalization and costs where applicable <br>中文：实证评分前审查，理论工作看假设和证明范围；返回主张、定位、结果/不确定性与局限，核查公平比较、泄漏、消融、种子、泛化和成本。 |
-| `paper-lookup` | The user asks about current impact, follow-ups or competitors, or the paper's own Related Work cannot support a positioning claim | Bounded metadata/citation lookup with exact IDs, source URLs, dates and coverage limits; distinguish author narrative from externally checked evidence <br>中文：当前影响、后续研究或竞争定位需外部依据时调用；返回有边界的元数据/引用检索、标识符、来源、日期和覆盖限制。 |
-| `github-deep-research` | The paper has a verified implementation link and the user asks about reproducibility, adoption or application feasibility | Verify paper/repo identity; inspect README, releases, relevant issues/PRs, license, code/weights/data/evaluation availability and resource requirements; distinguish official implementation from third-party replication <br>中文：有已核实实现链接且需判断复现/采用/落地时调用；核查身份、维护发布、许可、代码/权重/数据/评测与资源条件，区分官方实现及第三方复现。 |
-| `literature-review` | The user requests cross-paper comparison or a field map, or several retrieved works need synthesis to settle positioning | Scope and search cutoff plus a compact method/benefit/cost/limitation/evidence matrix; use a bounded narrative comparison by default, not an automatic systematic review <br>中文：跨论文比较或技术地图需综合时调用；返回范围、截止日期及方法/收益/成本/局限/证据矩阵，默认有限叙述比较而非完整系统综述。 |
-
-**Before collaborative work starts, provide installation guidance for missing companions.** Select
-companions using the table above, check their availability, and immediately show a short table with
-`skill-name`, `status`, and the exact original-repository `npx skills` command for each selected but
-missing skill. Do not wait for a failed invocation or bury this guidance at the end of the report.
-If the user asks how to enable the complete four-skill collaboration setup, show all four commands
-from the reference, marking already installed skills as installed / no reinstall needed. If all
-selected skills are available, proceed without an installation prompt. An installed but unusable
-skill needs a specific runtime limitation, not a misleading reinstall instruction. Missing skills
-do not block reading the supplied paper: continue with available tools, label affected evidence
-gaps, and never claim the missing companion ran. Execute installation only on an explicit request.
-
-协作前检查所需技能，缺失时立即显示技能名、状态和原始仓库安装命令，不等调用失败、不藏在报告末尾。完整配置请求展示四条命令并标明已安装无需重装；全部可用则继续。依赖不足与未安装分开说明。缺失不阻塞目标论文分析，标记证据缺口；仅经明确要求才执行安装。
-
----
 
 ## [Behavioral Rules] / 行为规则
 
@@ -180,8 +64,6 @@ gaps, and never claim the missing companion ran. Execute installation only on an
   不要打乱可选章节的固定相对顺序（重点章节→重点公式/图表→基础概念推荐），省略某一节时编号也不要留空，具体规则
   见 [Specification]。
 
----
-
 ## [Context] / 背景
 
 The user works through a personal reading queue of arXiv / conference PDFs one at a time, usually
@@ -208,6 +90,74 @@ read next, not a blurb for the paper's own press release.
 
 ## [Instruction] / 执行步骤
 
+### Source resolution / 来源定位
+
+The user may hand you any of these -- resolve to a local PDF path before reading anything:
+
+用户可提供下列任一输入；先定位为本地 PDF 再阅读全文。
+
+1. **A local path** (absolute, `~`-relative, or just a filename to `find`) -- use it directly. If
+   multiple similarly-named files could match, disambiguate via file metadata (see Behavioral Rules).
+2. **A bare arXiv ID**, e.g. `2504.19874` or `2504.19874v2` -- build the PDF URL
+   `https://arxiv.org/pdf/<id>` (a `v2`-style version suffix is optional and valid) and download it.
+3. **An arxiv.org URL** (`/abs/<id>` or `/pdf/<id>`) -- extract the ID and download the same way.
+
+本地路径直接使用，相似文件按元数据消歧；arXiv 编号保留可选版本号并构造 PDF 地址；arXiv 链接先提取编号再下载。
+
+**Downloading the target paper itself is expected and needs no confirmation** -- it's the paper the
+user asked you to read. Save it to `~/Downloads/arxiv/<id>.pdf` (create the folder if missing, matching
+where the user already keeps their reading queue) with `curl -L -o <path> https://arxiv.org/pdf/<id>`,
+then read it with the host's available PDF reader; use page selection only if the actual tool supports it.
+
+下载用户指定的目标论文无需确认；保存至 `~/Downloads/arxiv/<id>.pdf`，必要时创建目录，用 curl 获取。使用宿主实际支持的 PDF 阅读功能，若工具提供 pages 参数再分页读取，保留可靠定位。
+
+**Never auto-download a paper that only shows up in Related Work / References.** Those exist for
+comparison context, not full reading -- if digging into a cited paper would genuinely sharpen the
+行业定位/positioning judgment, name which one and ask the user before fetching it. This keeps the skill
+from quietly spidering out across a citation graph when the user asked about one specific paper.
+
+不能自动下载仅在 Related Work/References 中出现的其他论文；需要深入比较时先点名并征求同意，避免从单篇分析无限遍历引用网络。
+
+### Skill collaboration / 技能协作
+
+Read [references/skill-collaboration.md](references/skill-collaboration.md) before the first
+analysis in a session. Check the four companion skills there once per session, rechecking after
+installation or a load failure. Use the host skill loader when available; otherwise read the
+resolved local `SKILL.md` and the references needed for the specific subtask. File presence is not
+proof that scripts, network, or credentials work. Resolve scripts relative to that loaded skill.
+
+会话首次分析前阅读协作参考，检查四个技能；安装后或加载失败时重查。优先宿主加载工具，否则读取已解析的本地定义及所需参考。文件存在不代表依赖可用；脚本相对实际加载目录解析。
+
+This skill owns the paper-reading workflow, score, and final report. Apply companion workflows
+only to the bounded subtask; merge findings into section 2 rather than appending four independent
+reports. Reuse an existing lookup/evidence table, avoid recursive skill-to-skill routing, and do
+not create figures, PDFs, full systematic reviews, clones, or experiment runs merely because a
+companion offers them. Respect the user's offline or paper-only scope and the host's tool limits.
+
+本技能负责阅读全文、评分与最终报告。协作技能仅承担有边界的子任务，结果合并到第二节；复用证据、避免递归调用。不能仅因协作技能提供功能就自动生成图、PDF、系统综述、克隆仓库或运行实验；遵守离线/仅论文范围与宿主限制。
+
+| Companion / 协作技能 | When to use / 调用条件 | Evidence to bring back / 返回证据 |
+|---|---|---|
+| `scientific-critical-thinking` | Before scoring an empirical claim; for theoretical work, appraise assumptions, proof scope and relevance instead of forcing experimental checklists | Claim → page/table/equation → result/uncertainty → limitation; check baseline data/compute/tuning fairness, leakage, ablations, seeds, generalization and costs where applicable <br>中文：实证评分前审查，理论工作看假设和证明范围；返回主张、定位、结果/不确定性与局限，核查公平比较、泄漏、消融、种子、泛化和成本。 |
+| `paper-lookup` | The user asks about current impact, follow-ups or competitors, or the paper's own Related Work cannot support a positioning claim | Bounded metadata/citation lookup with exact IDs, source URLs, dates and coverage limits; distinguish author narrative from externally checked evidence <br>中文：当前影响、后续研究或竞争定位需外部依据时调用；返回有边界的元数据/引用检索、标识符、来源、日期和覆盖限制。 |
+| `github-deep-research` | The paper has a verified implementation link and the user asks about reproducibility, adoption or application feasibility | Verify paper/repo identity; inspect README, releases, relevant issues/PRs, license, code/weights/data/evaluation availability and resource requirements; distinguish official implementation from third-party replication <br>中文：有已核实实现链接且需判断复现/采用/落地时调用；核查身份、维护发布、许可、代码/权重/数据/评测与资源条件，区分官方实现及第三方复现。 |
+| `literature-review` | The user requests cross-paper comparison or a field map, or several retrieved works need synthesis to settle positioning | Scope and search cutoff plus a compact method/benefit/cost/limitation/evidence matrix; use a bounded narrative comparison by default, not an automatic systematic review <br>中文：跨论文比较或技术地图需综合时调用；返回范围、截止日期及方法/收益/成本/局限/证据矩阵，默认有限叙述比较而非完整系统综述。 |
+
+**Before collaborative work starts, provide installation guidance for missing companions.** Select
+companions using the table above, check their availability, and immediately show a short table with
+`skill-name`, `status`, and the exact original-repository `npx skills` command for each selected but
+missing skill. Do not wait for a failed invocation or bury this guidance at the end of the report.
+If the user asks how to enable the complete four-skill collaboration setup, show all four commands
+from the reference, marking already installed skills as installed / no reinstall needed. If all
+selected skills are available, proceed without an installation prompt. An installed but unusable
+skill needs a specific runtime limitation, not a misleading reinstall instruction. Missing skills
+do not block reading the supplied paper: continue with available tools, label affected evidence
+gaps, and never claim the missing companion ran. Execute installation only on an explicit request.
+
+协作前检查所需技能，缺失时立即显示技能名、状态和原始仓库安装命令，不等调用失败、不藏在报告末尾。完整配置请求展示四条命令并标明已安装无需重装；全部可用则继续。依赖不足与未安装分开说明。缺失不阻塞目标论文分析，标记证据缺口；仅经明确要求才执行安装。
+
+### Reading and appraisal / 阅读与评估
+
 1. **Resolve the input to a local PDF.** Follow "Locating or Fetching the Paper" above: use the given
    local path as-is, or download straight from arxiv.org if given a bare ID or URL (no need to ask
    first for the target paper). If multiple similarly-named local files exist (happens often with
@@ -217,8 +167,7 @@ read next, not a blurb for the paper's own press release.
 
 按输入规则定位或获取目标 PDF；多个文件按大小、修改时间、页数等实际元数据消歧，说明选择及原因，不凭文件名猜测。
 
-2. **Read the whole PDF before writing anything.** Use the Read tool's `pages` parameter in chunks (max
-   ~20 pages per call per tool limits) until you've covered every page -- body text, figures, tables,
+2. **Read the whole PDF before writing anything.** Use the host's actual PDF capabilities in page chunks supported by its tools until you've covered every page -- body text, figures, tables,
    equations, experiments, conclusion, and the Related Work / References section. For very long papers
    (40+ pages dominated by appendix/reference lists), it's fine to skim the appendix tables once you've
    confirmed the main contribution is fully covered in the body -- but say so explicitly rather than
@@ -328,13 +277,50 @@ read next, not a blurb for the paper's own press release.
 
 ## [Specification] / 输出规范
 
+For collection handoff, include an evidence-backed integer 1–4 score, rationale and claim_ids; no null/deferred score. Finish substantive Method, Results and Related Work appraisal first. Keep partial visual coverage and unverified external impact explicit, without describing the read as complete. Read [references/code-examples.md](references/code-examples.md) for the exact sidecar and execution fields.
+集合交接必须有证据支持的1–4整数评分、理由和主张引用，不能空值/暂缓；先完成方法、实验与相关工作的实质评估。视觉部分覆盖及未核实外部影响如实标注，不宣称完整阅读。实例参考给出精确sidecar及执行字段。
+
+### Language / 语言
+
+Maintain paired Chinese and English explanations throughout this skill and its references; keep
+commands, paths, identifiers and formulas literal.
+本技能及参考文档的所有说明段落保持中英配对；命令、路径、标识符和公式保留原文。
+
+Support Chinese and English equally. When the user gives an explicit language instruction ("in
+English", "用中文", "双语对照"/"bilingual"), follow it exactly -- that overrides everything else below.
+Absent an explicit instruction, mirror whichever language the user's own message is written in: a
+Chinese prompt gets a Chinese report, an English prompt gets an English report. If the request carries
+no language signal at all (e.g. a bare arXiv ID or URL pasted with no surrounding sentence), stay
+compatible with both -- keep headings/structure language-neutral where possible and don't force a
+default; only fall back to Chinese if you genuinely have nothing else to go on (e.g. no prior
+conversation language to mirror either). Keep paper-specific vocabulary unchanged regardless of output
+language -- method/model names, equation symbols, figure/table numbers, citation numbers -- translate
+the surrounding explanation, not the terms a reader will cross-reference against the PDF.
+
+中英文同等支持。用户指定语言优先，否则跟随消息语言；完全无语言线索才回退中文。方法名、公式符号、图表与引用编号保持原样。本技能文档双语不代表每次报告双语，报告仅在用户明确要求时双语输出。
+
+| 中文标题 | English heading | 是否必须 / Required? |
+|---|---|---|
+| 一、核心思想 | 1. Core Idea | 必须 / Required |
+| 二、是否值得深度阅读 | 2. Worth Reading In-Depth | 必须 / Required |
+| 三、重点章节 | 3. Key Sections | 评分 ≥2 必须写；评分 1 分可选省略 / Required for score ≥2, optional only at score 1 |
+| 四、重点公式 / 图表 | 4. Key Formulas / Figures | 可选 / Optional -- 需要深入讲解时才写 |
+| 五、基础概念推荐 | 5. Background Concepts | 可选 / Optional -- 用到近期论文提出的专有概念时才写 |
+
+The numbers 三/四/五 above show the full sequence when every optional section is included. When one is
+omitted, renumber the rest to stay sequential (no gaps) while keeping this same relative order -- see
+[Specification] for the exact rule.
+
+三/四/五表示全部可选节存在时的次序；省略后按实际出现章节连续编号，不留空号。
+
+### Report contract / 报告约定
+
 Output always leads with sections 1 and 2 (required); sections 3-5 appear only when [Instruction]
 step 5 says they earn their place. Headings may be in Chinese or English per "Language / 语言" above,
 using the mapping table there. The *relative order* 核心思想 → 是否值得深度阅读 → 重点章节 → 重点公式/图表
 → 基础概念推荐 is fixed -- the score in section 2 always comes before the detail in section 3 so the
 user can triage before deciding whether to read further -- but the *numbers* are sequential over
-whichever sections you actually include, not fixed at 三/四/五. If you omit 重点章节, what would have
-been 四、重点公式/图表 becomes 三、重点公式/图表, and so on. Never leave a gap in the numbering and never
+whichever sections you actually include, not fixed at 三/四/五. If 重点章节 is omitted, omit its dependent 重点公式/图表 too; 基础概念推荐 may then become section 3. Never leave a gap in the numbering and never
 include an optional section out of its relative order just to avoid renumbering.
 
 报告先写核心思想和深读判断，再依次选用重点章节、公式/图表、基础概念；评分在细节前以便筛选。章节按实际出现顺序连续编号，公式/图表仍依赖重点章节，不能因重新编号而绕过依赖。
@@ -505,7 +491,3 @@ present, even though its relative position after the two skipped sections never 
 
 
 重新编号示例：1 分论文若省略重点章节与公式/图表但保留基础概念，则为“一、核心思想 → 二、是否值得深度阅读 → 三、基础概念推荐”；相对顺序不变，不保留空号。
-
-## Documentation languages / 技能文档语言
-Write this skill and its explanatory references in paired Chinese and English. Currently support only zh-CN and en-US output; do not add another documentation or output language. Generated websites use a bilingual root index.html entry, with all Chinese collection/deck pages under zh-CN/ and all English pages under en-US/. Any future approved locale must follow the same locale-directory convention.
-本技能及说明性参考文档保持中文、英文对照。目前仅支持 zh-CN 和 en-US，不新增其他文档或输出语言。生成网站使用双语根 index.html 入口，中文集合/论文页面全部放 zh-CN/，英文全部放 en-US/；未来获准增加语言时也按地区语言目录组织。

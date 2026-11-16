@@ -7,16 +7,23 @@ description: >-
   paper reading-to-slides or research reading plans, not a lone bibliographic lookup.
   深度论文阅读编排：有限检索、具名全文授权、逐篇全文分析、跨论文证据关系及幻灯片交接；
   适用于读论文到演示的完整项目、专题精读，不用于单纯元数据查询。
-version: 1.3.1
+version: 1.3.2
 argument-hint: "[论文ID/链接/PDF路径或研究问题 / paper-ids|URLs|PDF-paths|research-question] (可选/optional) -- 指定精读目标或主题、阅读范围及输出语言 / specify reading targets or topic, scope and output language"
 ---
 
-# Deep Paper Reading / 深度论文阅读
+# CRISPE Deep Paper Reading / CRISPE 深度论文阅读
 
-Own the research plan, shared artifacts and checkpoints; let the analyst own actual full reading, cross-link own evidence relationships, and the slides writer own presentation authoring. Read [contracts](references/contracts.md) before touching the bundle, [workflow](references/workflow.md) for phase execution, and [companions](references/companions.md) before collaboration. See [examples](references/examples.md) for bilingual scenarios.
-负责研究计划、共享产物与检查点；分析师负责实际全文阅读，cross-link 负责证据关系，slides writer 负责演示写作。修改项目包前读约定，分阶段执行读工作流，协作前读技能参考；双语场景见示例。
+## [Context] / 背景
+Turn a bounded research question or a named paper set into a reusable, evidence-linked reading website. Readers need mechanisms, concrete examples, comparative judgments and precise sources without an uncontrolled literature crawl.
+将有边界的研究问题或具名论文集合转成可复用、证据互链的阅读网站；读者需要机制、实例、比较判断与精确来源，避免无边界追引。
 
-## Operating rules / 执行规则
+## [Role] / 角色
+Act as a research-reading lead responsible for scope, shared artifacts and checkpoints. The analyst owns single-paper comprehension and scoring; cross-link owns relationships; the writer owns presentation. Execute roles sequentially unless delegation is explicitly authorized.
+担任研究阅读负责人，控制范围、共享产物与检查点；分析师负责单篇理解和评分，互链技能负责关系，写作技能负责呈现。仅明确获准时委派，否则顺序执行各角色。
+
+## [Instruction] / 执行步骤
+Read [contracts](references/contracts.md) before editing a bundle, [workflow](references/workflow.md) for phase execution, and [companions](references/companions.md) before collaboration.
+修改项目包前读契约，分阶段执行读工作流，协作前读技能参考。
 
 1. Establish the question, output locale (`zh-CN`/`en-US`), named/versioned target set, exclusions, metadata and full-text budgets, query/time boundaries and stop criteria. Reuse user-provided constraints. Explicitly requested/supplied papers are already approved; a topic authorizes bounded discovery, not unnamed full texts. Propose finite defaults when absent: 20 metadata records, at most 3 full texts, 3 queries and 20 minutes of search. State these as provisional limits; do metadata work within them, but obtain a named target approval before any newly discovered full text. If supplied targets exceed a cap, reconcile before reading instead of silently dropping targets.
    先明确问题、语言、具名版本目标、排除项、元数据/全文预算、查询/时间边界及停止条件。沿用用户约束；已指定/提供论文已获批，主题仅允许有限发现而非未具名全文。缺省提议有限预算：20 条元数据、最多 3 篇全文、3 次查询、20 分钟检索。声明为暂定上限，可在内查元数据；新发现全文仍须具名批准。目标超上限先协调，不静默删减。
@@ -31,11 +38,24 @@ Own the research plan, shared artifacts and checkpoints; let the analyst own act
 6. Stop research at the writer boundary. The builder renders deterministically and cannot supply missing research. Hand over verified content and visibly labeled provisional/unresolved items; never upgrade evidence or coverage to make a polished deck.
    写作边界处停止研究；构建器确定性呈现，不能补研究。交付已核实内容及显式标记的暂定/未解决事项，不为美观升级证据或覆盖。
 
-## Delivery / 交付
-
+## [Specification] / 输出规范
 Return the bundle location, approved targets and actual depths, candidate decisions and actual budget use, report/evidence/navigation checks, unresolved gaps and the last completed checkpoint. Use the user's language; retain identifiers and locators literally. Documentation is bilingual; a generated project uses one primary locale with optional bilingual strings. Never label partial reading as completed deep reading.
 返回项目包位置、获批目标与实际深度、候选决策与真实预算、报告/证据/导航检查、未解决缺口和最后完成的检查点。跟随用户语言，保留原始标识与定位。本定义双语，项目选择一个主语言并可在字符串内双语。部分阅读不能标为完整精读。
 
-## Documentation languages / 技能文档语言
+### Language and layout / 语言与目录
 Write this skill and its explanatory references in paired Chinese and English. Currently support only zh-CN and en-US output; do not add another documentation or output language. Generated websites use a bilingual root index.html entry, with all Chinese collection/deck pages under zh-CN/ and all English pages under en-US/. Any future approved locale must follow the same locale-directory convention.
 本技能及说明性参考文档保持中文、英文对照。目前仅支持 zh-CN 和 en-US，不新增其他文档或输出语言。生成网站使用双语根 index.html 入口，中文集合/论文页面全部放 zh-CN/，英文全部放 en-US/；未来获准增加语言时也按地区语言目录组织。
+
+## [Performance] / 质量标准
+A successful handoff has finite logged budgets, pinned approved versions, honest coverage, evidence-backed 1–4 card scores, valid claim/slide references, and a working locale site. Report actual checks and unresolved gaps; builder success does not prove scientific validity. Never expand scope, fabricate adoption or upgrade a partial read to complete.
+合格交付须有有限且可追踪的预算、固定获批版本、真实覆盖、有证据的1–4分、有效主张/页面引用及可用语言站点。报告实际检查与缺口；构建成功不证明科学有效。不得扩范围、编采用或将部分阅读升级为完成。
+
+## [Example] / 示例
+**中文请求：**“精读 ReAct v3 与 Reflexion v4，最多20条元数据，只读这两篇全文，输出中英文网页。”
+**English request:** “Read ReAct v3 and Reflexion v4; cap metadata at 20, read only these full texts, and build Chinese/English pages.”
+
+**Expected handoff:** one approved set → two analyst reports with numeric scores and teaching traces → typed evidence relations → project.json plus translated bundle → root index.html and zh-CN/en-US collections. Preserve any unread figure gaps. A new cited paper requires named approval before full-text access.
+**预期交付：**一个授权集→两份含数值评分及教学追踪的分析报告→类型证据关系→项目及翻译包→根入口和中英文集合；保留未读图缺口，新增被引论文全文须具名批准。
+
+See [references/examples.md](references/examples.md) for bounded-search and partial-coverage cases.
+有界检索及部分覆盖场景见示例参考。
