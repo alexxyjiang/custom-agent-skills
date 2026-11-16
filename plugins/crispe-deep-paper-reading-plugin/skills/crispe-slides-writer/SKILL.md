@@ -6,7 +6,7 @@ description: >-
   turn this analysis into slides, or match a supplied reading template. 生成论文精读幻灯片、论文阅读网页、
   把分析做成 slides、按模板生成论文网页；支持中文与英文。 Consumes analysis; does not replace full-paper reading.
   消费已完成的分析，不代替全文阅读；普通 UI 开发、单纯论文总结或 PPT 转换不触发。
-version: 1.3.0
+version: 1.3.1
 argument-hint: "[project.json路径 / project-json-path] (可选/optional) -- 指定论文分析项目；可附模板路径、输出目录及中英文要求 / specify an analyzed-paper project, optional template path, output directory and Chinese/English preference"
 ---
 
@@ -55,3 +55,7 @@ Deliver `project.json`, source reports/examples, `site/index.html` language entr
 ## Documentation languages / 技能文档语言
 Write this skill and its explanatory references in paired Chinese and English. Currently support only zh-CN and en-US output; do not add another documentation or output language. Generated websites use a bilingual root index.html entry, with all Chinese collection/deck pages under zh-CN/ and all English pages under en-US/. Any future approved locale must follow the same locale-directory convention.
 本技能及说明性参考文档保持中文、英文对照。目前仅支持 zh-CN 和 en-US，不新增其他文档或输出语言。生成网站使用双语根 index.html 入口，中文集合/论文页面全部放 zh-CN/，英文全部放 en-US/；未来获准增加语言时也按地区语言目录组织。
+
+## Generation credit / 生成署名
+Every generated index.html (root entry and locale collections) must visibly credit crispe-deep-paper-reading and link to https://github.com/alexxyjiang/custom-agent-skills/tree/master/plugins/crispe-deep-paper-reading-plugin using only “Generated with [crispe-deep-paper-reading]” (or its Chinese equivalent). Match the generated page language; an English-only build has English-only credit, a Chinese-only build Chinese-only, and a bilingual entry credits both. Keep skill documentation Chinese/English paired.
+所有生成的 index.html（根入口及语言集合）必须可见地注明由 crispe-deep-paper-reading 生成，仅用“由 [crispe-deep-paper-reading] 生成”并链接到 https://github.com/alexxyjiang/custom-agent-skills/tree/master/plugins/crispe-deep-paper-reading-plugin。署名跟随生成语言；仅英文则只用英文，仅中文则只用中文，双语入口两种都展示。技能文档仍保持中英文对照。

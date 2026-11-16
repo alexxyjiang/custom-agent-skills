@@ -121,5 +121,41 @@ class ContractChecks(unittest.TestCase):
     def test_unsafe_evidence_url(self):
         self.reject(lambda d: d["papers"][0]["claims"][0].update(url="javascript:alert(1)"))
 
+class AttributionChecks(unittest.TestCase):
+    """Independent of the optional external paper example bundle."""
+
+    def test_english_only_entry(self):
+        import re
+        page = builder.render_entry(["en-US"])
+        self.assertIn('Generated with', page)
+        self.assertIn(builder.SKILL_URL, page)
+        self.assertIsNone(re.search(r'[\u4e00-\u9fff]', page))
+        self.assertIn('href="en-US/index.html"', page)
+        self.assertNotIn('href="zh-CN/index.html"', page)
+
+    def test_chinese_only_entry(self):
+        page = builder.render_entry(["zh-CN"])
+        self.assertIn('由 ', page)
+        self.assertIn('crispe-deep-paper-reading</a> 生成', page)
+        self.assertEqual(page.count('href="' + builder.SKILL_URL + '"'), 1)
+        self.assertNotIn('Generated with', page)
+        self.assertIn(builder.SKILL_URL, page)
+
+    def test_bilingual_entry(self):
+        page = builder.render_entry(["zh-CN", "en-US"])
+        self.assertIn('Generated with', page)
+        self.assertIn('由 ', page)
+        self.assertEqual(page.count('class="generator-credit"'), 1)
+
+    def test_locale_collection_credits(self):
+        for locale in ["zh-CN", "en-US"]:
+            data = {"language": locale, "title": "Test", "scope": {"question": "Test"}, "papers": [], "relations": []}
+            page = builder.render_index(data)
+            credit = page.split('<footer class="generator-credit">', 1)[1].split('</footer>', 1)[0]
+            self.assertIn(builder.SKILL_URL, credit)
+            self.assertIn('Generated with' if locale == 'en-US' else '由 ', credit)
+            self.assertNotIn('由 ' if locale == 'en-US' else 'Generated with', credit)
+
+
 if __name__ == "__main__":
     unittest.main()

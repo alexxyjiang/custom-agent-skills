@@ -15,6 +15,7 @@ from urllib.parse import urlparse
 SLUG = re.compile(r"[a-z0-9]+(?:-[a-z0-9]+)*\Z")
 ROOT = Path(__file__).resolve().parents[1]
 LOCALES = {"zh-CN": "中文", "en-US": "English"}
+SKILL_URL = "https://github.com/alexxyjiang/custom-agent-skills/tree/master/plugins/crispe-deep-paper-reading-plugin"
 
 def require(condition, message):
     if not condition:
@@ -234,6 +235,16 @@ def render_paper(paper, data, base, alternate=None):
     # Single pass: inserted research text cannot turn into template directives.
     return re.sub(r"@@([A-Z]+)@@", lambda m: replacements[m[1]], template)
 
+def render_attribution(locales):
+    messages = []
+    for locale in LOCALES:
+        if locale not in locales:
+            continue
+        link = f'<a href="{SKILL_URL}" target="_blank" rel="noopener noreferrer">crispe-deep-paper-reading</a>'
+        message = f'由 {link} 生成' if locale == "zh-CN" else f'Generated with {link}'
+        messages.append(f'<p lang="{locale}">{message}</p>')
+    return '<footer class="generator-credit">' + "".join(messages) + '</footer>'
+
 def render_index(data, alternate=None):
     zh = data["language"] == "zh-CN"
     groups = {}
@@ -254,13 +265,17 @@ def render_index(data, alternate=None):
     css = (ROOT / "assets/style.css").read_text()
     scope = code_block(json.dumps(data["scope"], ensure_ascii=False, indent=2), "json", "阅读范围 · JSON" if zh else "Reading scope · JSON", zh)
     script = (ROOT / "assets/code.js").read_text()
-    return f'<!doctype html><html lang="{data["language"]}"><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>{text(data["title"])}</title><style>{css}</style><body class="collection"><main>{language_link(alternate)}<p class="eyebrow">READ · THINK · BUILD</p><h1>{text(data["title"])}</h1><p class="intro">{text(data["scope"]["question"])}</p><p>{len(data["papers"])} {"篇论文" if zh else "papers"} · {len(groups)} {"条阅读路线" if zh else "reading routes"}</p>{"".join(sections)}<section><h2>{"论文关系与证据" if zh else "Connections and evidence"}</h2>{"".join(relations)}</section><details><summary>{"阅读范围" if zh else "Reading scope"}</summary>{scope}</details></main><script>{script}</script></body></html>'
+    return f'<!doctype html><html lang="{data["language"]}"><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>{text(data["title"])}</title><style>{css}</style><body class="collection"><main>{language_link(alternate)}<p class="eyebrow">READ · THINK · BUILD</p><h1>{text(data["title"])}</h1><p class="intro">{text(data["scope"]["question"])}</p><p>{len(data["papers"])} {"篇论文" if zh else "papers"} · {len(groups)} {"条阅读路线" if zh else "reading routes"}</p>{"".join(sections)}<section><h2>{"论文关系与证据" if zh else "Connections and evidence"}</h2>{"".join(relations)}</section><details><summary>{"阅读范围" if zh else "Reading scope"}</summary>{scope}</details>{render_attribution([data["language"]])}</main><script>{script}</script></body></html>'
 
 def render_entry(locales):
-    """Bilingual, script-free entry: only link languages present in this build."""
-    links = "".join(f'<a class="locale-card" href="{locale}/index.html" hreflang="{locale}" lang="{locale}"><strong>{LOCALES[locale]}</strong><span>{locale}</span></a>' for locale in LOCALES if locale in locales)
+    """Use exactly the generated languages, including the entry and credit."""
+    available = [locale for locale in LOCALES if locale in locales]
+    zh, en = "zh-CN" in available, "en-US" in available
+    title = "论文精读 · Paper reading" if zh and en else "论文精读" if zh else "Paper reading"
+    intro = "选择阅读语言 / Choose your reading language" if zh and en else "选择阅读语言" if zh else "Choose your reading language"
+    links = "".join(f'<a class="locale-card" href="{locale}/index.html" hreflang="{locale}" lang="{locale}"><strong>{LOCALES[locale]}</strong><span>{locale}</span></a>' for locale in available)
     css = (ROOT / "assets/style.css").read_text()
-    return f'<!doctype html><html lang="zh-CN"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>论文精读 · Paper reading</title><style>{css}</style></head><body class="collection"><main class="language-entry"><p class="eyebrow">READ · THINK · BUILD</p><h1>论文精读<br><span lang="en-US">Paper reading</span></h1><p class="intro">选择阅读语言 / Choose your reading language</p><nav class="locale-grid" aria-label="阅读语言 / Reading language">{links}</nav></main></body></html>'
+    return f'<!doctype html><html lang="{available[0]}"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>{title}</title><style>{css}</style></head><body class="collection"><main class="language-entry"><p class="eyebrow">READ · THINK · BUILD</p><h1>{title}</h1><p class="intro">{intro}</p><nav class="locale-grid" aria-label="{intro}">{links}</nav>{render_attribution(available)}</main></body></html>'
 
 def render_site(bundles):
     """Validate complete locale bundles first, then render the root and locale trees."""
