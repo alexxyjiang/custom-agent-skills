@@ -1,15 +1,15 @@
 # Portable project bundle contract v1 / 可移植项目包约定 v1
 
-Read before creating or modifying `project.json`. This file is self-contained; no installed companion or external schema is needed to interpret it. The same contract is used by reading orchestration, cross-linking and the slides-writer handoff.
-创建或修改 `project.json` 前阅读本文。本约定自包含，无需安装其他技能或访问外部模式；阅读编排、关系构建及幻灯片写作交接使用同一约定。
+Read before creating or modifying `project.zh-CN.json`. This file is self-contained; no installed companion or external schema is needed to interpret it. The same contract is used by reading orchestration, cross-linking and the slides-writer handoff.
+创建或修改 `project.zh-CN.json` 前阅读本文。本约定自包含，无需安装其他技能或访问外部模式；阅读编排、关系构建及幻灯片写作交接使用同一约定。
 
 ## Ownership and portability / 职责与可移植性
 
 Agents generate and review the research bundle: sources, reading reports, claims, examples, relations and slide content. A builder is a deterministic presentation step, not a researcher: it must not search, fetch full texts, invent evidence, infer missing relations, upgrade coverage or turn not-run code into passed code. A successful build establishes presentation validity only.
 智能体生成并审查研究包：来源、阅读报告、主张、示例、关系与幻灯片内容。构建器仅确定性呈现，不做研究；不得检索、获取全文、补造证据、推断缺失关系、升级阅读覆盖或将未运行代码改为通过。构建成功仅说明呈现有效。
 
-Use a bundle root containing `project.json`, optional `reports/`, and optional `assets/`. Relative files resolve from that root, not the current working directory. Ship referenced files together. No absolute filesystem paths, `file:` URLs, `..` traversal, machine-specific home paths or escaping symlinks. `figure.src` is a relative asset path, never a remote URL. Public evidence URLs are HTTP(S), not local paths. Preserve existing valid content when updating a bundle.
-项目根目录包含 `project.json`、可选 `reports/` 和 `assets/`；相对路径从项目根解析，随包交付引用文件。禁止绝对文件路径、`file:` URL、`..` 越界、本机主目录及逃逸符号链接。`figure.src` 必须为相对资源路径而非远程 URL；公开证据地址使用 HTTP(S)。更新时保留已有有效内容。
+Use a bundle root containing `project.zh-CN.json`, optional `reports/`, and optional `assets/`. Relative files resolve from that root, not the current working directory. Ship referenced files together. No absolute filesystem paths, `file:` URLs, `..` traversal, machine-specific home paths or escaping symlinks. `figure.src` is a relative asset path, never a remote URL. Public evidence URLs are HTTP(S), not local paths. Preserve existing valid content when updating a bundle.
+项目根目录包含 `project.zh-CN.json`、可选 `reports/` 和 `assets/`；相对路径从项目根解析，随包交付引用文件。禁止绝对文件路径、`file:` URL、`..` 越界、本机主目录及逃逸符号链接。`figure.src` 必须为相对资源路径而非远程 URL；公开证据地址使用 HTTP(S)。更新时保留已有有效内容。
 
 ## Exact shape / 精确结构
 
@@ -78,3 +78,11 @@ writer 将 JSON、代码及执行记录放入带标签、语法高亮和复制�
 ## Website locale layout / 网页语言目录
 The language field is exactly zh-CN or en-US. Publish root index.html as a bilingual language chooser; all collection indexes and paper pages live under their locale directories (zh-CN/index.html, en-US/index.html, and locale/paper-id.html). Cross-paper links stay within the locale; language links target the sibling locale and retain the current slide anchor. Only these two locales are currently supported. Skill definitions and references remain Chinese/English paired documentation.
 language 字段仅为 zh-CN 或 en-US。根 index.html 是双语语言入口；所有集合与论文页面归入对应语言目录。跨论文导航保留在当前语言内，语言切换跳兄弟语言目录并保留当前页锚点。目前只支持上述两种语言，技能定义及参考文档保持中英文对照。
+
+## Formula strings / 公式字符串
+Author TeX in prose string values with `\(…\)`, `\[…\]` or `$$…$$`; escape backslashes normally when serializing JSON. KaTeX renders only prose, never code/records. A display expression must fit its card or be split into a dedicated slide; it is not raw HTML and must retain its source locator. Single-dollar prices remain literal. Actual PrismJS handles code colors without changing source text.
+正文字符串使用上述TeX定界符，JSON按标准转义反斜线。KaTeX仅渲染正文，不渲染代码/记录；独立公式应适配卡片或单独成页，不允许原始HTML，并保留来源定位。单美元价格保持原样，真实PrismJS负责代码配色且不改源码。
+
+## Locale-qualified bundle filenames / 按语言命名项目包
+Name each generated bundle `project.<locale>.json`: `project.zh-CN.json` for Chinese and `project.en-US.json` for English. The suffix must agree with the bundle's language field. A single-language project still includes its locale in the filename; do not generate unqualified or shortened locale filenames.
+每个生成项目包命名为上述完整地区语言格式，中文与英文分别使用对应文件名；后缀须与language字段一致。单语言项目也保留地区语言后缀，不生成无后缀或缩写语言名的项目文件。

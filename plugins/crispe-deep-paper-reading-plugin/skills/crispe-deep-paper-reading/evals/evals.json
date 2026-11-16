@@ -9,7 +9,7 @@
     },
     {
       "id": 2,
-      "prompt": "EN: Draft a handoff plan for two supplied, already approved PDFs A v2 and B v1, with publisher version URLs in their metadata. Work offline in Chinese, metadata cap 0/full-text cap 2. A appendix pp. 11–12 are unreadable. The writer skill is missing. Do not execute teaching code. Preserve the analyst full-reading standard and explain exact project.json coverage, evidence/navigation and delivery status without fabricating paper content. ZH: 两篇已批PDF离线中文交接，元数据0/全文2，A附录11–12页不可读、writer缺失；不运行代码，不编论文内容，保留全文标准及真实覆盖和待呈现状态。",
+      "prompt": "EN: Draft a handoff plan for two supplied, already approved PDFs A v2 and B v1, with publisher version URLs in their metadata. Work offline in Chinese, metadata cap 0/full-text cap 2. A appendix pp. 11–12 are unreadable. The writer skill is missing. Do not execute teaching code. Preserve the analyst full-reading standard and explain exact project.zh-CN.json coverage, evidence/navigation and delivery status without fabricating paper content. ZH: 两篇已批PDF离线中文交接，元数据0/全文2，A附录11–12页不可读、writer缺失；不运行代码，不编论文内容，保留全文标准及真实覆盖和待呈现状态。",
       "expected_output": "No repeated target approval or online calls. A remains partial with unread pp.11–12; B requires actual all-page inspection before full-text. Reports/claims/typed relations/stable slides in one v1 bundle; original-source writer guidance before handoff; not-run code and no fabricated outputs; pending presentation, not completed deep read/HTML.",
       "files": []
     }

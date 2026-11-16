@@ -8,34 +8,88 @@ let current = 0;
 const autoplay = document.querySelector("#autoplay");
 const speed = document.querySelector("#playback-speed");
 const zh = document.documentElement.lang === "zh-CN";
-let playing = false, timer = null;
-function pause() {
-  playing = false; clearTimeout(timer); timer = null;
-  autoplay.setAttribute("aria-pressed", "false");
-  autoplay.textContent = zh ? "自动播放" : "Autoplay";
+let playing = false, timer = null, deadline = 0;
+const playbackStatus = document.createElement("span");
+playbackStatus.id = "playback-status";
+playbackStatus.setAttribute("role", "status");
+playbackStatus.setAttribute("aria-live", "off");
+autoplay.insertAdjacentElement("afterend", playbackStatus);
+function duration() {
+  const value = Number(speed.value);
+  return [5000, 15000, 30000, 60000].includes(value) ? value : 15000;
 }
-function schedule() {
-  clearTimeout(timer); timer = null;
+function holdReason() {
+  if (document.hidden) return zh ? "等待返回页面" : "Waiting for visible tab";
+  if (toc.open || viewer.open) return zh ? "等待关闭弹窗" : "Waiting for dialog";
+  if (slides[current]?.querySelector("details[open]")) return zh ? "等待收起详情" : "Waiting for details";
+  return "";
+}
+function updatePlaybackStatus(reason = holdReason()) {
+  autoplay.setAttribute("aria-pressed", String(playing));
+  autoplay.textContent = playing ? (zh ? "暂停播放" : "Pause") : (zh ? "自动播放" : "Autoplay");
+  if (!playing) {
+    playbackStatus.textContent = "";
+    autoplay.dataset.state = "paused";
+  } else if (reason) {
+    playbackStatus.textContent = reason;
+    autoplay.dataset.state = "waiting";
+  } else {
+    const seconds = Math.max(0, Math.ceil((deadline - performance.now()) / 1000));
+    playbackStatus.textContent = zh ? `${seconds}s 后翻页` : `Next in ${seconds}s`;
+    autoplay.dataset.state = "playing";
+  }
+}
+function clearPlaybackTimer() { clearTimeout(timer); timer = null; }
+function pause() {
+  playing = false; clearPlaybackTimer(); deadline = 0;
+  updatePlaybackStatus("");
+}
+function tickPlayback() {
+  timer = null;
   if (!playing) return;
   if (current === slides.length - 1) { pause(); return; }
-  if (document.hidden || toc.open || viewer.open || slides[current].querySelector("details[open]")) return;
-  timer = setTimeout(() => { if (!document.hidden && !toc.open && !viewer.open) show(current + 1); else schedule(); }, Number(speed.value));
+  const reason = holdReason();
+  if (reason) {
+    // Poll as a fallback: dynamically added details/dialogs cannot strand playback.
+    deadline = 0; updatePlaybackStatus(reason);
+    timer = setTimeout(tickPlayback, 250);
+    return;
+  }
+  if (!deadline) deadline = performance.now() + duration();
+  const remaining = deadline - performance.now();
+  if (remaining <= 0) { show(current + 1); return; }
+  updatePlaybackStatus("");
+  timer = setTimeout(tickPlayback, Math.min(250, remaining));
+}
+function schedule() {
+  clearPlaybackTimer(); deadline = 0;
+  if (!playing) { updatePlaybackStatus(""); return; }
+  if (!holdReason()) deadline = performance.now() + duration();
+  tickPlayback();
 }
 autoplay.addEventListener("click", () => {
   if (playing) { pause(); return; }
   if (current === slides.length - 1) show(0);
   playing = true;
-  autoplay.setAttribute("aria-pressed", "true");
-  autoplay.textContent = zh ? "暂停播放" : "Pause";
   schedule();
 });
+function reconcilePlayback() {
+  // Duplicate/late close events must not keep restarting a live countdown.
+  clearPlaybackTimer();
+  tickPlayback();
+}
 speed.addEventListener("change", schedule);
-document.addEventListener("visibilitychange", schedule);
+document.addEventListener("visibilitychange", reconcilePlayback);
+addEventListener("pagehide", clearPlaybackTimer);
+addEventListener("pageshow", schedule);
 document.querySelectorAll("dialog").forEach(dialog => {
-  dialog.addEventListener("close", schedule);
-  dialog.addEventListener("cancel", () => queueMicrotask(() => { if (dialog.open) dialog.close(); schedule(); }));
+  dialog.addEventListener("close", reconcilePlayback);
+  dialog.addEventListener("cancel", () => queueMicrotask(() => { if (dialog.open) dialog.close(); reconcilePlayback(); }));
 });
-document.querySelectorAll(".steps details").forEach(details => details.addEventListener("toggle", schedule));
+// toggle does not bubble; capture covers every current/future details element.
+document.addEventListener("toggle", event => {
+  if (event.target.matches?.("details") && slides[current]?.contains(event.target)) reconcilePlayback();
+}, true);
 function fit() { stage.style.transform = `scale(${Math.max(.05, Math.min((innerWidth - 24) / 1600, (innerHeight - 24) / 900))})`; }
 function hashIndex() { const n = slides.findIndex(s => "#" + s.id === location.hash); return n < 0 ? 0 : n; }
 function show(index, updateHash = true) {

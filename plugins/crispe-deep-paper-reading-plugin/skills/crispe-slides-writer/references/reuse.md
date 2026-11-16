@@ -18,6 +18,8 @@ npx skills add zarazhangrui/frontend-slides --skill frontend-slides
 npx skills add anthropics/skills --skill frontend-design
 ```
 
-## Code-window reference / 代码窗口参考
-Reviewed [Prism's official documentation](https://prismjs.com/) for semantic `pre > code.language-*`, token classes, toolbar/copy and line-highlighting conventions. The bundled window uses those general presentation conventions with a small original offline Python/JSON lexer and source-only copy logic, rather than a CDN or vendored Prism implementation. Unknown languages remain escaped plain code. Highlighting is presentation, not a syntax validator.
-检查 Prism 官方文档的语义 pre/code、语言标识、token 高亮、工具栏/复制及行高亮约定。内置窗口借鉴通用呈现方式，采用自行编写的离线 Python/JSON 词法着色与纯源码复制，不引入 CDN 或复制 Prism 实现。未知语言保留转义纯文本；高亮不等于语法校验。
+## Rendering dependencies / 渲染依赖
+PrismJS 1.30.0 (official npm prismjs archive) now performs actual full-block tokenization for Python, JSON, JavaScript, Bash and SQL; unknown languages remain escaped plain code. The bundled Tomorrow theme is adapted by component styles; retain exact source and line wrappers. KaTeX 0.16.22 plus its auto-render extension and WOFF2 fonts renders prose formulas. These are vendored MIT-licensed distributions, not CDN requests; package URLs, SHA-256 digests and file lists are recorded in `assets/vendor/manifest.json`. Python build/runtime still uses only the standard library.
+PrismJS 1.30.0真实执行整块代码分词，内置上述语言，其他语言转义纯文本；Tomorrow主题按组件调整并保留精确源码和行包装。KaTeX 0.16.22及auto-render/WOFF2字体渲染公式。依赖为随包MIT发行版而非CDN；包地址、哈希和文件见vendor清单；Python构建仍仅需标准库。
+
+Official API references / 官方接口参考：[KaTeX auto-render](https://katex.org/docs/autorender)、[Prism token API](https://prismjs.com/extending.html)。

@@ -2,12 +2,12 @@
 name: crispe-paper-cross-link
 description: >-
   Build evidence-backed typed relationships and slide navigation between papers in a portable
-  project.json bundle. Use for claim graphs, cross-paper comparisons, citing/extending/supporting/
+  project.zh-CN.json bundle. Use for claim graphs, cross-paper comparisons, citing/extending/supporting/
   contradicting/similar/independent-replication distinctions, and linked reading decks.
   为论文建立带版本定位证据的类型关系与幻灯片导航；适用于主张图、跨论文比较、引用/扩展/
   支持/矛盾/相似/独立重复验证区分和互链阅读演示。不负责整站 HTML 或自动全文追引。
-version: 1.3.2
-argument-hint: "[project.json路径 / project-json-path] (可选/optional) -- 指定已有论文分析项目，核验跨论文证据关系并生成页面连接 / identify an analyzed-paper project to verify evidence relationships and create slide links"
+version: 1.4.0
+argument-hint: "[project.zh-CN.json路径 / project-json-path] (可选/optional) -- 指定已有论文分析项目，核验跨论文证据关系并生成页面连接 / identify an analyzed-paper project to verify evidence relationships and create slide links"
 ---
 
 # CRISPE Paper Cross-Link / CRISPE 跨论文证据互链
@@ -38,7 +38,7 @@ Read [contracts](references/contracts.md), then [relation rules](references/rela
    按本地约定核查 id、端点、证据、覆盖、链接、可比和路径。返回更新包、简洁关系复核表（边/类型/状态/证据/可比/缺口/导航）和待办；呈现集成交 writer。构建器仅确定性呈现，不研究也不核实证据。
 
 ## [Specification] / 输出规范
-Return the updated project.json and a compact review table: edge, type, status, endpoint evidence, comparability, remaining gap and source/target slide anchors. Use cites/extends/supports/contradicts/similar/replicates with verified/provisional/unresolved status; follow the exact local contract. No whole-site HTML output is required from this role.
+Return the updated project.<locale>.json and a compact review table: edge, type, status, endpoint evidence, comparability, remaining gap and source/target slide anchors. Use cites/extends/supports/contradicts/similar/replicates with verified/provisional/unresolved status; follow the exact local contract. No whole-site HTML output is required from this role.
 返回更新项目和简表：边、类型、状态、双端证据、可比性、缺口与起终点锚点。使用契约中的六种类型及三种状态，严格遵循本地字段；本角色不输出整站HTML。
 
 Write this skill and its explanatory references in paired Chinese and English. Currently support only zh-CN and en-US output; do not add another documentation or output language. Generated websites use a bilingual root index.html entry, with all Chinese collection/deck pages under zh-CN/ and all English pages under en-US/. Any future approved locale must follow the same locale-directory convention.

@@ -7,7 +7,7 @@ description: >-
   paper reading-to-slides or research reading plans, not a lone bibliographic lookup.
   深度论文阅读编排：有限检索、具名全文授权、逐篇全文分析、跨论文证据关系及幻灯片交接；
   适用于读论文到演示的完整项目、专题精读，不用于单纯元数据查询。
-version: 1.3.2
+version: 1.4.0
 argument-hint: "[论文ID/链接/PDF路径或研究问题 / paper-ids|URLs|PDF-paths|research-question] (可选/optional) -- 指定精读目标或主题、阅读范围及输出语言 / specify reading targets or topic, scope and output language"
 ---
 
@@ -33,8 +33,8 @@ Read [contracts](references/contracts.md) before editing a bundle, [workflow](re
    精确具名集合只授权一次，在全链复用；新增论文、换版本或改上限才再确认。每次协作传递集合和剩余额度，调用前检查其可选全文获取行为，不得越界下载参考或后续论文。
 4. Use metadata/abstract depth for candidate screening. Each approved deep-read target goes to `crispe-paper-analyst` for every page, figures, tables, equations, related work, references and included supplements. Preserve its report structure, locator detail and full-reading standard; do not replace it with a short summary or early score. An access/tool/context failure becomes `partial` with explicit unread ranges, never a successful full read. Pause/resume in chunks when needed. A metadata-only candidate is not a deeply read target. Before publishing a collection, require an evidence-backed integer 1–4 score for each card; complete substantive appraisal first, and disclose remaining gaps separately instead of deferring scores.
    候选筛选可只读元数据/摘要；每个获批精读目标交分析师逐页读图表、公式、相关工作、参考文献及随文补充材料。保留其报告结构、精确定位和全文标准，不用短摘要或提前评分代替。访问/工具/上下文失败记部分覆盖及未读范围，不伪装完成；必要时分块续读。元数据候选不算精读完成。集合发布前每张卡片必须有证据支持的1–4整数评分；先完成实质审查，剩余缺口另列，不能以暂缓替代评分。
-5. Sequence `crispe-paper-analyst` → `crispe-paper-cross-link` → `crispe-slides-writer`, using one agent-generated `project.json` and relative reports/assets. Sequential role execution in the same agent is valid; delegate only if authorized and supported. Missing skills do not justify pretending they ran: show original-source guidance, execute the documented role with available tools where possible, and expose any remaining checkpoint failure.
-   按分析师→关系构建→幻灯片写作执行，使用同一份智能体生成的 `project.json` 和相对报告/资源。同一智能体顺序扮演角色即可；仅经允许且宿主支持才委派。缺技能须提示原始来源，能用现有工具履行角色则继续，不能声称已调用；暴露未满足的检查点。
+5. Sequence `crispe-paper-analyst` → `crispe-paper-cross-link` → `crispe-slides-writer`, using one agent-generated `project.<locale>.json` (`project.zh-CN.json` / `project.en-US.json`) and relative reports/assets. Sequential role execution in the same agent is valid; delegate only if authorized and supported. Missing skills do not justify pretending they ran: show original-source guidance, execute the documented role with available tools where possible, and expose any remaining checkpoint failure.
+   按分析师→关系构建→幻灯片写作执行，使用同一份智能体生成的 `project.zh-CN.json` 和相对报告/资源。同一智能体顺序扮演角色即可；仅经允许且宿主支持才委派。缺技能须提示原始来源，能用现有工具履行角色则继续，不能声称已调用；暴露未满足的检查点。
 6. Stop research at the writer boundary. The builder renders deterministically and cannot supply missing research. Hand over verified content and visibly labeled provisional/unresolved items; never upgrade evidence or coverage to make a polished deck.
    写作边界处停止研究；构建器确定性呈现，不能补研究。交付已核实内容及显式标记的暂定/未解决事项，不为美观升级证据或覆盖。
 
@@ -54,7 +54,7 @@ A successful handoff has finite logged budgets, pinned approved versions, honest
 **中文请求：**“精读 ReAct v3 与 Reflexion v4，最多20条元数据，只读这两篇全文，输出中英文网页。”
 **English request:** “Read ReAct v3 and Reflexion v4; cap metadata at 20, read only these full texts, and build Chinese/English pages.”
 
-**Expected handoff:** one approved set → two analyst reports with numeric scores and teaching traces → typed evidence relations → project.json plus translated bundle → root index.html and zh-CN/en-US collections. Preserve any unread figure gaps. A new cited paper requires named approval before full-text access.
+**Expected handoff:** one approved set → two analyst reports with numeric scores and teaching traces → typed evidence relations → project.zh-CN.json plus translated bundle → root index.html and zh-CN/en-US collections. Preserve any unread figure gaps. A new cited paper requires named approval before full-text access.
 **预期交付：**一个授权集→两份含数值评分及教学追踪的分析报告→类型证据关系→项目及翻译包→根入口和中英文集合；保留未读图缺口，新增被引论文全文须具名批准。
 
 See [references/examples.md](references/examples.md) for bounded-search and partial-coverage cases.

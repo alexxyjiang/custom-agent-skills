@@ -3,9 +3,6 @@
 import argparse
 import base64
 import html
-import io
-import keyword
-import tokenize
 import json
 import mimetypes
 from pathlib import Path
@@ -136,43 +133,32 @@ def validate(data, base):
     return papers
 
 def highlighted_lines(source, language):
-    """Small offline lexer for JSON/Python; unknown languages remain escaped plain text."""
-    lines = source.splitlines() or [""]
-    marks = [[None] * len(line) for line in lines]
-    def mark(start, end, kind):
-        for row in range(start[0] - 1, min(end[0], len(lines))):
-            left = start[1] if row == start[0] - 1 else 0
-            right = end[1] if row == end[0] - 1 else len(lines[row])
-            marks[row][left:right] = [kind] * max(0, right - left)
-    if language == "python":
-        try:
-            for token in tokenize.generate_tokens(io.StringIO(source).readline):
-                kind = {tokenize.STRING: "string", tokenize.COMMENT: "comment", tokenize.NUMBER: "number", tokenize.OP: "operator"}.get(token.type)
-                if token.type == tokenize.NAME and keyword.iskeyword(token.string):
-                    kind = "keyword"
-                if kind:
-                    mark(token.start, token.end, kind)
-        except (tokenize.TokenError, IndentationError, SyntaxError):
-            pass  # An excerpt can be incomplete; highlighting never changes its text.
-    elif language == "json":
-        pattern = re.compile(r'"(?:\\.|[^"\\])*"|\b(?:true|false|null)\b|-?\b\d+(?:\.\d+)?(?:[eE][+-]?\d+)?|[{}\[\]:,]')
-        for row, line in enumerate(lines, 1):
-            for match in pattern.finditer(line):
-                raw = match.group()
-                kind = "property" if raw.startswith('"') and line[match.end():].lstrip().startswith(":") else "string" if raw.startswith('"') else "keyword" if raw in {"true", "false", "null"} else "punctuation" if raw in "{}[]:," else "number"
-                mark((row, match.start()), (row, match.end()), kind)
-    rendered = []
-    for number, (line, kinds) in enumerate(zip(lines, marks), 1):
-        pieces, start = [], 0
-        while start < len(line):
-            end = start + 1
-            while end < len(line) and kinds[end] == kinds[start]:
-                end += 1
-            escaped = text(line[start:end])
-            pieces.append(f'<span class="token {kinds[start]}">{escaped}</span>' if kinds[start] else escaped)
-            start = end
-        rendered.append(f'<span class="code-line" data-line="{number}">{"".join(pieces)}</span>')
-    return "".join(rendered)
+    """Escaped source scaffold; PrismJS tokenizes the full block in the browser."""
+    return "".join(f'<span class="code-line" data-line="{i}">{text(line)}</span>' for i, line in enumerate(source.splitlines() or [""], 1))
+
+def presentation_css():
+    vendor = ROOT / "assets/vendor"
+    css_path = vendor / "katex/dist/katex.min.css"
+    css = css_path.read_text()
+    def embed_font(match):
+        relative = match[1].strip('\'"')
+        if relative.endswith(".woff2"):
+            encoded = base64.b64encode((css_path.parent / relative).read_bytes()).decode()
+            return f"url(data:font/woff2;base64,{encoded}) format('woff2')"
+        return ""
+    # Keep only modern WOFF2 sources; no relative font request survives embedding.
+    css = re.sub(r"url\(([^)]+)\)\s*format\([^)]+\),?", embed_font, css)
+    prism = (vendor / "prismjs/themes/prism-tomorrow.min.css").read_text()
+    return css + "\n" + prism + "\n" + (ROOT / "assets/style.css").read_text()
+
+def presentation_js():
+    vendor = ROOT / "assets/vendor"
+    paths = ["prismjs/components/prism-core.min.js", "prismjs/components/prism-clike.min.js", "prismjs/components/prism-javascript.min.js", "prismjs/components/prism-python.min.js", "prismjs/components/prism-json.min.js", "prismjs/components/prism-bash.min.js", "prismjs/components/prism-sql.min.js", "katex/dist/katex.min.js", "katex/dist/contrib/auto-render.min.js"]
+    licenses = "\n".join("/* " + (vendor / package / "LICENSE").read_text().replace("*/", "* /") + " */" for package in ["katex", "prismjs"])
+    runtime = licenses + "\nwindow.Prism={manual:true};\n" + "\n;\n".join((vendor / path).read_text() for path in paths)
+    runtime += "\n;\n" + (ROOT / "assets/code.js").read_text()
+    # Inline scripts must never be terminated by library source text.
+    return re.sub(r"</script", r"<\/script", runtime, flags=re.I)
 
 def code_block(source, language, title, zh):
     language = language if re.fullmatch(r"[a-z0-9-]+", language) else "text"
@@ -230,8 +216,8 @@ def render_paper(paper, data, base, alternate=None):
     cov = paper["read_coverage"]
     coverage = f'{cov["status"]} · ' + ("未覆盖：" if zh else "Unread: ") + "; ".join(cov["unread"])
     template = (ROOT / "assets/deck.html").read_text()
-    replacements = {"LANG": data["language"], "TITLE": text(paper["title"]), "SLIDES": "".join(sections), "TOC": "".join(toc), "CSS": (ROOT / "assets/style.css").read_text(), "JS": (ROOT / "assets/deck.js").read_text(), "COVERAGE": text(coverage), "HOME": "论文集合" if zh else "Collection", "CONTENTS": "目录" if zh else "Contents", "CLOSE": "关闭" if zh else "Close", "PREV": "上一页" if zh else "Previous", "NEXT": "下一页" if zh else "Next", "PLAY": "自动播放" if zh else "Autoplay", "SPEED": "每页时长" if zh else "Time per slide", "LANGUAGE": language_link(alternate, paper["id"])}
-    replacements["JS"] = (ROOT / "assets/code.js").read_text() + "\n" + replacements["JS"]
+    replacements = {"LANG": data["language"], "TITLE": text(paper["title"]), "SLIDES": "".join(sections), "TOC": "".join(toc), "CSS": presentation_css(), "JS": (ROOT / "assets/deck.js").read_text(), "COVERAGE": text(coverage), "HOME": "论文集合" if zh else "Collection", "CONTENTS": "目录" if zh else "Contents", "CLOSE": "关闭" if zh else "Close", "PREV": "上一页" if zh else "Previous", "NEXT": "下一页" if zh else "Next", "PLAY": "自动播放" if zh else "Autoplay", "SPEED": "每页时长" if zh else "Time per slide", "LANGUAGE": language_link(alternate, paper["id"])}
+    replacements["JS"] = presentation_js() + "\n" + replacements["JS"]
     # Single pass: inserted research text cannot turn into template directives.
     return re.sub(r"@@([A-Z]+)@@", lambda m: replacements[m[1]], template)
 
@@ -262,9 +248,9 @@ def render_index(data, alternate=None):
             claim = next(c for c in paper["claims"] if c["id"] == evidence["claim_id"])
             refs.append(f'<a href="{url(claim["url"])}">{text(evidence["paper_id"])}: {text(claim["locator"])}</a>')
         relations.append(f'<article class="relation"><strong>{text(rel["from"])} → {text(rel["to"])} · {text(rel["type"])} · {text(rel["status"])}</strong><p>{text(rel["statement"])}</p><p>{text(rel["comparability"]["status"])}: {text(rel["comparability"]["reason"])}</p>{" · ".join(refs)}</article>')
-    css = (ROOT / "assets/style.css").read_text()
+    css = presentation_css()
     scope = code_block(json.dumps(data["scope"], ensure_ascii=False, indent=2), "json", "阅读范围 · JSON" if zh else "Reading scope · JSON", zh)
-    script = (ROOT / "assets/code.js").read_text()
+    script = presentation_js()
     return f'<!doctype html><html lang="{data["language"]}"><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>{text(data["title"])}</title><style>{css}</style><body class="collection"><main>{language_link(alternate)}<p class="eyebrow">READ · THINK · BUILD</p><h1>{text(data["title"])}</h1><p class="intro">{text(data["scope"]["question"])}</p><p>{len(data["papers"])} {"篇论文" if zh else "papers"} · {len(groups)} {"条阅读路线" if zh else "reading routes"}</p>{"".join(sections)}<section><h2>{"论文关系与证据" if zh else "Connections and evidence"}</h2>{"".join(relations)}</section><details><summary>{"阅读范围" if zh else "Reading scope"}</summary>{scope}</details>{render_attribution([data["language"]])}</main><script>{script}</script></body></html>'
 
 def render_entry(locales):

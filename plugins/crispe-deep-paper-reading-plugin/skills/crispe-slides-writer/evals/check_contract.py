@@ -13,7 +13,7 @@ BASE = ROOT / "examples/deep-paper-reading"
 
 class ContractChecks(unittest.TestCase):
     def setUp(self):
-        self.data = json.loads((BASE / "project.json").read_text())
+        self.data = json.loads((BASE / "project.zh-CN.json").read_text())
 
     def reject(self, mutate):
         mutate(self.data)
@@ -40,16 +40,17 @@ class ContractChecks(unittest.TestCase):
         self.assertEqual(rendered.count('class="paper-score"'), 2)
         self.assertIn('language-json', rendered)
         self.assertIn('class="copy-code"', rendered)
-        self.assertIn('token property', rendered)
+        self.assertIn('Prism.tokenize', rendered)
+        self.assertIn('code.dataset.highlighter', rendered)
 
     def test_english_bundle(self):
         import re
-        data = json.loads((BASE / "project.en.json").read_text())
+        data = json.loads((BASE / "project.en-US.json").read_text())
         builder.validate(data, BASE)
         self.assertIsNone(re.search(r"[\u4e00-\u9fff]", json.dumps(data, ensure_ascii=False)))
 
     def test_locale_directory_layout(self):
-        english = json.loads((BASE / "project.en.json").read_text())
+        english = json.loads((BASE / "project.en-US.json").read_text())
         output = builder.render_site([(self.data, BASE), (english, BASE)])
         self.assertEqual(set(output), {"index.html", "zh-CN/index.html", "zh-CN/react.html", "zh-CN/reflexion.html", "en-US/index.html", "en-US/react.html", "en-US/reflexion.html"})
         self.assertIn('href="zh-CN/index.html"', output["index.html"])
@@ -65,7 +66,7 @@ class ContractChecks(unittest.TestCase):
             builder.render_site([(self.data, BASE), (self.data, BASE)])
 
     def test_translated_anchors_must_match(self):
-        english = json.loads((BASE / "project.en.json").read_text())
+        english = json.loads((BASE / "project.en-US.json").read_text())
         english["papers"][0]["slides"][0]["id"] = "different-cover"
         with self.assertRaises(ValueError):
             builder.render_site([(self.data, BASE), (english, BASE)])
@@ -120,6 +121,42 @@ class ContractChecks(unittest.TestCase):
 
     def test_unsafe_evidence_url(self):
         self.reject(lambda d: d["papers"][0]["claims"][0].update(url="javascript:alert(1)"))
+
+class RenderingDependencyChecks(unittest.TestCase):
+    def test_pinned_vendor_integrity(self):
+        import hashlib
+        vendor = SKILL / "assets/vendor"
+        manifest = json.loads((vendor / "manifest.json").read_text())
+        self.assertEqual(manifest["katex"]["version"], "0.16.22")
+        self.assertEqual(manifest["prismjs"]["version"], "1.30.0")
+        for package, record in manifest.items():
+            self.assertEqual(record["license"], "MIT")
+            for name, digest in record["files"].items():
+                self.assertEqual(hashlib.sha256((vendor / package / name).read_bytes()).hexdigest(), digest)
+
+    def test_embedded_math_fonts_and_font_stacks(self):
+        import re
+        css = builder.presentation_css()
+        urls = re.findall(r"url\(([^)]+)\)", css)
+        self.assertTrue(urls)
+        self.assertTrue(all(u.startswith("data:font/woff2;base64,") for u in urls))
+        self.assertIn('"Iosevka Aile","Noto Sans CJK SC",sans-serif', css)
+        self.assertIn('"Iosevka Etoile","Noto Serif CJK SC",serif', css)
+        self.assertIn('"IosevkaAlexJiang","Noto Sans Mono CJK SC",monospace', css)
+
+    def test_escaped_source_before_prism(self):
+        from html.parser import HTMLParser
+        class Collector(HTMLParser):
+            def __init__(self):
+                super().__init__(); self.parts = []
+            def handle_data(self, value):
+                self.parts.append(value)
+        source = '<script>alert("x")</script>'
+        parser = Collector(); parser.feed(builder.highlighted_lines(source, "python"))
+        self.assertEqual("".join(parser.parts), source)
+        self.assertNotIn("<script>", builder.highlighted_lines(source, "python"))
+        self.assertIn("Prism.tokenize", builder.presentation_js())
+
 
 class AttributionChecks(unittest.TestCase):
     """Independent of the optional external paper example bundle."""

@@ -5,7 +5,7 @@
 Create a scope draft and a candidate ledger in `scope.search_log` (strings, per contracts). Record exact query, source, cutoff, counters and include/defer/exclude decisions. `scope.exclusions` holds explicit exclusions. Use finite per-call result limits; do not fetch broad results and truncate only after examining them. Offline means zero network calls; set metadata budget to zero if none is needed. A scoped search is not an exhaustive/systematic review. Do not request additional full texts to fill a quota.
 创建范围草稿及 `scope.search_log` 候选台账（按约定使用字符串），记录查询、来源、截止、计数和纳入/暂缓/排除；明确排除放 `scope.exclusions`。每次请求有限条数，不能先大量获取检查再截断。离线不联网；无需元数据检索时预算设零。有界检索不等于穷尽/系统综述，不能为凑篇数额外取全文。
 
-**Artifact:** draft `project.json` with `papers: []`, `relations: []`, scope, title, locale and version 1. Candidates can live entirely in the log until identity/version/source is resolved. **Checkpoint:** state scope, limits and a named/versioned proposed full-text set; block new full texts until approved. User-named targets already satisfy this approval, subject to budget consistency.
+**Artifact:** draft `project.zh-CN.json` with `papers: []`, `relations: []`, scope, title, locale and version 1. Candidates can live entirely in the log until identity/version/source is resolved. **Checkpoint:** state scope, limits and a named/versioned proposed full-text set; block new full texts until approved. User-named targets already satisfy this approval, subject to budget consistency.
 **产物：** 草稿项目包含空论文/关系数组、范围、标题、语言及版本 1；候选身份/版本/来源未解时留日志即可。**检查点：** 展示范围、上限和具名版本集合；新全文未授权先暂停。用户已指定目标无需重复授权，但须满足预算。
 
 ## C1 — Analyst reading / 分析师阅读
@@ -26,7 +26,7 @@ Pass the same bundle, reports and scope to `crispe-paper-cross-link`. Ask for a 
 
 ## C3 — Writer and deterministic builder / 写作与确定性构建
 
-Supply `project.json` and all relative reports/assets to `crispe-slides-writer`. Request teaching-first lead/cards/takeaways, examples and appendix coverage notes, preservation of stable ids and evidence, and accessible navigation/figures. The writer owns deck structure/style/HTML integration. Reordering slides is fine; changing/removing ids requires updating and revalidating all references. The writer must not silently summarize away unread material, convert inferred claims to author claims or turn unresolved relations into conclusions.
+Supply `project.zh-CN.json` and all relative reports/assets to `crispe-slides-writer`. Request teaching-first lead/cards/takeaways, examples and appendix coverage notes, preservation of stable ids and evidence, and accessible navigation/figures. The writer owns deck structure/style/HTML integration. Reordering slides is fine; changing/removing ids requires updating and revalidating all references. The writer must not silently summarize away unread material, convert inferred claims to author claims or turn unresolved relations into conclusions.
 将项目包与所有相对报告/资源交 slides writer；要求教学优先的引导/卡片/收获、示例及覆盖附录，保留稳定 id 与证据，提供可访问导航/图示。writer 负责整套结构/样式/HTML 集成；可重排，改/删 id 须同步更新并核查所有引用。不能隐去未读材料、将推断改成作者主张或把未解决关系写成定论。
 
 **Artifact:** reviewed portable bundle and the writer's requested deterministic presentation outputs. **Checkpoint:** validate all contract fields, ids, links, figures, evidence and honest execution/read coverage before building; inspect rendered navigation after building. If writer/builder is unavailable, deliver the valid bundle as a pending presentation handoff, not a completed HTML deck. A builder failure does not invalidate good research or justify researching new claims.

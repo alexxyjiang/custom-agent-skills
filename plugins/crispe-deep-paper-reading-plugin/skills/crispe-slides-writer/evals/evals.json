@@ -6,7 +6,7 @@
       "prompt": "将指定 ReAct 与 Reflexion 分析生成接近本地模板的精读网页；代码与证据可跳转。",
       "expected_output": "Validate typed handoff; produce collection and decks, retain partial coverage, code line steps and citation/appendix links.",
       "files": [
-        "examples/deep-paper-reading/project.json"
+        "examples/deep-paper-reading/project.zh-CN.json"
       ]
     },
     {

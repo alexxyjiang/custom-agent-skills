@@ -1,6 +1,38 @@
 "use strict";
 (() => {
   const zh = document.documentElement.lang === "zh-CN";
+  // Tokenize complete blocks first: multiline Python strings/comments remain intact.
+  document.querySelectorAll(".code-panel code").forEach(code => {
+    const source = [...code.querySelectorAll(":scope > .code-line")].map(line => line.textContent).join("\n");
+    const language = Prism.util.getLanguage(code);
+    const grammar = Prism.languages[language];
+    const rows = [document.createElement("span")];
+    const row = () => rows[rows.length - 1];
+    function append(value, classes = []) {
+      if (typeof value === "string") {
+        value.split("\n").forEach((part, i) => {
+          if (i) rows.push(document.createElement("span"));
+          let target = row();
+          classes.forEach(names => { const span = document.createElement("span"); span.className = names; target.append(span); target = span; });
+          target.append(document.createTextNode(part));
+        });
+      } else if (Array.isArray(value)) value.forEach(token => append(token, classes));
+      else append(value.content, [...classes, ["token", value.type, ...(Array.isArray(value.alias) ? value.alias : value.alias ? [value.alias] : [])].join(" ")]);
+    }
+    append(grammar ? Prism.tokenize(source, grammar) : source);
+    rows.forEach((line, i) => { line.className = "code-line"; line.dataset.line = i + 1; });
+    code.replaceChildren(...rows);
+    code.dataset.highlighter = grammar ? "prismjs" : "plain";
+  });
+  // Render only authored prose, never source code, JSON, controls or raw records.
+  document.querySelectorAll(".slide h1,.slide .lead,.card p,.takeaway,.steps .step span,.paper-card p,.collection .intro").forEach(element => {
+    renderMathInElement(element, {
+      delimiters: [{left:"$$",right:"$$",display:true},{left:"\\[",right:"\\]",display:true},{left:"\\(",right:"\\)",display:false}],
+      throwOnError:false, trust:false, strict:"ignore",
+      ignoredTags:["script","noscript","style","textarea","pre","code","option"],
+      errorCallback:() => { element.dataset.mathError = "true"; }
+    });
+  });
   document.querySelectorAll(".copy-code").forEach(button => {
     button.addEventListener("click", async () => {
       const panel = button.closest(".code-panel");
