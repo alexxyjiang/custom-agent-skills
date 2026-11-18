@@ -11,7 +11,7 @@ description: >-
   full texts. 窄范围事实查询不触发 / Exclude narrow factual lookups.
   Opt-in worked examples and teaching code/functions; structured orchestrator handoff.
   按需提供具体示例、教学代码/函数与面向编排器的结构化交接。
-version: 1.4.0
+version: 1.4.1
 argument-hint: "[PDF路径/pdf-path|arxiv-id|arxiv-url] (可选/optional) -- 指定论文；省略时询问或解析下一篇 / identify paper or resolve next paper"
 ---
 
@@ -333,10 +333,10 @@ explain the substance behind the name.
 用 2–5 句话说明问题、机制和真正的新意。可保留方法名或类比，但解释其背后的实质，不照搬摘要。
 
 ### 二、是否值得深度阅读 (必须 / Required)
-- **评分：N/4**（N ∈ {1,2,3,4}，按 [Instruction] 第4步的标准）
-- **理由**：why this score, referencing specific strengths/weaknesses found while reading the full paper
+- **评分 / Score: N/4**（N ∈ {1,2,3,4}，按第4步 / follow Instruction step 4）
+- **理由 / Rationale**：why this score, referencing specific strengths/weaknesses found while reading the full paper
   (not just restating the contribution list)
-- **行业定位**：place it relative to 1-2 named prior works pulled from Related Work/References -- what
+- **行业定位 / Field Positioning**：place it relative to 1-2 named prior works pulled from Related Work/References -- what
   gap does it fill, or what does it just incrementally extend
 - **证据与局限 / Evidence and limits**: name the strongest supporting result and the most important
   threat to the conclusion, with paper locators. Separate not reported from not performed; apply
@@ -349,7 +349,7 @@ explain the substance behind the name.
   cite exact sources and access dates, distinguish paper claims / external evidence / analyst
   inference, and state actual read/search scope and gaps. Missing-companion installation guidance
   belongs in the pre-collaboration setup notice above; keep the final report's main section order intact.
-- **推荐阅读顺序**（if score ≥ 2 and section 三 is included）：which sections to read first and which to
+- **推荐阅读顺序 / Reading Order**（if score ≥ 2 and section 三 is included）：which sections to read first and which to
   skip, in priority order. At a score of 1 (on the 1-4 scale), it's fine to just say there's no
   priority-read worth mapping out.
 
@@ -440,7 +440,7 @@ required specificity -- not a real paper):
 
 以下为虚构示例，用于展示位置与论证应有的具体程度，不代表真实研究结果。
 
-### 一、核心思想
+### 一、核心思想 / Core Idea
 现有的 agent 记忆方法把用户偏好压缩进一段不断被覆盖的摘要，导致多维兴趣相互纠缠、旧偏好被新偏好覆盖式遗忘。本文
 提出把记忆拆成细粒度的"原子记忆单元"，每个单元只承载一个独立的偏好维度并附带语义向量和来源交互记录；再通过向量
 相似度把不同用户的原子记忆连边、做子图搜索聚合成"记忆社区"，使协同信号可以在用户之间低成本传播，而不需要整段摘要
@@ -450,7 +450,7 @@ English: Instead of overwriting one entangled preference summary, this fictional
 source-linked atomic memories across users into searchable communities, avoiding full-summary
 rewrites and expensive graph convolution.
 
-### 二、是否值得深度阅读
+### 二、是否值得深度阅读 / Worth Reading In-Depth
 - **评分：3/4**
 - **理由**：方法论新颖（原子化+社区结构替代单一摘要记忆），消融实验扎实地证明了每个组件的贡献，而不是只报告端到端数字
 - **行业定位**：相对于 Related Work 中提到的 flat memory（如 [59]）和 planar/graph memory（如 [23,46]）方法，
@@ -459,16 +459,17 @@ rewrites and expensive graph convolution.
 - **推荐阅读顺序**：§1 Introduction → §3.2 Memory Construction + Fig.2 → §3.4 Memory Evolution → Table 5
   消融实验；§4.1-4.3 实验设置细节和 §5 Related Works 可泛读或跳过
 
-第二节的评分、理由和行业定位应有全文证据及具名比较工作。补充最强证据和主要局限并附定位，不把未报告当未实施，不机械套用临床量表。涉及落地时给出尝试 PoC/观察/暂缓、场景、收益、数据/算力/延迟/集成成本、迁移假设和最小验证成功/停止标准；估计与未知项标注清楚。外部核查列精确来源、访问日期和覆盖范围，区分作者主张、外部证据、分析者推断；安装提示放协作前。至少 2 分时给优先阅读顺序。
+English counterpart: score 3/4 in this fictional example because the atomic-memory/community mechanism combines fine-grained preferences with cross-user signals. Compare the named source categories only as shown in the fictional paper; real reports must name actual prior works. Read §3.2 → Fig.2 → §3.4 → Table 5, then inspect evaluation setup and Related Work. This excerpt illustrates specificity, not a real result or a substitute for the evidence/application fields required above.
+英文对应：虚构示例的3/4分来自细粒度记忆与跨用户信号的组合；这里只展示虚构论文内的比较类别，真实报告须具名真实先前工作。阅读顺序如上，随后核对评测及相关工作。本摘录仅示范具体程度，不是真实结论，也不代替前述证据/应用字段。
 
-### 三、重点章节
+### 三、重点章节 / Key Sections
 | 章节 / Section | 位置 / Location | 内容 / Content |
 |---|---|---|
 | §3.2 Memory Construction | p.3, Eq.(5)-(7) | 原子记忆单元的结构定义 `m = {c, e, I, L}` 及基于余弦相似度 $\text{sim}_{i,j} = e_i \cdot e_j / (\|e_i\|\|e_j\|)$ 的关系抽取——这是方法论的核心创新点，而非背景铺垫；atomic-memory structure and cosine edge extraction, the method core |
 | Fig.2 Overview | p.4 | 四步流程图（原子记忆形成→社区构建→检索→演化），建议配合正文对照阅读；four-stage overview: creation, community building, retrieval, evolution |
 | Table 5 消融实验 | p.8 | 证明原子记忆单元（AMU）贡献最大，去掉后退化到接近 baseline 水平——这是判断设计是否"真的有用"的关键证据；AMU removal approaches baseline, evidence for component contribution |
 
-### 四、重点公式 / 图表
+### 四、重点公式 / 图表 / Key Formulas and Figures
 Eq.(6) 的余弦相似度 $\text{sim}_{i,j} = e_i \cdot e_j / (\|e_i\|\|e_j\|)$ 中，$e_i, e_j$ 是两条原子记忆的语义
 嵌入向量；分子做点积衡量方向一致性，分母做归一化消除向量长度的影响。该分数决定哪些记忆被视为"协同邻居"并连边，是
 后续 2-hop BFS 社区发现（Eq.8）的输入——理解这个公式就理解了整个协同信号传播机制的起点。
@@ -477,7 +478,7 @@ English: In Eq.(6), e_i and e_j are atomic-memory embeddings. The dot product me
 normalization removes magnitude effects. The cosine score selects collaborative edges for the
 two-hop BFS community discovery in Eq.(8).
 
-### 五、基础概念推荐
+### 五、基础概念推荐 / Background Concepts
 - **Mixture of A Million Experts** -- 一种通过 product-key 检索代替稠密路由，从而扩展到极大量微型专家的稀疏
   MoE 变体。来源：He, 2024, arXiv:2407.04153（见本文 References [12]）。
 

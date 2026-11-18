@@ -5,10 +5,10 @@ Inspected local `~/paper-reading-slides`: `index.html`, `react.html`, `reflexion
 已检查上述本地索引、ReAct、Reflexion、HippoRAG 页面；该路径是本次输入，不是安装依赖。内置生成器重新实现所观察到的设计规则，不复制论文正文或图片负载。
 
 ## Tokens and layouts / 变量与版式
-- Stage 1600×900, scaled uniformly inside a dark `#0b1120` viewport; slide `#f8fafc`, text `#0f172a`, body `#334155`, muted `#64748b`, border `#e2e8f0`.
-  1600×900 固定画布，暗背景中等比例缩放；页面、正文、弱化文字及边框采用上述颜色。
-- Indigo `#4f46e5`: mechanism; emerald `#059669`: evidence; amber `#d97706`: assumptions; rose `#e11d48`: failures. White/tinted cards, 16px radius, generous gutters; role-specific local font stacks below.
-  靛蓝对应机制，绿色对应证据，琥珀对应假设，玫红对应失败；白色/浅色卡片、16px 圆角、充分间距、下述按角色区分的本地字体栈。
+- Stage 1600×900; Ivory #fffff0 outer webpage background, GhostWhite #f8f8ff slide, MidnightBlue/Navy text, LightSteelBlue #b0c4de borders, RoyalBlue #4169e1 accent.
+  1600×900固定画布，在Ivory #fffff0网页外背景中等比例缩放；slide为GhostWhite #f8f8ff，正文、边框及强调色如上。
+- RoyalBlue `#4169e1`: primary accent. Semantic cards use AliceBlue `#f0f8ff`, Honeydew `#f0fff0`, Ivory `#fffff0`, and MistyRose `#ffe4e1`; retain 16px corners, generous gutters and role-specific local fonts.
+  皇家蓝作为主强调色；机制、证据、提醒和反例分别采用上述标准浅蓝、浅绿、浅黄、浅红卡片，保留16px圆角和充分间距。
 - Chapter pill → informative question/title → lead → two/three panels → takeaway → source strip. Code left, explanation/state right. Collection page uses responsive topic groups and linked cards, not the fixed slide stage.
   章节标签→问题标题→导语→双/三栏→要点→来源条。代码左侧、解释和状态右侧；集合页响应式主题卡片，不受固定画布限制。
 
@@ -31,9 +31,21 @@ Target titles ≤70 characters, leads ≤240, two/three cards with short paragra
 - Code, JSON and execution records: `"IosevkaAlexJiang", "Noto Sans Mono CJK SC", monospace`.
   代码、JSON和运行记录按上述顺序回退。
 
-Use bundled KaTeX for inline `\(x\)` and display `\[x\]` / `$$x$$`; keep its own math font families. Never scan pre/code or single-dollar prices. Use bundled PrismJS with the Tomorrow palette and matching component colors, not a homemade lexer. Tokenize an entire block so multiline strings stay correct; preserve exact 1-based line wrappers for walkthroughs and copy only original source. Both libraries and WOFF2 math fonts are embedded in generated HTML; inspect `assets/vendor/manifest.json` and packaged MIT licenses for provenance.
-采用内置KaTeX处理行内与独立公式并保留数学字体；不扫描pre/code或单美元价格。代码用内置PrismJS的Tomorrow配色并匹配组件色，不再自制词法着色。整块分词保证多行字符串，保留一基行包装与纯源码复制。两库与数学WOFF2字体内嵌HTML；来源及MIT许可见vendor清单和许可文件。
+Use bundled KaTeX for inline `\(x\)` and display `\[x\]` / `$$x$$`; keep its own math font families. Never scan pre/code or single-dollar prices. Use bundled PrismJS with its official default prism.css theme, without application token/background recoloring. Keep KaTeX default colors unchanged. Tokenize an entire block so multiline strings stay correct; preserve exact 1-based line wrappers for walkthroughs and copy only original source. Both libraries and WOFF2 math fonts are embedded in generated HTML; inspect `assets/vendor/manifest.json` and packaged MIT licenses for provenance.
+采用内置KaTeX处理行内与独立公式并保留数学字体；不扫描pre/code或单美元价格。代码用PrismJS官方默认prism.css，不覆盖语法或背景颜色；KaTeX默认色表不变。整块分词保证多行字符串，保留一基行包装与纯源码复制。两库与数学WOFF2字体内嵌HTML；来源及MIT许可见vendor清单和许可文件。
 
 ## Playback observability and recovery / 播放可观察性与恢复
 A pressed button is not proof of autoplay. Show seconds until the next slide and localized waiting reasons. Observe all details toggle events with capture, including dynamically added nodes; use one cancellable deadline/timer with a recovery fallback. Reconcile modal/tab changes without resetting a live deadline. Real-time regression must run against the user's generated file and the generator output, including the non-code details close/resume path.
 按钮按下不代表播放正常；显示下一页倒计时及等待原因。捕获所有details事件含动态节点，单可取消计时器/截止时间并有恢复兜底；弹窗/页签变化协调状态但不重置有效截止时间。真实计时回归同时覆盖用户文件及生成输出，包含非代码区详情收起恢复。
+
+## Named palette / 标准命名配色
+Keep blue application chrome (RoyalBlue #4169e1, MidnightBlue #191970, Navy #000080, SteelBlue #4682b4, LightSteelBlue #b0c4de). Preserve semantic pastel cards: mechanism AliceBlue #f0f8ff, evidence Honeydew #f0fff0 or MintCream #f5fffa, caution Ivory #fffff0 or OldLace #fdf5e6, counterexample MistyRose #ffe4e1 or LavenderBlush #fff0f5; neutral WhiteSmoke #f5f5f5, Linen #faf0e6 or White #ffffff. Use basic named colors for semantic borders and neutral values. Write application hex values in lowercase. Prism default theme and KaTeX styles are independent of this palette; do not normalize their vendor colors. Original paper artwork remains unchanged.
+页面框架采用上述标准蓝色色表，保留机制蓝/证据绿/提醒黄/反例红等浅色语义卡片及中性背景；语义边框和中性色使用基本命名色。应用十六进制全部小写；Prism默认主题和KaTeX不参与应用色表归一，不修改第三方颜色；论文原图不改色。
+
+## Surface boundaries / 背景区域边界
+The webpage area outside the slide frame is always Ivory #fffff0, including letterboxing around the uniformly scaled stage on desktop and phone. Keep this separate from the slide canvas (#f8f8ff), semantic pastel cards, blue navigation chrome, and figure/zoom surfaces (#ffffff). Prism uses its unmodified default theme; KaTeX retains default colors. Do not recolor original figures; reconstruct PDF soft masks or render white-background crops when necessary for readable labels/axes. Use lowercase authored hex values throughout.
+桌面及手机等比缩放后，slides外框外的网页区域（含上下/左右留白）统一Ivory #fffff0。与slide画布#f8f8ff、浅色语义卡片、蓝色导航及图表/放大白底#ffffff区分。Prism使用未改动默认主题，KaTeX默认色不变；原图不染色，必要时恢复PDF软蒙版或白底裁图保证标签坐标可读。自有十六进制全部小写。
+
+## Contents introduction / 目录导语
+Reuse paper.summary from the collection card as the table-of-contents introduction, following the page language. Do not expose raw read_coverage states or an empty “Unread:” label as reader-facing introductory copy. Retain the actual coverage record in the project/report and any substantive limitations in the relevant evidence slides.
+目录导语复用集合卡片的paper.summary并跟随页面语言；不把原始read_coverage状态或空未覆盖标签作为读者导语。真实覆盖记录保留在项目/报告，实质局限放相应证据页。

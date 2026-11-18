@@ -148,7 +148,7 @@ def presentation_css():
         return ""
     # Keep only modern WOFF2 sources; no relative font request survives embedding.
     css = re.sub(r"url\(([^)]+)\)\s*format\([^)]+\),?", embed_font, css)
-    prism = (vendor / "prismjs/themes/prism-tomorrow.min.css").read_text()
+    prism = (vendor / "prismjs/themes/prism.css").read_text()
     return css + "\n" + prism + "\n" + (ROOT / "assets/style.css").read_text()
 
 def presentation_js():
@@ -204,7 +204,13 @@ def render_paper(paper, data, base, alternate=None):
             asset = base / fig["src"]
             mime = mimetypes.guess_type(asset.name)[0]
             encoded = base64.b64encode(asset.read_bytes()).decode()
-            body += f'<figure><button class="zoom" type="button" aria-label="{text(fig["alt"])}"><img src="data:{mime};base64,{encoded}" alt="{text(fig["alt"])}"></button><figcaption>{text(fig["caption"])} · <a href="{url(fig["source_url"])}">{text(fig["locator"])}</a></figcaption></figure>'
+            # Render one semantic caption only; original text remains available as
+            # provenance when a localized caption is supplied by the author.
+            artwork = f'<figure class="paper-figure"><button class="zoom" type="button" aria-label="{text(fig["alt"])}"><img src="data:{mime};base64,{encoded}" alt="{text(fig["alt"])}"></button><figcaption><span class="figure-caption">{text(fig["caption"])}</span> · <a href="{url(fig["source_url"])}">{text(fig["locator"])}</a></figcaption></figure>'
+            if cards and "example_id" not in slide:
+                body = f'<div class="figure-explainer">{artwork}<div class="figure-notes"><div class="cards">{cards}</div></div></div>'
+            else:
+                body += artwork
         refs = "".join(f'<a href="{url(claims[c]["url"])}" title="{text(claims[c]["limits"])}">{text(claims[c]["locator"])} [{text(claims[c]["kind"])}]</a>' for c in slide.get("claim_ids", []))
         links = list(slide.get("links", []))
         for rel in data.get("relations", []):
@@ -213,10 +219,8 @@ def render_paper(paper, data, base, alternate=None):
         nav = "".join(f'<a class="cross-link" href="{text(l["paper_id"])}.html#slide-{text(l["slide_id"])}">{text(l["label"])}</a>' for l in links)
         tag = ("附录 · " if zh else "Appendix · ") if slide["appendix"] else ""
         sections.append(f'<section class="slide" id="slide-{sid}" aria-label="{text(slide["title"])}"><header><span class="badge">{tag}{text(slide.get("chapter", ""))}</span><span>{number:02} / {len(paper["slides"])}</span></header><h1>{text(slide["title"])}</h1><p class="lead">{text(slide.get("lead", ""))}</p><div class="slide-body">{body}{nav}</div><p class="takeaway">{text(slide.get("takeaway", ""))}</p><footer>{refs}</footer></section>')
-    cov = paper["read_coverage"]
-    coverage = f'{cov["status"]} · ' + ("未覆盖：" if zh else "Unread: ") + "; ".join(cov["unread"])
     template = (ROOT / "assets/deck.html").read_text()
-    replacements = {"LANG": data["language"], "TITLE": text(paper["title"]), "SLIDES": "".join(sections), "TOC": "".join(toc), "CSS": presentation_css(), "JS": (ROOT / "assets/deck.js").read_text(), "COVERAGE": text(coverage), "HOME": "论文集合" if zh else "Collection", "CONTENTS": "目录" if zh else "Contents", "CLOSE": "关闭" if zh else "Close", "PREV": "上一页" if zh else "Previous", "NEXT": "下一页" if zh else "Next", "PLAY": "自动播放" if zh else "Autoplay", "SPEED": "每页时长" if zh else "Time per slide", "LANGUAGE": language_link(alternate, paper["id"])}
+    replacements = {"LANG": data["language"], "TITLE": text(paper["title"]), "SLIDES": "".join(sections), "TOC": "".join(toc), "CSS": presentation_css(), "JS": (ROOT / "assets/deck.js").read_text(), "SUMMARY": text(paper["summary"]), "HOME": "论文集合" if zh else "Collection", "CONTENTS": "目录" if zh else "Contents", "CLOSE": "关闭" if zh else "Close", "PREV": "上一页" if zh else "Previous", "NEXT": "下一页" if zh else "Next", "PLAY": "自动播放" if zh else "Autoplay", "SPEED": "每页时长" if zh else "Time per slide", "LANGUAGE": language_link(alternate, paper["id"])}
     replacements["JS"] = presentation_js() + "\n" + replacements["JS"]
     # Single pass: inserted research text cannot turn into template directives.
     return re.sub(r"@@([A-Z]+)@@", lambda m: replacements[m[1]], template)
@@ -251,7 +255,7 @@ def render_index(data, alternate=None):
     css = presentation_css()
     scope = code_block(json.dumps(data["scope"], ensure_ascii=False, indent=2), "json", "阅读范围 · JSON" if zh else "Reading scope · JSON", zh)
     script = presentation_js()
-    return f'<!doctype html><html lang="{data["language"]}"><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>{text(data["title"])}</title><style>{css}</style><body class="collection"><main>{language_link(alternate)}<p class="eyebrow">READ · THINK · BUILD</p><h1>{text(data["title"])}</h1><p class="intro">{text(data["scope"]["question"])}</p><p>{len(data["papers"])} {"篇论文" if zh else "papers"} · {len(groups)} {"条阅读路线" if zh else "reading routes"}</p>{"".join(sections)}<section><h2>{"论文关系与证据" if zh else "Connections and evidence"}</h2>{"".join(relations)}</section><details><summary>{"阅读范围" if zh else "Reading scope"}</summary>{scope}</details>{render_attribution([data["language"]])}</main><script>{script}</script></body></html>'
+    return f'<!doctype html><html lang="{data["language"]}"><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>{text(data["title"])}</title><style>{css}</style><body class="collection"><main>{language_link(alternate)}<p class="eyebrow">READ, THINK, PRESENTATION</p><h1>{text(data["title"])}</h1><p class="intro">{text(data["scope"]["question"])}</p><p>{len(data["papers"])} {"篇论文" if zh else "papers"} · {len(groups)} {"条阅读路线" if zh else "reading routes"}</p>{"".join(sections)}<section><h2>{"论文关系与证据" if zh else "Connections and evidence"}</h2>{"".join(relations)}</section><details><summary>{"阅读范围" if zh else "Reading scope"}</summary>{scope}</details>{render_attribution([data["language"]])}</main><script>{script}</script></body></html>'
 
 def render_entry(locales):
     """Use exactly the generated languages, including the entry and credit."""
@@ -261,7 +265,13 @@ def render_entry(locales):
     intro = "选择阅读语言 / Choose your reading language" if zh and en else "选择阅读语言" if zh else "Choose your reading language"
     links = "".join(f'<a class="locale-card" href="{locale}/index.html" hreflang="{locale}" lang="{locale}"><strong>{LOCALES[locale]}</strong><span>{locale}</span></a>' for locale in available)
     css = (ROOT / "assets/style.css").read_text()
-    return f'<!doctype html><html lang="{available[0]}"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>{title}</title><style>{css}</style></head><body class="collection"><main class="language-entry"><p class="eyebrow">READ · THINK · BUILD</p><h1>{title}</h1><p class="intro">{intro}</p><nav class="locale-grid" aria-label="{intro}">{links}</nav>{render_attribution(available)}</main></body></html>'
+    redirect = ""
+    if len(available) == 1:
+        target = json.dumps(available[0] + "/index.html")
+        redirect = ('<script>(()=>{try{const target=new URL(' + target + ',location.href);'
+                    'target.search=location.search;target.hash=location.hash;'
+                    'location.replace(target.href);}catch(_){/* Keep the visible locale link usable. */}})();</script>')
+    return f'<!doctype html><html lang="{available[0]}"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>{title}</title><style>{css}</style></head><body class="collection"><main class="language-entry"><p class="eyebrow">READ, THINK, PRESENTATION</p><h1>{title}</h1><p class="intro">{intro}</p><nav class="locale-grid" aria-label="{intro}">{links}</nav>{render_attribution(available)}</main>{redirect}</body></html>'
 
 def render_site(bundles):
     """Validate complete locale bundles first, then render the root and locale trees."""

@@ -115,3 +115,13 @@ Expected stdout is exactly `[(0, 2)]` followed by a newline. Before running, rec
 
 The analyst sidecar is a partial handoff, merged into the orchestrator's existing project; it is not itself a complete builder input. The orchestrator adds scope, relations, and writer-authored slides. Contract strings (`actual_output`, `state`, `limits`) remain strings even when unknown. Generic examples must not be presented as evidence for a specific paper.
 分析师 sidecar 是合并到编排器项目的部分交接，不是可直接构建的完整项目；编排器添加 scope、relations 和 writer 编写的 slides。actual_output、state、limits 即使未知也保持字符串。通用示例不得作为特定论文的证据。
+
+## Figure handoff / 图表交接
+For every figure/table invoked by the analysis or used to explain evidence, include its original-asset entry in the writer handoff so the corresponding slide can show and explain it directly without sending readers back to the paper: pinned version, figure/table number, physical PDF page, caption, relevant claim, extraction/crop coordinates if known, and actual visual-read status. Reuse the target PDF; request no unrelated full text. Preserve original labels and data, distinguish original artwork/crop from teaching redrawing, and direct extraction to the writer's paper-figures reference. A successful image extraction does not establish a completed visual read.
+分析中提及或用于说明证据的每个图表，都给writer交接原图信息，使对应slide直接展示并讲解，不让读者返回论文横跳：固定版本、图表号、物理页、图注、关联主张、已知提取/裁图坐标及真实视觉阅读状态。复用目标PDF，不取无关全文；保留原始标签和数据，区分原图/裁图与教学重绘，提取按writer原图参考执行。提取成功不等于视觉阅读完成。
+
+Figure handoffs must include the complete original caption, not only a translated summary or figure number. Inventory every body figure/table referenced by slides. Direct embedding is valid; local screenshots are optional, but artwork, caption lines, panel labels and notes must remain complete.
+图表交接包含完整原文图注，不能仅译文摘要或图号；清点slides引用的全部正文图表。允许直接嵌入，截图可选，但图表、图注全部行、面板标签及注释须完整。
+
+For slide publication, deliver artwork-only images with complete labels/panels/notes and preserve the original caption separately as provenance. The writer displays one page-language caption, preserving full original caption text only in provenance rather than a second visible caption. Do not include production-process statements in reader-facing explanations.
+发布交接提供图表本体，保留完整标签/面板/表注，原图注另存溯源。writer仅展示页面语言的一份图注，完整原图注存溯源而非第二份可见文字；面向读者的解释不写制作过程自述。

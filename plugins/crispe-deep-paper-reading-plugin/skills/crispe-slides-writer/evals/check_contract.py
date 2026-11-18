@@ -170,6 +170,14 @@ class AttributionChecks(unittest.TestCase):
         self.assertIn('href="en-US/index.html"', page)
         self.assertNotIn('href="zh-CN/index.html"', page)
 
+    def test_single_locale_redirect_has_fallback(self):
+        page = builder.render_entry(["zh-CN"])
+        self.assertIn('new URL("zh-CN/index.html",location.href)', page)
+        self.assertIn('location.replace(target.href)', page)
+        self.assertIn('href="zh-CN/index.html"', page)
+        self.assertIn('READ, THINK, PRESENTATION', page)
+        self.assertNotIn('location.replace', builder.render_entry(["zh-CN", "en-US"]))
+
     def test_chinese_only_entry(self):
         page = builder.render_entry(["zh-CN"])
         self.assertIn('由 ', page)

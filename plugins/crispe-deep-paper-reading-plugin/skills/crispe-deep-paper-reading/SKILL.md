@@ -7,7 +7,7 @@ description: >-
   paper reading-to-slides or research reading plans, not a lone bibliographic lookup.
   深度论文阅读编排：有限检索、具名全文授权、逐篇全文分析、跨论文证据关系及幻灯片交接；
   适用于读论文到演示的完整项目、专题精读，不用于单纯元数据查询。
-version: 1.4.0
+version: 1.4.1
 argument-hint: "[论文ID/链接/PDF路径或研究问题 / paper-ids|URLs|PDF-paths|research-question] (可选/optional) -- 指定精读目标或主题、阅读范围及输出语言 / specify reading targets or topic, scope and output language"
 ---
 
@@ -16,6 +16,10 @@ argument-hint: "[论文ID/链接/PDF路径或研究问题 / paper-ids|URLs|PDF-p
 ## [Context] / 背景
 Turn a bounded research question or a named paper set into a reusable, evidence-linked reading website. Readers need mechanisms, concrete examples, comparative judgments and precise sources without an uncontrolled literature crawl.
 将有边界的研究问题或具名论文集合转成可复用、证据互链的阅读网站；读者需要机制、实例、比较判断与精确来源，避免无边界追引。
+
+### READ, THINK, PRESENTATION / 先阅读，再思考，后呈现
+Use the exact site slogan `READ, THINK, PRESENTATION`. Read the approved source material first; think through mechanisms, evidence, comparisons and limitations next; only then organize the verified understanding into self-contained slides. Presentation is the result of reading and reasoning, never a substitute for them or a template-first summary of an abstract.
+站点slogan固定为上述文字。先阅读获批原始材料，再思考机制、证据、比较与局限，最后将核实后的理解组织为可独立阅读的slides。呈现是阅读与思考的产物，不能以模板填充或摘要改写代替理解。
 
 ## [Role] / 角色
 Act as a research-reading lead responsible for scope, shared artifacts and checkpoints. The analyst owns single-paper comprehension and scoring; cross-link owns relationships; the writer owns presentation. Execute roles sequentially unless delegation is explicitly authorized.
@@ -34,7 +38,7 @@ Read [contracts](references/contracts.md) before editing a bundle, [workflow](re
 4. Use metadata/abstract depth for candidate screening. Each approved deep-read target goes to `crispe-paper-analyst` for every page, figures, tables, equations, related work, references and included supplements. Preserve its report structure, locator detail and full-reading standard; do not replace it with a short summary or early score. An access/tool/context failure becomes `partial` with explicit unread ranges, never a successful full read. Pause/resume in chunks when needed. A metadata-only candidate is not a deeply read target. Before publishing a collection, require an evidence-backed integer 1–4 score for each card; complete substantive appraisal first, and disclose remaining gaps separately instead of deferring scores.
    候选筛选可只读元数据/摘要；每个获批精读目标交分析师逐页读图表、公式、相关工作、参考文献及随文补充材料。保留其报告结构、精确定位和全文标准，不用短摘要或提前评分代替。访问/工具/上下文失败记部分覆盖及未读范围，不伪装完成；必要时分块续读。元数据候选不算精读完成。集合发布前每张卡片必须有证据支持的1–4整数评分；先完成实质审查，剩余缺口另列，不能以暂缓替代评分。
 5. Sequence `crispe-paper-analyst` → `crispe-paper-cross-link` → `crispe-slides-writer`, using one agent-generated `project.<locale>.json` (`project.zh-CN.json` / `project.en-US.json`) and relative reports/assets. Sequential role execution in the same agent is valid; delegate only if authorized and supported. Missing skills do not justify pretending they ran: show original-source guidance, execute the documented role with available tools where possible, and expose any remaining checkpoint failure.
-   按分析师→关系构建→幻灯片写作执行，使用同一份智能体生成的 `project.zh-CN.json` 和相对报告/资源。同一智能体顺序扮演角色即可；仅经允许且宿主支持才委派。缺技能须提示原始来源，能用现有工具履行角色则继续，不能声称已调用；暴露未满足的检查点。
+   按分析师→关系构建→幻灯片写作执行，使用各语言对应的智能体项目包 `project.<locale>.json`（`project.zh-CN.json` / `project.en-US.json`） 和相对报告/资源。同一智能体顺序扮演角色即可；仅经允许且宿主支持才委派。缺技能须提示原始来源，能用现有工具履行角色则继续，不能声称已调用；暴露未满足的检查点。
 6. Stop research at the writer boundary. The builder renders deterministically and cannot supply missing research. Hand over verified content and visibly labeled provisional/unresolved items; never upgrade evidence or coverage to make a polished deck.
    写作边界处停止研究；构建器确定性呈现，不能补研究。交付已核实内容及显式标记的暂定/未解决事项，不为美观升级证据或覆盖。
 
@@ -43,8 +47,8 @@ Return the bundle location, approved targets and actual depths, candidate decisi
 返回项目包位置、获批目标与实际深度、候选决策与真实预算、报告/证据/导航检查、未解决缺口和最后完成的检查点。跟随用户语言，保留原始标识与定位。本定义双语，项目选择一个主语言并可在字符串内双语。部分阅读不能标为完整精读。
 
 ### Language and layout / 语言与目录
-Write this skill and its explanatory references in paired Chinese and English. Currently support only zh-CN and en-US output; do not add another documentation or output language. Generated websites use a bilingual root index.html entry, with all Chinese collection/deck pages under zh-CN/ and all English pages under en-US/. Any future approved locale must follow the same locale-directory convention.
-本技能及说明性参考文档保持中文、英文对照。目前仅支持 zh-CN 和 en-US，不新增其他文档或输出语言。生成网站使用双语根 index.html 入口，中文集合/论文页面全部放 zh-CN/，英文全部放 en-US/；未来获准增加语言时也按地区语言目录组织。
+Write this skill and its explanatory references in paired Chinese and English. Currently support only zh-CN and en-US output; do not add another documentation or output language. Generated websites use root index.html as the language entry: single-locale builds redirect to that locale with a visible fallback, while bilingual builds show both language choices. Chinese collection/deck pages live under zh-CN/ and English pages under en-US/. Any future approved locale must follow the same locale-directory convention.
+本技能及说明性参考文档保持中文、英文对照。目前仅支持 zh-CN 和 en-US，不新增其他文档或输出语言。根 index.html 为语言入口：单语言跳转至对应语言并保留备用链接，双语显示两种选择；中文集合/论文页放 zh-CN/，英文放 en-US/；未来获准增加语言时也按地区语言目录组织。
 
 ## [Performance] / 质量标准
 A successful handoff has finite logged budgets, pinned approved versions, honest coverage, evidence-backed 1–4 card scores, valid claim/slide references, and a working locale site. Report actual checks and unresolved gaps; builder success does not prove scientific validity. Never expand scope, fabricate adoption or upgrade a partial read to complete.
@@ -54,8 +58,8 @@ A successful handoff has finite logged budgets, pinned approved versions, honest
 **中文请求：**“精读 ReAct v3 与 Reflexion v4，最多20条元数据，只读这两篇全文，输出中英文网页。”
 **English request:** “Read ReAct v3 and Reflexion v4; cap metadata at 20, read only these full texts, and build Chinese/English pages.”
 
-**Expected handoff:** one approved set → two analyst reports with numeric scores and teaching traces → typed evidence relations → project.zh-CN.json plus translated bundle → root index.html and zh-CN/en-US collections. Preserve any unread figure gaps. A new cited paper requires named approval before full-text access.
-**预期交付：**一个授权集→两份含数值评分及教学追踪的分析报告→类型证据关系→项目及翻译包→根入口和中英文集合；保留未读图缺口，新增被引论文全文须具名批准。
+**Expected handoff:** one approved set → two analyst reports with numeric scores and teaching traces → typed evidence relations → project.zh-CN.json + project.en-US.json → root index.html and zh-CN/en-US collections. Preserve any unread figure gaps. A new cited paper requires named approval before full-text access.
+**预期交付：**一个授权集→两份含数值评分及教学追踪的分析报告→类型证据关系→project.zh-CN.json及project.en-US.json→根入口和中英文集合；保留未读图缺口，新增被引论文全文须具名批准。
 
 See [references/examples.md](references/examples.md) for bounded-search and partial-coverage cases.
 有界检索及部分覆盖场景见示例参考。

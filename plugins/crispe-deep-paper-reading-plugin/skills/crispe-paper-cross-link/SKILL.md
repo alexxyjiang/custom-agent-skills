@@ -2,12 +2,12 @@
 name: crispe-paper-cross-link
 description: >-
   Build evidence-backed typed relationships and slide navigation between papers in a portable
-  project.zh-CN.json bundle. Use for claim graphs, cross-paper comparisons, citing/extending/supporting/
+  project.<locale>.json bundle. Use for claim graphs, cross-paper comparisons, citing/extending/supporting/
   contradicting/similar/independent-replication distinctions, and linked reading decks.
   为论文建立带版本定位证据的类型关系与幻灯片导航；适用于主张图、跨论文比较、引用/扩展/
   支持/矛盾/相似/独立重复验证区分和互链阅读演示。不负责整站 HTML 或自动全文追引。
-version: 1.4.0
-argument-hint: "[project.zh-CN.json路径 / project-json-path] (可选/optional) -- 指定已有论文分析项目，核验跨论文证据关系并生成页面连接 / identify an analyzed-paper project to verify evidence relationships and create slide links"
+version: 1.4.1
+argument-hint: "[project.<locale>.json路径 / project.<locale>.json-path] (可选/optional) -- 指定已有论文分析项目，核验跨论文证据关系并生成页面连接 / identify an analyzed-paper project to verify evidence relationships and create slide links"
 ---
 
 # CRISPE Paper Cross-Link / CRISPE 跨论文证据互链
@@ -41,8 +41,8 @@ Read [contracts](references/contracts.md), then [relation rules](references/rela
 Return the updated project.<locale>.json and a compact review table: edge, type, status, endpoint evidence, comparability, remaining gap and source/target slide anchors. Use cites/extends/supports/contradicts/similar/replicates with verified/provisional/unresolved status; follow the exact local contract. No whole-site HTML output is required from this role.
 返回更新项目和简表：边、类型、状态、双端证据、可比性、缺口与起终点锚点。使用契约中的六种类型及三种状态，严格遵循本地字段；本角色不输出整站HTML。
 
-Write this skill and its explanatory references in paired Chinese and English. Currently support only zh-CN and en-US output; do not add another documentation or output language. Generated websites use a bilingual root index.html entry, with all Chinese collection/deck pages under zh-CN/ and all English pages under en-US/. Any future approved locale must follow the same locale-directory convention.
-本技能及说明性参考文档保持中文、英文对照。目前仅支持 zh-CN 和 en-US，不新增其他文档或输出语言。生成网站使用双语根 index.html 入口，中文集合/论文页面全部放 zh-CN/，英文全部放 en-US/；未来获准增加语言时也按地区语言目录组织。
+Write this skill and its explanatory references in paired Chinese and English. Currently support only zh-CN and en-US output; do not add another documentation or output language. Generated websites use root index.html as the language entry: single-locale builds redirect to that locale with a visible fallback, while bilingual builds show both language choices. Chinese collection/deck pages live under zh-CN/ and English pages under en-US/. Any future approved locale must follow the same locale-directory convention.
+本技能及说明性参考文档保持中文、英文对照。目前仅支持 zh-CN 和 en-US，不新增其他文档或输出语言。根 index.html 为语言入口：单语言跳转至对应语言并保留备用链接，双语显示两种选择；中文集合/论文页放 zh-CN/，英文放 en-US/；未来获准增加语言时也按地区语言目录组织。
 
 ## [Performance] / 质量标准
 Do not rewrite the analyst's full-reading obligation. If partial sources support only a citation or similarity observation, keep that narrow edge and disclose coverage; do not imply full scientific validation. An empty relation set is better than invented connections.

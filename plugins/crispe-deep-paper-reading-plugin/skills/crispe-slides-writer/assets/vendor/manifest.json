@@ -45,7 +45,8 @@
       "components/prism-javascript.min.js": "0345ea83e12b7b974e953c79a64dea35a40308309449db70b82020fb688ac321",
       "components/prism-json.min.js": "956d86baa5ae7ec4106758f354ac2d140bdcd7fc103dece02f73ed12b8d663e4",
       "components/prism-python.min.js": "ed4385685bcf2d4935c8dbbab4bde16603da1329e092d2bf36c3dadd67e9a85c",
-      "components/prism-sql.min.js": "3fc5f8ce69950ec73adc972f061df42aaea78faa4864709134ea2adc083f3a33"
+      "components/prism-sql.min.js": "3fc5f8ce69950ec73adc972f061df42aaea78faa4864709134ea2adc083f3a33",
+      "themes/prism.css": "87faadabd6d49d76ce3b03f811c6cbb5833d324de241070764067e273e72d164"
     }
   }
 }

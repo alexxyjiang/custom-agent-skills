@@ -13,8 +13,8 @@ Use a bundle root containing `project.zh-CN.json`, optional `reports/`, and opti
 
 ## Exact shape / 精确结构
 
-All fields below are required except those explicitly marked optional. Arrays may be empty; required strings remain present, with unknown/not-applicable facts explicitly explained rather than fabricated. Use JSON numbers only for version/budgets/line indices as specified; booleans are JSON booleans. Do not rename keys, change enums, add private schema fields or substitute per-paper bundles. Research logs and reports can hold additional narrative without extending this shape.
-除明确标注可选外，下列字段均必需。数组可为空；必需字符串仍需保留，未知或不适用须说明而非编造。版本、预算、行号按规定使用 JSON 数字，布尔值使用 JSON 布尔。禁止改键、改枚举、添加私有模式字段或拆成逐篇项目包；补充叙述放日志和报告。
+All fields below are required except those explicitly marked optional. Arrays may be empty; required strings remain present, with unknown/not-applicable facts explicitly explained rather than fabricated. Use JSON integers for schema_version, score.value, budgets and line indices; paper.version stays a string and booleans are JSON booleans. Do not rename keys, change enums, add private schema fields or substitute per-paper bundles. Research logs and reports can hold additional narrative without extending this shape.
+除明确标注可选外，下列字段均必需。数组可为空；必需字符串仍需保留，未知或不适用须说明而非编造。schema_version、score.value、预算及行号使用JSON整数；paper.version保持字符串，布尔值使用JSON布尔。禁止改键、改枚举、添加私有模式字段或拆成逐篇项目包；补充叙述放日志和报告。
 
 | Object / 对象 | Fields and types / 字段与类型 |
 |---|---|
@@ -29,7 +29,7 @@ All fields below are required except those explicitly marked optional. Arrays ma
 | slide | `id`: safe slug unique within its paper; `title`: string; `chapter`: string; `lead`: string; `cards`: card array; `claim_ids`: string array referring to this paper's claims; `example_id`: optional reference to this paper's example; `appendix`: boolean; `takeaway`: optional string; `links`: link array; `figure`: optional figure object |
 | card | `title`: string; `text`: string; `tone`: `indigo`, `emerald`, `amber`, or `rose` |
 | link | `paper_id`: existing paper id; `slide_id`: existing slide id in that paper; `label`: string |
-| figure | `src`: relative asset path string; `alt`: string; `caption`: string; `source_url`: HTTP(S) string; `locator`: string |
+| figure | `src`: relative asset path string; `alt`: string; `caption`: string; `source_url`: HTTP(S) string; `locator`: string; `original_caption`: optional complete verbatim caption provenance (not rendered separately) string |
 | relation | `id`: string unique across relations; `from`: source paper id; `to`: target paper id; `type`: `cites`, `extends`, `supports`, `contradicts`, `similar`, or `replicates`; `statement`: string; `status`: `verified`, `provisional`, or `unresolved`; `evidence`: evidence array; `comparability`: object below; `navigation`: object below |
 | evidence | `paper_id`: existing paper id; `claim_id`: existing claim id within that paper |
 | comparability | `status`: `comparable`, `not-comparable`, or `not-assessed`; `reason`: string |
@@ -86,3 +86,6 @@ Author TeX in prose string values with `\(…\)`, `\[…\]` or `$$…$$`; escape
 ## Locale-qualified bundle filenames / 按语言命名项目包
 Name each generated bundle `project.<locale>.json`: `project.zh-CN.json` for Chinese and `project.en-US.json` for English. The suffix must agree with the bundle's language field. A single-language project still includes its locale in the filename; do not generate unqualified or shortened locale filenames.
 每个生成项目包命名为上述完整地区语言格式，中文与英文分别使用对应文件名；后缀须与language字段一致。单语言项目也保留地区语言后缀，不生成无后缀或缩写语言名的项目文件。
+
+Figure publication uses artwork-only src and one visible page-language caption. Keep original_caption as provenance, not a second visible caption; preserve all graphic labels, legends and table notes. Reader-facing text excludes production-process claims. The primary theme accent is RoyalBlue #4169e1.
+图表发布使用仅图本体的src和一份页面语言可见图注；original_caption仅溯源不重复显示，图内标签/图例/表注保留。读者文字不含制作过程自述，主主题色为皇家蓝#4169e1。
