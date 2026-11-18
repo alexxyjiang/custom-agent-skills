@@ -187,6 +187,25 @@ def language_link(alternate, paper_id=None):
     require(locale in LOCALES, "Unknown alternate locale")
     return f'<a class="language-switch" href="{text(target)}" hreflang="{locale}">{LOCALES[locale]}</a>'
 
+def paper_source_key(value):
+    """Normalize a paper identity without conflating every URL on the same host."""
+    parsed = urlparse(value)
+    host = (parsed.hostname or "").lower().removeprefix("www.")
+    if host in {"arxiv.org", "export.arxiv.org"}:
+        match = re.match(r"/(?:abs|pdf|html)/(.+?)(?:\.pdf)?$", parsed.path)
+        if match:
+            return "arxiv:" + re.sub(r"v[0-9]+$", "", match[1])
+    if host in {"doi.org", "dx.doi.org"}:
+        return "doi:" + parsed.path.strip("/").lower()
+    return host + parsed.path.rstrip("/")
+
+def render_reference(label, source, paper, limits=""):
+    escaped = text(label)
+    title = f' title="{text(limits)}"' if limits else ""
+    if paper_source_key(source) == paper_source_key(paper["source_url"]):
+        return f'<span class="citation-marker"{title}>{escaped}</span>'
+    return f'<a class="reference-link" href="{url(source)}"{title}>{escaped}</a>'
+
 def render_paper(paper, data, base, alternate=None):
     zh = data["language"] == "zh-CN"
     claims = keyed(paper["claims"], "claim")
@@ -206,12 +225,12 @@ def render_paper(paper, data, base, alternate=None):
             encoded = base64.b64encode(asset.read_bytes()).decode()
             # Render one semantic caption only; original text remains available as
             # provenance when a localized caption is supplied by the author.
-            artwork = f'<figure class="paper-figure"><button class="zoom" type="button" aria-label="{text(fig["alt"])}"><img src="data:{mime};base64,{encoded}" alt="{text(fig["alt"])}"></button><figcaption><span class="figure-caption">{text(fig["caption"])}</span> · <a href="{url(fig["source_url"])}">{text(fig["locator"])}</a></figcaption></figure>'
+            artwork = f'<figure class="paper-figure"><button class="zoom" type="button" aria-label="{text(fig["alt"])}"><img src="data:{mime};base64,{encoded}" alt="{text(fig["alt"])}"></button><figcaption><span class="figure-caption">{text(fig["caption"])}</span> · {render_reference(fig["locator"], fig["source_url"], paper)}</figcaption></figure>'
             if cards and "example_id" not in slide:
                 body = f'<div class="figure-explainer">{artwork}<div class="figure-notes"><div class="cards">{cards}</div></div></div>'
             else:
                 body += artwork
-        refs = "".join(f'<a href="{url(claims[c]["url"])}" title="{text(claims[c]["limits"])}">{text(claims[c]["locator"])} [{text(claims[c]["kind"])}]</a>' for c in slide.get("claim_ids", []))
+        refs = "".join(render_reference(f'{claims[c]["locator"]} [{claims[c]["kind"]}]', claims[c]["url"], paper, claims[c]["limits"]) for c in slide.get("claim_ids", []))
         links = list(slide.get("links", []))
         for rel in data.get("relations", []):
             if rel["from"] == paper["id"] and rel["navigation"]["from_slide"] == sid:
@@ -250,7 +269,7 @@ def render_index(data, alternate=None):
         for evidence in rel["evidence"]:
             paper = next(p for p in data["papers"] if p["id"] == evidence["paper_id"])
             claim = next(c for c in paper["claims"] if c["id"] == evidence["claim_id"])
-            refs.append(f'<a href="{url(claim["url"])}">{text(evidence["paper_id"])}: {text(claim["locator"])}</a>')
+            refs.append(render_reference(f'{evidence["paper_id"]}: {claim["locator"]}', claim["url"], paper, claim["limits"]))
         relations.append(f'<article class="relation"><strong>{text(rel["from"])} → {text(rel["to"])} · {text(rel["type"])} · {text(rel["status"])}</strong><p>{text(rel["statement"])}</p><p>{text(rel["comparability"]["status"])}: {text(rel["comparability"]["reason"])}</p>{" · ".join(refs)}</article>')
     css = presentation_css()
     scope = code_block(json.dumps(data["scope"], ensure_ascii=False, indent=2), "json", "阅读范围 · JSON" if zh else "Reading scope · JSON", zh)

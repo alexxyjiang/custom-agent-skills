@@ -6,7 +6,7 @@ description: >-
   contradicting/similar/independent-replication distinctions, and linked reading decks.
   为论文建立带版本定位证据的类型关系与幻灯片导航；适用于主张图、跨论文比较、引用/扩展/
   支持/矛盾/相似/独立重复验证区分和互链阅读演示。不负责整站 HTML 或自动全文追引。
-version: 1.4.1
+version: 1.4.2
 argument-hint: "[project.<locale>.json路径 / project.<locale>.json-path] (可选/optional) -- 指定已有论文分析项目，核验跨论文证据关系并生成页面连接 / identify an analyzed-paper project to verify evidence relationships and create slide links"
 ---
 
@@ -43,6 +43,9 @@ Return the updated project.<locale>.json and a compact review table: edge, type,
 
 Write this skill and its explanatory references in paired Chinese and English. Currently support only zh-CN and en-US output; do not add another documentation or output language. Generated websites use root index.html as the language entry: single-locale builds redirect to that locale with a visible fallback, while bilingual builds show both language choices. Chinese collection/deck pages live under zh-CN/ and English pages under en-US/. Any future approved locale must follow the same locale-directory convention.
 本技能及说明性参考文档保持中文、英文对照。目前仅支持 zh-CN 和 en-US，不新增其他文档或输出语言。根 index.html 为语言入口：单语言跳转至对应语言并保留备用链接，双语显示两种选择；中文集合/论文页放 zh-CN/，英文放 en-US/；未来获准增加语言时也按地区语言目录组织。
+
+Local paper locators are static source markers in presentation; cross-slide, other-paper and third-party references remain links. Preserve their exact provenance and endpoint identities so the writer can classify them; link text is italic, underlined and RoyalBlue #4169e1.
+当前论文定位呈现为静态引用标记，跨slide/其他论文/第三方引用仍为链接；保留精确来源和端点身份供writer分类，文字统一斜体/下划线/皇家蓝#4169e1。
 
 ## [Performance] / 质量标准
 Do not rewrite the analyst's full-reading obligation. If partial sources support only a citation or similarity observation, keep that narrow edge and disclose coverage; do not imply full scientific validation. An empty relation set is better than invented connections.

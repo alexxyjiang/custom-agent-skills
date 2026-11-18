@@ -64,3 +64,7 @@ button:disabled{opacity:1;color:#c0c0c0!important;cursor:default}
 .paper-figure .zoom,.paper-figure img,#image-view,#image-view img{background:#ffffff}.paper-figure img,#image-view img{filter:none;mix-blend-mode:normal;opacity:1}
 
 .toc-summary{font-family:var(--font-body);color:var(--body);font-size:17px;line-height:1.65;white-space:normal;margin:12px 0 20px;max-width:900px}
+
+/* References: local paper locators are static; other destinations remain links. */
+.citation-marker,.reference-link,.cross-link,.slide footer a,.paper-figure figcaption a,.relation a{font-style:italic;text-decoration:underline;text-underline-offset:3px;color:#4169e1}
+.citation-marker{cursor:text}.figure-explainer{grid-template-rows:minmax(0,1fr)}.figure-notes{max-height:100%;overflow:auto;overscroll-behavior:contain;padding:3px}.figure-notes .cards{flex-shrink:0}.slide>header,.slide>h1,.slide>.lead,.slide>.takeaway,.slide>footer{flex-shrink:0}

@@ -6,7 +6,7 @@ description: >-
   turn this analysis into slides, or match a supplied reading template. 生成论文精读幻灯片、论文阅读网页、
   把分析做成 slides、按模板生成论文网页；支持中文与英文。 Consumes analysis; does not replace full-paper reading.
   消费已完成的分析，不代替全文阅读；普通 UI 开发、单纯论文总结或 PPT 转换不触发。
-version: 1.4.1
+version: 1.4.2
 argument-hint: "[project.<locale>.json路径 / project.<locale>.json-path] (可选/optional) -- 指定论文分析项目；可附模板路径、输出目录及中英文要求 / specify an analyzed-paper project, optional template path, output directory and Chinese/English preference"
 ---
 
@@ -91,6 +91,10 @@ For a single generated locale, root index.html redirects to its relative locale/
 Use Ivory #fffff0 for the webpage outside the slide frame, the named blue interface chrome and named white/pastel semantic card palette in references/design.md; retain red/yellow/green/blue distinctions and use lowercase application hex notation. PrismJS must use its official default prism.css without token-color overrides; KaTeX keeps its default colors. Do not recolor original paper figures. Theme rules apply only to application chrome/cards, not either rendering library.
 slides外框外网页背景固定Ivory #fffff0，界面蓝色及浅色语义卡片按design色表，保留红黄绿蓝区分且自有色值小写。PrismJS使用官方默认prism.css，不覆盖token颜色；KaTeX默认颜色不变；论文原图不改色。主题规则仅作用于应用框架/卡片，不覆盖渲染库。
 
+### Citation presentation / 引用呈现
+Render locators pointing to the current paper (including analyst-inference) as non-clickable citation markers, not links back to the full paper. Use italic text, underline and RoyalBlue #4169e1 for citation markers and retained reference links. Preserve cross-slide, other-paper and third-party destinations as functioning links; classify by paper identity/URL rather than claim kind or hostname alone. Keep source URLs in project provenance even when not clickable in the slide footer.
+指向当前论文的定位（含analyst-inference）显示为不可点击引用标记，不再链接整篇论文。引用标记及保留链接均用斜体、下划线和皇家蓝#4169e1。跨slide、其他论文及第三方目标保留真实链接；按论文身份/URL分类，不能只看主张类型或域名。底部不点击仍在项目溯源保留URL。
+
 ## [Performance] / 质量标准
 Every collection card shows an evidence-backed integer 1–4 score. Code/JSON/execution records use labelled semantic windows with highlighting and source-only copy; line-step mappings are exact. Validate both desktop and phone bounds, locale links, source/appendix links, TOC/focus, hash navigation, 5s/15s/30s/1min autoplay, modal/hidden-tab holds and last-slide stop. Prefer splitting overloaded pages to shrinking text. Record actual verification and unperformed checks separately.
 集合每张卡片展示有依据的1–4整数评分；代码/JSON/记录有标签、高亮和纯源码复制，行步骤精确。检查桌面/手机边界、语言/来源/附录链接、目录焦点、锚点、四档播放、弹窗/隐藏页签暂停及末页停止。过密拆页不缩字；实际检查与未执行项分开记录。
@@ -105,6 +109,10 @@ Before reporting a fix, run `evals/autoplay_check.py <actual-user-deck.html> --r
 ### Surface and rendering checklist / 背景与渲染检查
 Verify the scaled slide's surrounding webpage is #fffff0 on desktop and phone; keep figure images and zoom viewers #ffffff, semantic cards in the named pastel palette, and RoyalBlue #4169e1 as the primary accent. Use one localized caption outside artwork-only images; retain original caption provenance without duplicating visible captions. Keep reader-facing text free of production-method claims, except the requested generation credit and necessary controls. Confirm Prism default token/background colors and KaTeX default behavior are unaffected by application styling.
 检查桌面/手机缩放后slide四周网页为#fffff0，图表及放大窗口为#ffffff，语义卡片按标准浅色表，主色皇家蓝#4169e1。图本体不含印刷图注，外侧仅一份页面语言图注，原图注存溯源不重复显示。除指定生成署名和必要控件外，读者文案不含制作过程自述。确认应用样式不影响Prism默认语法/背景色及KaTeX默认表现。
+
+### Non-overlap gate / 无重叠门槛
+Measure rendered cards, figures, captions, takeaway and footer boxes after fonts/math/images settle. Any partial overlap is a failure even if text remains readable. Split long explanations into adjacent linked pages, preserving stable existing anchors; do not shrink fonts or hide scientific caveats to pass. Bound figure-side notes within their allocated grid; overflow recovery may scroll, but publication should favor concise or split content. Check actual user decks at desktop and phone sizes, not only generated fixtures.
+字体/公式/图片稳定后测量卡片、图、图注、takeaway及页脚边界；即使仍可读，局部重叠也不合格。长解释拆相邻互链页并保留既有锚点，不能缩字或删科学限定蒙混。图旁说明约束在分配网格内，滚动仅兜底，发布优先精简/拆页；桌面手机都测用户实际页面，不仅样本。
 
 ## [Example] / 示例
 - “把这两篇分析做成与模板接近的中文精读网页。” → validate claims, plan case/code/evidence pages, build a collection and two decks.

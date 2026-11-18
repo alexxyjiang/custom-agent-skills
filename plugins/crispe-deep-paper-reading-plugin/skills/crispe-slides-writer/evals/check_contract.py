@@ -158,6 +158,25 @@ class RenderingDependencyChecks(unittest.TestCase):
         self.assertIn("Prism.tokenize", builder.presentation_js())
 
 
+class CitationChecks(unittest.TestCase):
+    def test_local_arxiv_forms_are_static(self):
+        paper = {"source_url": "https://arxiv.org/abs/2304.03442v2"}
+        for source in ["https://arxiv.org/pdf/2304.03442v2.pdf", "https://arxiv.org/html/2304.03442v2#S6", "https://arxiv.org/abs/2304.03442"]:
+            markup = builder.render_reference("§6.1 [analyst-inference]", source, paper)
+            self.assertIn('class="citation-marker"', markup)
+            self.assertNotIn("href=", markup)
+
+    def test_external_paper_and_third_party_remain_links(self):
+        paper = {"source_url": "https://arxiv.org/abs/2304.03442v2"}
+        for source in ["https://arxiv.org/abs/2210.03629v3", "https://api.openalex.org/works/example"]:
+            self.assertIn('href="' + source + '"', builder.render_reference("Evidence", source, paper))
+
+    def test_reference_text_is_escaped(self):
+        markup = builder.render_reference("<script>x</script>", "https://example.com/paper", {"source_url":"https://example.com/paper"})
+        self.assertIn("&lt;script&gt;", markup)
+        self.assertNotIn("<script>", markup)
+
+
 class AttributionChecks(unittest.TestCase):
     """Independent of the optional external paper example bundle."""
 

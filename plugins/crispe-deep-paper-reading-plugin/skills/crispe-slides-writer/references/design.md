@@ -49,3 +49,7 @@ The webpage area outside the slide frame is always Ivory #fffff0, including lett
 ## Contents introduction / 目录导语
 Reuse paper.summary from the collection card as the table-of-contents introduction, following the page language. Do not expose raw read_coverage states or an empty “Unread:” label as reader-facing introductory copy. Retain the actual coverage record in the project/report and any substantive limitations in the relevant evidence slides.
 目录导语复用集合卡片的paper.summary并跟随页面语言；不把原始read_coverage状态或空未覆盖标签作为读者导语。真实覆盖记录保留在项目/报告，实质局限放相应证据页。
+
+## References and overlap / 引用与重叠
+Current-paper footer/figure locators are static italic underlined #4169e1 text; external paper, third-party and slide navigation links retain href with the same style. URL identity distinguishes references, including arXiv abs/pdf/html forms and versions. Preserve provenance in JSON. Do not tolerate overlapping paint: check card descendants against takeaway/footer after final rendering and split dense figure notes into adjacent pages. Keep all existing anchors valid.
+本论文底部/图定位为斜体下划线皇家蓝静态文字；外部论文/第三方/页面导航保留同样样式的href。URL身份区分引用，含arXiv不同形式及版本；JSON保留溯源。检查最终绘制卡片子元素与要点/页脚，不容忍覆盖；图旁长解释拆相邻页并保留锚点。

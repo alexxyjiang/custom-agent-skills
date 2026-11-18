@@ -11,7 +11,7 @@ description: >-
   full texts. 窄范围事实查询不触发 / Exclude narrow factual lookups.
   Opt-in worked examples and teaching code/functions; structured orchestrator handoff.
   按需提供具体示例、教学代码/函数与面向编排器的结构化交接。
-version: 1.4.1
+version: 1.4.2
 argument-hint: "[PDF路径/pdf-path|arxiv-id|arxiv-url] (可选/optional) -- 指定论文；省略时询问或解析下一篇 / identify paper or resolve next paper"
 ---
 
