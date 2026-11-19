@@ -96,11 +96,14 @@ function show(index, updateHash = true) {
   const oldFocus = document.activeElement?.closest(".slide");
   current = Math.max(0, Math.min(slides.length - 1, index));
   slides.forEach((s, i) => { const active = i === current; s.classList.toggle("active", active); s.inert = !active; s.setAttribute("aria-hidden", String(!active)); });
+  document.title = slides[current].dataset.slideHeading || slides[current].getAttribute("aria-label");
   prev.disabled = current === 0; next.disabled = current === slides.length - 1;
   document.querySelector("#page").textContent = `${current + 1} / ${slides.length}`;
   const progress = document.querySelector("#progress"); progress.max = slides.length; progress.value = current + 1;
   if (updateHash) { try { history.replaceState(null, "", "#" + slides[current].id); } catch (_) {} }
   if (oldFocus && oldFocus !== slides[current]) document.querySelector("#contents").focus();
+  window.fitPaperMath?.(slides[current]);
+  window.fitPaperFigures?.(slides[current]);
   schedule();
 }
 prev.addEventListener("click", () => show(current - 1));
@@ -108,7 +111,12 @@ next.addEventListener("click", () => show(current + 1));
 document.querySelector("#contents").addEventListener("click", () => { toc.showModal(); schedule(); });
 document.querySelectorAll("dialog .close").forEach(b => b.addEventListener("click", () => b.closest("dialog").close()));
 toc.addEventListener("click", e => { const a = e.target.closest("a"); if (!a) return; e.preventDefault(); const target = slides.findIndex(s => "#" + s.id === a.hash); if (target >= 0) show(target); toc.close(); });
-document.querySelectorAll(".slide a[href^='#slide-']").forEach(a => a.addEventListener("click", e => { const index = slides.findIndex(s => "#" + s.id === a.hash); if(index >= 0) {e.preventDefault(); show(index);} }));
+document.querySelectorAll(".slide a[href]").forEach(a => a.addEventListener("click", e => {
+  const target = new URL(a.href, location.href);
+  if (target.origin !== location.origin || target.pathname !== location.pathname || !target.hash.startsWith("#slide-")) return;
+  const index = slides.findIndex(s => "#" + s.id === target.hash);
+  if (index >= 0) { e.preventDefault(); show(index); }
+}));
 document.querySelectorAll(".example").forEach(example => { const buttons = [...example.querySelectorAll(".step")]; function activate(button) { const numbers = JSON.parse(button.dataset.lines); buttons.forEach(b => b.setAttribute("aria-pressed", String(b === button))); example.querySelectorAll(":scope > .code-panel .code-line").forEach(line => line.classList.toggle("highlight", numbers.includes(Number(line.dataset.line)))); } buttons.forEach(b => b.addEventListener("click", () => activate(b))); if(buttons.length) activate(buttons[0]); });
 document.querySelectorAll(".zoom").forEach(button => button.addEventListener("click", () => { const source = button.querySelector("img"), target = viewer.querySelector("img"); target.src = source.src; target.alt = source.alt; viewer.showModal(); schedule(); }));
 addEventListener("keydown", e => { if (toc.open || viewer.open || e.altKey || e.ctrlKey || e.metaKey || /INPUT|TEXTAREA|SELECT|PRE|CODE/.test(e.target.tagName) || e.target.isContentEditable) return; const map = {ArrowRight:current+1,ArrowDown:current+1,ArrowLeft:current-1,ArrowUp:current-1,Home:0,End:slides.length-1}; if(e.key in map) {e.preventDefault(); show(map[e.key]);} });

@@ -55,6 +55,9 @@ def validate(data, base):
         for field in ["title", "source_url", "version", "topic", "summary", "score", "read_coverage", "claims", "examples", "slides"]:
             require(field in paper, f"{pid}: missing {field}")
         url(paper["source_url"])
+        for source_field in ["publication_source", "archive_source"]:
+            if source_field in paper:
+                require(isinstance(paper[source_field], str) and bool(paper[source_field].strip()), f"{pid}: {source_field} must be a nonempty verified source label")
         if "arxiv.org/" in paper["source_url"]:
             require(re.search(r"v[1-9][0-9]*(?:$|[?#])", paper["source_url"]) is not None, f"{pid}: pin arXiv version")
         if "report_path" in paper:
@@ -99,6 +102,15 @@ def validate(data, base):
                 require(slide["example_id"] in examples, f"Unknown example: {pid}/{slide['example_id']}")
             for card in slide.get("cards", []):
                 require(card.get("tone", "indigo") in {"indigo", "emerald", "amber", "rose"}, "Invalid card tone")
+            if "figure_role" in slide:
+                require(slide["figure_role"] in {"key", "reference"}, "figure_role must be key or reference")
+            if "figure_layout" in slide:
+                require(slide["figure_layout"] in {"auto", "left", "right", "top", "bottom", "full"}, "Invalid figure_layout")
+            if "figure_notes" in slide:
+                require(isinstance(slide["figure_notes"], list), "figure_notes must be a card array")
+                for note in slide["figure_notes"]:
+                    require(isinstance(note, dict) and isinstance(note.get("title"), str) and isinstance(note.get("text"), str), "Figure note needs title and text")
+                    require(note.get("tone", "indigo") in {"indigo", "emerald", "amber", "rose"}, "Invalid figure note tone")
             if "figure" in slide:
                 fig = slide["figure"]
                 require(all(fig.get(k) for k in ["src", "alt", "caption", "source_url", "locator"]), "Incomplete figure provenance")
@@ -199,12 +211,90 @@ def paper_source_key(value):
         return "doi:" + parsed.path.strip("/").lower()
     return host + parsed.path.rstrip("/")
 
+def format_locator(value):
+    """Normalize presentation punctuation, never invent sections or page ranges."""
+    value = re.sub(r"\bPDF\s+(?:p(?:age)?\.?\s*)?", "p.", value, flags=re.I)
+    value = re.sub(r"\bp\.\s*", "p.", value)
+    value = re.sub(r"\s*[,，]\s*", ", ", value)
+    return value.strip()
+
+def figure_link_label(link, data):
+    label = link["label"]
+    if label.startswith(("查看图表：", "View figure: ")):
+        paper = next((p for p in data["papers"] if p["id"] == link["paper_id"]), None)
+        target = next((s for s in paper["slides"] if s["id"] == link["slide_id"]), None) if paper else None
+        if target and target.get("figure"):
+            prefix = "查看图表：" if label.startswith("查看图表：") else "View figure: "
+            return prefix + format_locator(target["figure"]["locator"])
+    return label
+
 def render_reference(label, source, paper, limits=""):
     escaped = text(label)
     title = f' title="{text(limits)}"' if limits else ""
     if paper_source_key(source) == paper_source_key(paper["source_url"]):
         return f'<span class="citation-marker"{title}>{escaped}</span>'
     return f'<a class="reference-link" href="{url(source)}"{title}>{escaped}</a>'
+
+def slide_source(paper):
+    if paper.get("publication_source"):
+        return paper["publication_source"].strip()
+    if paper.get("archive_source"):
+        return paper["archive_source"].strip()
+    parsed = urlparse(paper["source_url"])
+    host = (parsed.hostname or "").lower().removeprefix("www.")
+    if host in {"arxiv.org", "export.arxiv.org"}:
+        match = re.search(r"/(?:abs|pdf|html)/(.+?)(v[0-9]+)?(?:\.pdf)?$", parsed.path)
+        if match:
+            version = match[2] or paper["version"]
+            return f"arXiv {match[1]} {version}"
+    archive_names = {"biorxiv.org":"bioRxiv", "medrxiv.org":"medRxiv", "chemrxiv.org":"ChemRxiv", "osf.io":"OSF", "zenodo.org":"Zenodo", "preprints.org":"Preprints.org", "ssrn.com":"SSRN", "papers.ssrn.com":"SSRN", "eprints.iacr.org":"IACR ePrint"}
+    archive = archive_names.get(host, host)
+    # Preserve the recorded identity/version literally rather than infer metadata.
+    return f"{archive} {paper['version']}".strip()
+
+def organize_figure_appendix(data, base):
+    """Keep key artwork in the narrative; collect reference artwork in the appendix."""
+    import hashlib
+    for paper in data["papers"]:
+        slides = paper["slides"]
+        used_ids = {slide["id"] for slide in slides}
+        grouped = {}
+        for slide in slides:
+            if "figure" not in slide:
+                continue
+            figure = slide["figure"]
+            digest = hashlib.sha256((base / figure["src"]).read_bytes()).hexdigest()
+            grouped.setdefault((paper_source_key(figure["source_url"]), digest), []).append(slide)
+        added = []
+        for group in grouped.values():
+            # Classification is an author/research decision, not inferred from pixels.
+            key_slide = next((slide for slide in group if slide.get("figure_role") == "key"), None)
+            if key_slide is not None:
+                target = key_slide
+                target["appendix"] = False
+            else:
+                target = next((slide for slide in group if slide["appendix"]), None)
+                if target is None:
+                    origin = group[0]
+                    figure = origin["figure"]
+                    sid = "appendix-" + origin["id"] + "-figure"
+                    while sid in used_ids:
+                        sid += "-original"
+                    used_ids.add(sid)
+                    target = {"id":sid, "title":figure["caption"], "chapter":"图表附录" if data["language"] == "zh-CN" else "Figure appendix", "lead":"", "cards":[], "claim_ids":list(origin["claim_ids"]), "links":[], "appendix":True, "takeaway":"点击图表可查看全分辨率" if data["language"] == "zh-CN" else "Select the figure to view full resolution", "figure":dict(figure), "figure_role":"reference", "figure_notes":origin.get("figure_notes", []), "figure_layout":origin.get("figure_layout", "auto")}
+                    added.append(target)
+            for origin in group:
+                if origin is target:
+                    continue
+                origin.pop("figure")
+                forward = {"paper_id":paper["id"], "slide_id":target["id"], "label":("查看图表：" if data["language"] == "zh-CN" else "View figure: ") + format_locator(target["figure"]["locator"])}
+                backward = {"paper_id":paper["id"], "slide_id":origin["id"], "label":("返回：" if data["language"] == "zh-CN" else "Return: ") + origin["title"]}
+                if forward not in origin["links"]:
+                    origin["links"].append(forward)
+                if backward not in target["links"]:
+                    target["links"].append(backward)
+        combined = slides + added
+        paper["slides"] = [s for s in combined if not s["appendix"]] + [s for s in combined if s["appendix"]]
 
 def render_paper(paper, data, base, alternate=None):
     zh = data["language"] == "zh-CN"
@@ -225,22 +315,32 @@ def render_paper(paper, data, base, alternate=None):
             encoded = base64.b64encode(asset.read_bytes()).decode()
             # Render one semantic caption only; original text remains available as
             # provenance when a localized caption is supplied by the author.
-            artwork = f'<figure class="paper-figure"><button class="zoom" type="button" aria-label="{text(fig["alt"])}"><img src="data:{mime};base64,{encoded}" alt="{text(fig["alt"])}"></button><figcaption><span class="figure-caption">{text(fig["caption"])}</span> · {render_reference(fig["locator"], fig["source_url"], paper)}</figcaption></figure>'
-            if cards and "example_id" not in slide:
-                body = f'<div class="figure-explainer">{artwork}<div class="figure-notes"><div class="cards">{cards}</div></div></div>'
-            else:
-                body += artwork
-        refs = "".join(render_reference(f'{claims[c]["locator"]} [{claims[c]["kind"]}]', claims[c]["url"], paper, claims[c]["limits"]) for c in slide.get("claim_ids", []))
+            artwork = f'<figure class="paper-figure"><button class="zoom" type="button" aria-label="{text(fig["alt"])}"><img src="data:{mime};base64,{encoded}" alt="{text(fig["alt"])}"></button><figcaption><span class="figure-caption">{text(fig["caption"])}</span></figcaption></figure>'
+            notes = slide.get("figure_notes", slide.get("cards", []))
+            note_cards = "".join(f'<article class="card {text(c.get("tone", "indigo"))}"><h3>{text(c["title"])}</h3><p>{text(c["text"])}</p></article>' for c in notes)
+            preference = slide.get("figure_layout", "auto")
+            body = f'<div class="figure-layout" data-preference="{text(preference)}" data-layout="full" data-has-notes="{str(bool(notes)).lower()}">{artwork}<div class="figure-notes"><div class="cards">{note_cards}</div></div></div>'
+        reference_items = []
+        if slide.get("figure"):
+            figure = slide["figure"]
+            reference_items.append((format_locator(figure["locator"]), figure["source_url"], ""))
+        for cid in slide.get("claim_ids", []):
+            claim = claims[cid]
+            locator = format_locator(claim["locator"])
+            if not any(label == locator and paper_source_key(source) == paper_source_key(claim["url"]) for label, source, _ in reference_items):
+                reference_items.append((locator, claim["url"], claim["kind"] + ": " + claim["limits"]))
+        refs = "".join(render_reference(label, source, paper, limits) for label, source, limits in reference_items)
         links = list(slide.get("links", []))
         for rel in data.get("relations", []):
             if rel["from"] == paper["id"] and rel["navigation"]["from_slide"] == sid:
                 links.append({"paper_id": rel["to"], "slide_id": rel["navigation"]["to_slide"], "label": f'{rel["type"]} · {rel["status"]}: {rel["statement"]}'})
-        nav = "".join(f'<a class="cross-link" href="{text(l["paper_id"])}.html#slide-{text(l["slide_id"])}">{text(l["label"])}</a>' for l in links)
+        nav = "".join(f'<a class="cross-link" href="{text(l["paper_id"])}.html#slide-{text(l["slide_id"])}">{text(figure_link_label(l, data))}</a>' for l in links)
         tag = ("附录 · " if zh else "Appendix · ") if slide["appendix"] else ""
-        sections.append(f'<section class="slide" id="slide-{sid}" aria-label="{text(slide["title"])}"><header><span class="badge">{tag}{text(slide.get("chapter", ""))}</span><span>{number:02} / {len(paper["slides"])}</span></header><h1>{text(slide["title"])}</h1><p class="lead">{text(slide.get("lead", ""))}</p><div class="slide-body">{body}{nav}</div><p class="takeaway">{text(slide.get("takeaway", ""))}</p><footer>{refs}</footer></section>')
+        heading = f'{tag}{slide.get("chapter", "")}・{slide_source(paper)}'
+        sections.append(f'<section class="slide" data-slide-heading="{text(heading)}" id="slide-{sid}" aria-label="{text(slide["title"])}"><header><span class="badge">{text(heading)}</span><span>{number:02} / {len(paper["slides"])}</span></header><h1>{text(slide["title"])}</h1><p class="lead">{text(slide.get("lead", ""))}</p><div class="slide-body">{body}{nav}</div><p class="takeaway">{text(slide.get("takeaway", ""))}</p><footer>{refs}</footer></section>')
     template = (ROOT / "assets/deck.html").read_text()
     replacements = {"LANG": data["language"], "TITLE": text(paper["title"]), "SLIDES": "".join(sections), "TOC": "".join(toc), "CSS": presentation_css(), "JS": (ROOT / "assets/deck.js").read_text(), "SUMMARY": text(paper["summary"]), "HOME": "论文集合" if zh else "Collection", "CONTENTS": "目录" if zh else "Contents", "CLOSE": "关闭" if zh else "Close", "PREV": "上一页" if zh else "Previous", "NEXT": "下一页" if zh else "Next", "PLAY": "自动播放" if zh else "Autoplay", "SPEED": "每页时长" if zh else "Time per slide", "LANGUAGE": language_link(alternate, paper["id"])}
-    replacements["JS"] = presentation_js() + "\n" + replacements["JS"]
+    replacements["JS"] = presentation_js() + "\n" + (ROOT / "assets/figure-layout.js").read_text() + "\n" + (ROOT / "assets/math-layout.js").read_text() + "\n" + replacements["JS"]
     # Single pass: inserted research text cannot turn into template directives.
     return re.sub(r"@@([A-Z]+)@@", lambda m: replacements[m[1]], template)
 
@@ -294,6 +394,11 @@ def render_entry(locales):
 
 def render_site(bundles):
     """Validate complete locale bundles first, then render the root and locale trees."""
+    import copy
+    bundles = [(copy.deepcopy(data), base) for data, base in bundles]
+    for data, base in bundles:
+        validate(data, base)  # Check local asset boundaries before reading bytes.
+        organize_figure_appendix(data, base)
     rendered = {}
     paper_sets = []
     for data, base in bundles:

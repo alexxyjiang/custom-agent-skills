@@ -32,7 +32,7 @@ BOUNDS = r"""() => {
  const eps = Math.max(.4, scale * 1.5);
  const rect = e => {const r=e.getBoundingClientRect();return {left:r.left,top:r.top,right:r.right,bottom:r.bottom,width:r.width,height:r.height}};
  const label = e => e.id ? '#'+e.id : e.tagName.toLowerCase()+'.'+[...e.classList].join('.')+' '+e.textContent.trim().slice(0,55);
- const visible = e => {const s=getComputedStyle(e),r=rect(e);return s.display!=='none' && s.visibility!=='hidden' && r.width>0 && r.height>0 && !e.closest('dialog:not([open])') && ![...document.querySelectorAll('details:not([open])')].some(d=>d.contains(e) && e!==d && !e.closest('summary'))};
+ const visible = e => {if(e.closest('.katex-mathml'))return false;const s=getComputedStyle(e),r=rect(e);return s.display!=='none' && s.visibility!=='hidden' && r.width>0 && r.height>0 && !e.closest('dialog:not([open])') && ![...document.querySelectorAll('details:not([open])')].some(d=>d.contains(e) && e!==d && !e.closest('summary'))};
  const outside = (a,b,vertical=true) => a.left < b.left-eps || a.right > b.right+eps || (vertical && (a.top < b.top-eps || a.bottom > b.bottom+eps));
  const add = (kind,e,container,r,b) => issues.push({kind,element:label(e),container:label(container),rect:r,bounds:b});
  if (!root) return {issues:[{kind:'missing content root'}],metrics};

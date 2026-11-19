@@ -8,8 +8,8 @@ Read before creating or modifying `project.zh-CN.json`. This file is self-contai
 Agents generate and review the research bundle: sources, reading reports, claims, examples, relations and slide content. A builder is a deterministic presentation step, not a researcher: it must not search, fetch full texts, invent evidence, infer missing relations, upgrade coverage or turn not-run code into passed code. A successful build establishes presentation validity only.
 智能体生成并审查研究包：来源、阅读报告、主张、示例、关系与幻灯片内容。构建器仅确定性呈现，不做研究；不得检索、获取全文、补造证据、推断缺失关系、升级阅读覆盖或将未运行代码改为通过。构建成功仅说明呈现有效。
 
-Use a bundle root containing `project.zh-CN.json`, optional `reports/`, and optional `assets/`. Relative files resolve from that root, not the current working directory. Ship referenced files together. No absolute filesystem paths, `file:` URLs, `..` traversal, machine-specific home paths or escaping symlinks. `figure.src` is a relative asset path, never a remote URL. Public evidence URLs are HTTP(S), not local paths. Preserve existing valid content when updating a bundle.
-项目根目录包含 `project.zh-CN.json`、可选 `reports/` 和 `assets/`；相对路径从项目根解析，随包交付引用文件。禁止绝对文件路径、`file:` URL、`..` 越界、本机主目录及逃逸符号链接。`figure.src` 必须为相对资源路径而非远程 URL；公开证据地址使用 HTTP(S)。更新时保留已有有效内容。
+Use a bundle root containing `project.<locale>.json` (`project.zh-CN.json` / `project.en-US.json`), optional `reports/`, and optional `assets/`. Relative files resolve from that root, not the current working directory. Ship referenced files together. No absolute filesystem paths, `file:` URLs, `..` traversal, machine-specific home paths or escaping symlinks. `figure.src` is a relative asset path, never a remote URL. Public evidence URLs are HTTP(S), not local paths. Preserve existing valid content when updating a bundle.
+项目根目录包含 `project.<locale>.json`（`project.zh-CN.json` / `project.en-US.json`）、可选 `reports/` 和 `assets/`；相对路径从项目根解析，随包交付引用文件。禁止绝对文件路径、`file:` URL、`..` 越界、本机主目录及逃逸符号链接。`figure.src` 必须为相对资源路径而非远程 URL；公开证据地址使用 HTTP(S)。更新时保留已有有效内容。
 
 ## Exact shape / 精确结构
 
@@ -20,13 +20,13 @@ All fields below are required except those explicitly marked optional. Arrays ma
 |---|---|
 | root | `schema_version`: integer exactly `1`; `title`: string; `language`: `zh-CN` or `en-US`; `scope`: object below; `papers`: paper array; `relations`: relation array |
 | scope | `question`: string; `approved_full_text`: string array of paper ids mapped to exact versions; `max_metadata_records`: nonnegative integer; `max_full_text`: nonnegative integer; `stop_conditions`: string array; `search_log`: string array; `exclusions`: string array |
-| paper | `id`: safe slug; `title`: string; `source_url`: versioned HTTP(S) URL; `version`: string; `topic`: string; `summary`: string; `score`: score object below; `read_coverage`: object below; `report_path`: optional relative path string; `claims`: claim array; `examples`: example array; `slides`: slide array |
+| paper | `id`: safe slug; `title`: string; `source_url`: versioned HTTP(S) URL; `version`: string; `publication_source`: optional verified conference/journal label string (e.g. ICLR 2026); `archive_source`: optional verified preprint/archive label including identifier/version; `topic`: string; `summary`: string; `score`: score object below; `read_coverage`: object below; `report_path`: optional relative path string; `claims`: claim array; `examples`: example array; `slides`: slide array |
 | score | `value`: integer 1–4 (required, never null/deferred); `rationale`: nonempty string; `claim_ids`: nonempty array referencing this paper's evidence claims |
 | read_coverage | `status`: `full-text`, `partial`, or `metadata-only`; `read`: string array of inspected page/section/figure/table/equation locators; `unread`: string array of outstanding locators and reasons |
 | claim | `id`: string unique within its paper; `text`: string; `locator`: string; `url`: HTTP(S) string; `kind`: `paper-claim`, `external-evidence`, or `analyst-inference`; `limits`: string |
 | example | `id`: string unique within its paper; `kind`: `teaching`, `original`, or `reproduction`; `source_locator`: string; `code`: string; `language`: string; `run_command`: string; `expected_output`: string; `actual_output`: string; `execution`: `passed`, `not-run`, or `failed`; `limitations`: string; `steps`: step array |
 | step | `lines`: array of 1-based integers into the example's `code`; `explanation`: string; `state`: string |
-| slide | `id`: safe slug unique within its paper; `title`: string; `chapter`: string; `lead`: string; `cards`: card array; `claim_ids`: string array referring to this paper's claims; `example_id`: optional reference to this paper's example; `appendix`: boolean; `takeaway`: optional string; `links`: link array; `figure`: optional figure object |
+| slide | `id`: safe slug unique within its paper; `title`: string; `chapter`: string; `lead`: string; `cards`: card array; `claim_ids`: string array referring to this paper's claims; `example_id`: optional reference to this paper's example; `appendix`: boolean; `takeaway`: optional string; `links`: link array; `figure`: optional figure object; `figure_role`: optional `key`/`reference`; `figure_notes`: optional card array; `figure_layout`: optional `auto`/`left`/`right`/`top`/`bottom`/`full` |
 | card | `title`: string; `text`: string; `tone`: `indigo`, `emerald`, `amber`, or `rose` |
 | link | `paper_id`: existing paper id; `slide_id`: existing slide id in that paper; `label`: string |
 | figure | `src`: relative asset path string; `alt`: string; `caption`: string; `source_url`: HTTP(S) string; `locator`: string; `original_caption`: optional complete verbatim caption provenance (not rendered separately) string |
@@ -89,3 +89,19 @@ Name each generated bundle `project.<locale>.json`: `project.zh-CN.json` for Chi
 
 Figure publication uses artwork-only src and one visible page-language caption. Keep original_caption as provenance, not a second visible caption; preserve all graphic labels, legends and table notes. Reader-facing text excludes production-process claims. The primary theme accent is RoyalBlue #4169e1.
 图表发布使用仅图本体的src和一份页面语言可见图注；original_caption仅溯源不重复显示，图内标签/图例/表注保留。读者文字不含制作过程自述，主主题色为皇家蓝#4169e1。
+
+## Figure placement and slide headings / 图表位置与页标题
+Set figure_role=key to keep an essential figure with the main narrative (appendix=false); reference figures go to the trailing appendix. Keep one complete occurrence and shared references/return links, preserve original narrative ids, and never fabricate caption-only reading-point placeholders. Heading/browser title uses topic・verified publication/archive source; figure integrity, caption-once and white-surface rules remain.
+关键图设key随主线（appendix=false），参考图归末尾附录；图唯一完整、引用回链共享、保留正文id，不造图注式占位页。顶部及页签为主题・核实出版/存档来源，完整图、单图注及白底规则保留。
+
+When a verified conference or journal is known, set paper.publication_source to its concise venue/year label, e.g. ICLR 2026. Heading Source prefers this label; otherwise it falls back to the pinned arXiv id/version. Preserve the actual source_url and version for evidence provenance; a venue display label does not change the read version. Never invent acceptance or use preprint year as conference year.
+已核实会议或期刊时，publication_source填写简短会议/期刊及年份，如ICLR 2026；标题来源优先用此标签，否则回退固定arXiv编号/版本。实际source_url与version仍保留已读证据版本，不因展示标签而改变；不编录用、不把预印本年当会议年。
+
+Source priority is verified publication_source → verified archive_source → archive host/name plus the recorded identifier/version. Use exact brand casing (arXiv, bioRxiv, medRxiv, ChemRxiv, SSRN, OSF, Zenodo, etc.). archive_source supports any archive, not just arXiv; derive it from checked metadata and retain source_url/version. Do not invent identifiers, dates or versions; use the hostname plus recorded version when metadata is incomplete.
+Source优先级为已核实publication_source→已核实archive_source→存档站点名/域名加已记录编号版本。品牌大小写保持准确，如arXiv、bioRxiv、medRxiv、ChemRxiv等。archive_source适用任意存档站点，按核实元数据填写并保留source_url/version；不编编号、日期或版本，信息不全时用域名和已有版本。
+
+Both key narrative figures and reference appendix figures may include figure_notes (title/text/tone cards) and figure_layout (auto default; left/right/top/bottom/full). These fields stay with the selected unique figure target. Auto layout measures image ratio, available space and actual rendered notes/caption; explicit directions are preferences with fit fallback. A no-fit result is an unresolved layout failure to fix, not permission to clip content. Figure uniqueness, one caption and original artwork integrity remain mandatory.
+主线重点图和附录参考图均可含figure_notes卡片及figure_layout默认auto/左右上下/全幅；同名字段随所选唯一图页。自动排版实测比例、空间、说明和图注，显式方向可回退；无可行版式是待修失败，不能裁切内容蒙混。图唯一、单图注及原图完整继续强制。
+
+Adaptive left/right regions each require >=30% of total figure-layout width; top/bottom regions each require >=30% of height. A failing candidate must fall back or report no-fit; never shrink text, distort the artwork or hide notes. figure_notes stays with the figure in either narrative or appendix.
+左右区域各至少整体布局宽度30%，上下各至少高度30%；不合格候选回退或报无可行版，不缩字/变形/藏说明。figure_notes随主线或附录图页。

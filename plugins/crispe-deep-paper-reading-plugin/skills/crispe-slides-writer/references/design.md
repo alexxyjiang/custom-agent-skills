@@ -53,3 +53,18 @@ Reuse paper.summary from the collection card as the table-of-contents introducti
 ## References and overlap / 引用与重叠
 Current-paper footer/figure locators are static italic underlined #4169e1 text; external paper, third-party and slide navigation links retain href with the same style. URL identity distinguishes references, including arXiv abs/pdf/html forms and versions. Preserve provenance in JSON. Do not tolerate overlapping paint: check card descendants against takeaway/footer after final rendering and split dense figure notes into adjacent pages. Keep all existing anchors valid.
 本论文底部/图定位为斜体下划线皇家蓝静态文字；外部论文/第三方/页面导航保留同样样式的href。URL身份区分引用，含arXiv不同形式及版本；JSON保留溯源。检查最终绘制卡片子元素与要点/页脚，不容忍覆盖；图旁长解释拆相邻页并保留锚点。
+
+## Heading and appendix layout / 标题与附录布局
+Use `[Title]・[Source]` in the chapter heading and browser tab (Motivation・arXiv 2304.03442 v2). Embed key figures directly in the main narrative with substantive explanation; reference-level figures remain in the final appendix. Keep one complete unique occurrence, shared references/return links, one textual caption and full-resolution zoom. Do not generate caption-only placeholder pages.
+章节标题栏及页签使用上述格式；关键图随实质解释直接嵌入主线，参考图留末尾附录；每图完整唯一、共享引用回链、单图注及放大，不生成图注式占位页。
+
+For adaptive image/text pairs, each region must occupy >=30% of total layout width in left/right modes or >=30% of total height in top/bottom modes. Reject insufficient candidates and choose another mode or revise the explanation; keep type size and image ratio unchanged.
+自适应图文左右各至少整体宽30%，上下各至少整体高30%；不足的候选拒绝，换版或调整解释，不改字号或图比例。
+
+## Formula fitting and verification / 公式适配与验证
+Display math may wrap at KaTeX base-unit boundaries without altering the TeX annotation. If the widest indivisible unit or an inline formula still exceeds the card, retry full-width stacked cards, preserving type size, and recheck all text/card/takeaway/footer bounds. Keep fractions, roots, matrices and aligned environments intact; do not insert arbitrary string breaks into TeX commands. Authored aligned/split expressions can improve line meaning. Mark no-fit results, rather than silently accepting a scrollbar. Refit after fonts ready, slide activation and resize; coordinate figure fitting after math height changes. Verify physical bounds at desktop and phone-scaled stage sizes and confirm the exact original TeX annotation remains unchanged.
+独立数学沿KaTeX语义单元折行，TeX注释不变；最宽不可分单元或行内公式仍越界则全宽纵排卡片，保留字号并检查文字/卡片/要点/页脚边界。分式、根式、矩阵和aligned保持整体，不在TeX命令中随意插断点；必要时作者用aligned/split提升语义。无可行版标失败，不能默认滚动条算通过。字体/切页/resize后重测，数学高度变化后协调图布局；桌面及手机缩放均测且核对原TeX注释完全保留。
+
+## Locator consistency / 定位一致性
+Captions explain the figure; footer markers carry the verified section/figure/page locator once. Use the same locator for links to that figure inside the deck, e.g. §4.1, Figure 6, p.9-10. Claim-kind/coverage metadata is not visible footer copy. Canonicalization removes PDF prefixes and spacing differences without inventing sections or page ranges. Correct provenance errors only against the pinned source.
+图注解释图意，页底统一一次节/图/页定位，站内链接复用同定位；主张类型/覆盖元数据不写可见页底。规范化只去PDF前缀和空格差异，不造节页；来源错误须按固定原文核对。

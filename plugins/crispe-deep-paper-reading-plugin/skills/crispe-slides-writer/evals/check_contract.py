@@ -158,6 +158,85 @@ class RenderingDependencyChecks(unittest.TestCase):
         self.assertIn("Prism.tokenize", builder.presentation_js())
 
 
+class AppendixLayoutChecks(unittest.TestCase):
+    def test_arxiv_source_heading(self):
+        self.assertEqual(builder.slide_source({"source_url":"https://arxiv.org/abs/2304.03442v2", "version":"v2"}), "arXiv 2304.03442 v2")
+
+    def test_verified_venue_heading_precedes_arxiv(self):
+        self.assertEqual(builder.slide_source({"publication_source":"ICLR 2026", "source_url":"https://arxiv.org/abs/2304.03442v2", "version":"v2"}), "ICLR 2026")
+
+    def test_other_archive_source_priority(self):
+        paper = {"source_url":"https://www.biorxiv.org/content/10.1101/examplev2", "version":"v2", "archive_source":"bioRxiv 10.1101/example v2"}
+        self.assertEqual(builder.slide_source(paper), "bioRxiv 10.1101/example v2")
+        paper["publication_source"] = "Journal 2026"
+        self.assertEqual(builder.slide_source(paper), "Journal 2026")
+        del paper["publication_source"]
+        del paper["archive_source"]
+        self.assertEqual(builder.slide_source(paper), "bioRxiv v2")
+        paper["source_url"] = "https://new-archive.example/paper"
+        self.assertEqual(builder.slide_source(paper), "new-archive.example v2")
+
+    def test_shared_figure_normalization_is_idempotent(self):
+        import tempfile
+        import copy
+        with tempfile.TemporaryDirectory() as folder:
+            base = Path(folder)
+            (base / "figure.png").write_bytes(b"same-figure")
+            figure = {"src":"figure.png", "caption":"Figure 1", "source_url":"https://arxiv.org/abs/2304.03442v2", "locator":"Figure 1"}
+            slides = [{"id":sid, "title":sid, "chapter":"Method", "cards":[], "claim_ids":[], "links":[], "appendix":False, "figure":dict(figure)} for sid in ["one", "two"]]
+            data = {"language":"en-US", "papers":[{"id":"paper", "slides":slides}]}
+            builder.organize_figure_appendix(data, base)
+            output = data["papers"][0]["slides"]
+            self.assertEqual([s["id"] for s in output[:2]], ["one", "two"])
+            self.assertEqual(sum("figure" in s for s in output), 1)
+            self.assertTrue(output[-1]["appendix"])
+            self.assertEqual(len(output[-1]["links"]), 2)
+            before = copy.deepcopy(data)
+            builder.organize_figure_appendix(data, base)
+            self.assertEqual(data, before)
+
+
+class FigureRoleChecks(unittest.TestCase):
+    def test_key_figure_stays_in_narrative_without_placeholders(self):
+        import tempfile
+        import copy
+        with tempfile.TemporaryDirectory() as folder:
+            base=Path(folder);(base/"figure.png").write_bytes(b"figure")
+            figure={"src":"figure.png","caption":"Figure 1","source_url":"https://arxiv.org/abs/2304.03442v2","locator":"Figure 1"}
+            key={"id":"mechanism","title":"Mechanism","cards":[],"claim_ids":[],"links":[],"appendix":False,"figure":dict(figure),"figure_role":"key"}
+            data={"language":"en-US","papers":[{"id":"paper","slides":[key]}]}
+            builder.organize_figure_appendix(data,base)
+            self.assertEqual(len(data["papers"][0]["slides"]),1)
+            self.assertIn("figure",key)
+            self.assertFalse(key["appendix"])
+            self.assertEqual(key["cards"],[])
+            before=copy.deepcopy(data);builder.organize_figure_appendix(data,base)
+            self.assertEqual(data,before)
+
+    def test_reference_figure_has_shared_appendix_target(self):
+        import tempfile
+        with tempfile.TemporaryDirectory() as folder:
+            base=Path(folder);(base/"figure.png").write_bytes(b"figure")
+            figure={"src":"figure.png","caption":"Figure 1","source_url":"https://arxiv.org/abs/2304.03442v2","locator":"Figure 1"}
+            origin={"id":"context","title":"Context","cards":[],"claim_ids":[],"links":[],"appendix":False,"figure":figure,"figure_role":"reference"}
+            data={"language":"en-US","papers":[{"id":"paper","slides":[origin]}]}
+            builder.organize_figure_appendix(data,base)
+            self.assertEqual(origin["cards"],[])
+            self.assertNotIn("figure",origin)
+            self.assertTrue(data["papers"][0]["slides"][-1]["appendix"])
+
+
+class LocatorChecks(unittest.TestCase):
+    def test_normalize_without_inventing_location(self):
+        self.assertEqual(builder.format_locator("§4.1， Figure 6, PDF p. 9-10"), "§4.1, Figure 6, p.9-10")
+        self.assertEqual(builder.format_locator("Figure 5, p.6"), "Figure 5, p.6")
+
+    def test_figure_link_uses_target_locator(self):
+        link={"paper_id":"paper","slide_id":"chart","label":"查看图表：Figure 6, PDF p.9"}
+        data={"papers":[{"id":"paper","slides":[{"id":"chart","figure":{"locator":"§4.1, Figure 6, p.9-10"}}]}]}
+        self.assertEqual(builder.figure_link_label(link,data), "查看图表：§4.1, Figure 6, p.9-10")
+
+
 class CitationChecks(unittest.TestCase):
     def test_local_arxiv_forms_are_static(self):
         paper = {"source_url": "https://arxiv.org/abs/2304.03442v2"}

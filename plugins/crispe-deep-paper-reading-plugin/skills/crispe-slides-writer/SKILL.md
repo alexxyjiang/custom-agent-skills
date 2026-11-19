@@ -6,7 +6,7 @@ description: >-
   turn this analysis into slides, or match a supplied reading template. 生成论文精读幻灯片、论文阅读网页、
   把分析做成 slides、按模板生成论文网页；支持中文与英文。 Consumes analysis; does not replace full-paper reading.
   消费已完成的分析，不代替全文阅读；普通 UI 开发、单纯论文总结或 PPT 转换不触发。
-version: 1.4.2
+version: 1.4.3
 argument-hint: "[project.<locale>.json路径 / project.<locale>.json-path] (可选/optional) -- 指定论文分析项目；可附模板路径、输出目录及中英文要求 / specify an analyzed-paper project, optional template path, output directory and Chinese/English preference"
 ---
 
@@ -68,9 +68,15 @@ Use UI/title/control fonts in order: Iosevka Aile → Noto Sans CJK SC → sans-
 Render authored prose formulas with bundled KaTeX using `\(…\)` inline and `\[…\]` or `$$…$$` display delimiters. Do not treat single-dollar prices as math or render code/JSON as formulas. Use actual bundled PrismJS for full-block tokenization before rebuilding exact line-step wrappers; unsupported languages stay escaped plain code. Preserve source text and exact copying across multiline tokens. Include dependency versions, licenses and font assets; generated pages remain offline and CDN-free.
 公式使用内置KaTeX渲染：上述行内/独立公式定界符；单美元价格不作公式，代码/JSON不参与数学渲染。代码采用真实内置PrismJS，先整块分词再生成精确行步骤；不支持的语言保留转义纯文本。多行token仍须保留原始源码和准确复制；附依赖版本/许可/数学字体资源，生成网页保持离线无CDN。
 
-### Original figures / 原始图表
-Slides must be independently readable: whenever the explanation refers to a paper figure/table or relies on it to support a claim, include the relevant original figure/table or a faithful crop on that slide; split into adjacent explanation slides if necessary. Explain the visible panels, axes, numbers or evidence path beside the image. Source links are provenance, never a required detour to understand the slide; a figure number, “see paper” link or distant appendix alone is insufficient. Follow [references/paper-figures.md](references/paper-figures.md) for extraction, provenance and layout; use scripts/extract_paper_figure.py when suitable. Preserve labels/panels, localize caption/alt, retain page/figure/source locators and full-resolution zoom; split crowded slides, record unavailable assets and never generatively redraw quantitative results.
-Slides须可独立阅读：讲解提及或依赖原文图表支撑主张时，将相关原图表或忠实裁图直接置于当前页；放不下就拆成相邻讲解页。在图旁解释面板、坐标、数字或证据路径。来源链接仅供溯源，不是理解内容的必经跳转；只写图号、见原文或把必要图表远置附录均不够。按原图参考执行提取/溯源/排版，可用辅助脚本；保留标签面板、本地化图注/替代文字、页图来源和全分辨率放大。过密拆页，资源不可得留缺口，不生成式重画数据。
+### Figure significance and source headings / 图表层级与来源标题
+Use `[Title]・[Source]` in the top heading and browser title, retaining the specific argument as the main content heading. Source priority is verified publication_source (e.g. ICLR 2026), archive_source, then archive name/hostname with recorded identifier/version (arXiv 2304.03442 v2). Never infer acceptance or publication year from a preprint date.
+顶部及页签使用主题・来源，大号标题保留具体论点。来源优先已核实会议期刊、存档标签，再回退站点及已有编号版本，品牌写arXiv；不从预印本日期猜录用或出版年。
+
+Classify each figure as figure_role=key or reference based on explanatory significance. Key figures directly support the main argument and stay embedded with substantive explanation in the narrative (appendix=false); reference-only figures go to a dedicated appendix page. Repeated references reuse one complete figure target, with forward/return links. Never generate a caption-only “读图要点 / Reading the figure” placeholder slide or move an essential figure away from its argument just to populate an appendix. Preserve narrative anchors and all original panels/labels.
+按讲解意义将figure_role分为key/reference。支撑主论点的重点图与实质解释直接嵌入正文（appendix=false），仅供查阅图放附录；重复引用复用唯一完整图页及双向链接。禁止生成仅复述图注的读图要点占位页，也不为凑附录移走关键图；保留正文锚点及原图全部面板标签。
+
+Use [references/paper-figures.md](references/paper-figures.md) for faithful extraction and provenance. Source-image dimensions cannot determine scientific importance; the agent must classify significance from its reading. In the absence of an explicit role, existing narrative figure placement is treated as reference input for backwards compatibility, so set key explicitly for main-argument figures.
+忠实提取与溯源见参考；图尺寸不能决定科学重要性，须由阅读判断。为兼容旧输入，未指定role的正文图仍按参考图处理，主线图务必显式设key。
 
 ### Single captions and reader-facing copy / 单一图注与读者文案
 Keep every cited body figure/table complete, but show its caption only once as slide text. Use artwork-only images/crops without the printed caption; keep the complete original caption in provenance metadata, and author one accurate page-language caption in figure.caption. Do not automatically append original_caption as a second caption. Screenshot files are optional; if a PDF crop includes its caption, recrop before publishing instead of duplicating it.
@@ -94,6 +100,18 @@ slides外框外网页背景固定Ivory #fffff0，界面蓝色及浅色语义卡�
 ### Citation presentation / 引用呈现
 Render locators pointing to the current paper (including analyst-inference) as non-clickable citation markers, not links back to the full paper. Use italic text, underline and RoyalBlue #4169e1 for citation markers and retained reference links. Preserve cross-slide, other-paper and third-party destinations as functioning links; classify by paper identity/URL rather than claim kind or hostname alone. Keep source URLs in project provenance even when not clickable in the slide footer.
 指向当前论文的定位（含analyst-inference）显示为不可点击引用标记，不再链接整篇论文。引用标记及保留链接均用斜体、下划线和皇家蓝#4169e1。跨slide、其他论文及第三方目标保留真实链接；按论文身份/URL分类，不能只看主张类型或域名。底部不点击仍在项目溯源保留URL。
+
+### Adaptive figure layouts / 自适应图文布局
+Read [references/adaptive-figure-layouts.md](references/adaptive-figure-layouts.md) when authoring figure pages. Set optional figure_notes to concise evidence-linked card objects and figure_layout to auto (default), left, right, top, bottom or full. Notes stay with the unique figure, whether key narrative or reference appendix. Each image/text region must occupy at least 30% of total layout width for left/right, or total layout height for top/bottom; do not count gutter as usable space. The renderer measures the actual image ratio, note/caption dimensions and available stage space after fonts, math and images settle, then chooses a fitting candidate that preserves the largest readable image. Explicit directions are preferences, not permission to overflow. Keep source labels/axes intact and the fixed 16:9 canvas; never shrink text, distort or crop artwork to fit.
+编写图页时阅读自适应排版参考。figure_notes可填简洁有证据依据的卡片，figure_layout可为默认auto及左右上下/全幅。说明随唯一图页，可主线或附录。左右图文各占整体布局宽度至少30%，上下各占高度至少30%，间距不计可用区。渲染器在字体/公式/图片稳定后按真实宽高比、说明/图注尺寸和可用空间测量候选，选可容纳且图像尽量大的版式；指定方向仅偏好，不允许溢出。保留轴/标签与固定16:9，不缩字、变形或裁图凑版。
+
+### Adaptive mathematics / 自适应公式
+After KaTeX, fonts and the final slide layout settle, measure every inline/display expression against its card and stage. Wrap display math only at KaTeX's existing semantic break units, preserving the original TeX and complete fractions/roots/alignment structures. If an indivisible expression still exceeds a narrow column, switch the affected cards from columns to full-width rows and measure again. Prefer authored aligned/split equations for meaningful term-level line breaks. Never treat horizontal scrolling, clipping, hidden overflow or smaller type as a successful default formula view; also reject vertical overlap after wrapping/stacking. Unfit formulas require a dedicated slide or an explicit source-faithful equation restructuring.
+KaTeX、字体和最终版式稳定后，测量每个行内/独立公式与卡片/画布边界。独立公式仅沿KaTeX已有语义单元折行，保留原始TeX和完整分式/根式/对齐结构；不可分公式仍超窄栏时，把相关卡片从列改为全宽行并重测。语义更清楚时用作者编写的aligned/split按完整项换行。横向滚动、裁切、隐藏溢出或缩字不算默认完整展示，折行/纵排后还须无垂直覆盖；仍放不下则独立成页或忠实重排方程。
+
+### Locator placement / 定位信息位置
+Figure captions contain explanatory text only, not a second page/section locator. Put source positions once in the footer using a consistent verified format such as §4.1, Figure 6, p.9-10; use that same target locator in cross-slide labels such as 查看图表：§4.1, Figure 6, p.9-10. Do not mix PDF p. variants or append claim-kind tokens to visible footer text; keep kind/limits in metadata or tooltips. Normalize punctuation only; never infer or fabricate missing section/page numbers. Verify older locators against the pinned source before correcting them.
+图注仅解释图意，不重复页/节定位；位置统一在页底显示一次，格式如上述节/图/页，并复用到站内图表跳转文字。不混用PDF p.写法，不在可见页底追加主张类型；类型/局限保留元数据或提示。只规范标点，不能猜节/页；旧定位修正须核对固定原文。
 
 ## [Performance] / 质量标准
 Every collection card shows an evidence-backed integer 1–4 score. Code/JSON/execution records use labelled semantic windows with highlighting and source-only copy; line-step mappings are exact. Validate both desktop and phone bounds, locale links, source/appendix links, TOC/focus, hash navigation, 5s/15s/30s/1min autoplay, modal/hidden-tab holds and last-slide stop. Prefer splitting overloaded pages to shrinking text. Record actual verification and unperformed checks separately.
