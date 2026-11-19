@@ -25,7 +25,7 @@ from playwright.sync_api import sync_playwright
 # Text ranges catch painted glyph overflow that scrollHeight alone can miss.
 BOUNDS = r"""() => {
  const issues = [], metrics = [];
- const active = document.querySelector('.slide.active');
+ const active = document.querySelector('section.slide.active');
  const root = active || document.querySelector('main');
  const stage = document.querySelector('#deck-stage');
  const scale = stage ? stage.getBoundingClientRect().width / stage.offsetWidth : 1;
@@ -144,6 +144,8 @@ class Checker:
         if response is not None:
             assert response.ok, f'HTTP {response.status}: {url}'
         page.evaluate('document.fonts.ready')
+        if page.locator('#deck-stage').count():
+            page.wait_for_function('window.paperSlidesReady===true')
         self.stable()
 
     def screenshot(self, page, name):
@@ -158,12 +160,12 @@ class Checker:
         assert page.locator('.slide.active').count() == 1
         assert page.locator('.slide.active').get_attribute('id') == slide_id
         assert unquote(urlsplit(page.url).fragment) == slide_id
-        assert page.locator('#prev').is_disabled() == (page.locator('.slide').first.get_attribute('id') == slide_id)
-        assert page.locator('#next').is_disabled() == (page.locator('.slide').last.get_attribute('id') == slide_id)
-        bad = page.locator('.slide').evaluate_all("es => es.filter(e => e.inert === e.classList.contains('active') || e.getAttribute('aria-hidden') !== String(!e.classList.contains('active'))).map(e=>e.id)")
+        assert page.locator('#prev').is_disabled() == (page.locator('section.slide').first.get_attribute('id') == slide_id)
+        assert page.locator('#next').is_disabled() == (page.locator('section.slide').last.get_attribute('id') == slide_id)
+        bad = page.locator('section.slide').evaluate_all("es => es.filter(e => e.inert === e.classList.contains('active') || e.getAttribute('aria-hidden') !== String(!e.classList.contains('active'))).map(e=>e.id)")
         assert not bad, f'Hidden slides not inert/aria-hidden: {bad}'
         # Attempt programmatic focus: inert controls must reject it.
-        assert page.evaluate("""() => {for(const e of document.querySelectorAll('.slide:not(.active) a,.slide:not(.active) button')) {e.focus(); if(document.activeElement===e)return false;}return true;}""")
+        assert page.evaluate("""() => {for(const e of document.querySelectorAll('section.slide:not(.active) a,section.slide:not(.active) button')) {e.focus(); if(document.activeElement===e)return false;}return true;}""")
 
     def scroll_code(self, page, name):
         for i, pre in enumerate(page.locator('.slide.active pre:visible').all()):
@@ -195,7 +197,7 @@ class Checker:
                 self.selected(page, ids[i])
             # Unfocus button: Home/End should be dispatched on the document.
             page.locator('#contents').focus()
-            for key, index in [('End',-1),('Home',0),('ArrowRight',1),('ArrowDown',2),('ArrowLeft',1),('ArrowUp',0)]:
+            for key, index in [('End',-1),('Home',0),('ArrowRight',1),('ArrowLeft',0)]:
                 page.keyboard.press(key)
                 self.selected(page, ids[index])
         self.attempt(name + '/buttons-and-keyboard', nav)
@@ -236,7 +238,7 @@ class Checker:
                         continue
                     if target.path.endswith('.html'):
                         found.append((slide_id,j,href))
-            assert found, 'No cross-paper relation link found'
+            # A single-paper visual fixture need not contain cross-paper links.
             for slide_id,j,href in found:
                 self.goto(page, url+'#'+slide_id)
                 page.locator('.slide.active a[href]').nth(j).click()
@@ -247,7 +249,7 @@ class Checker:
 
     def deck(self, page, base, filename, name):
         self.goto(page, base+filename)
-        ids=page.locator('.slide').evaluate_all('es=>es.map(e=>e.id)')
+        ids=page.locator('section.slide').evaluate_all('es=>es.map(e=>e.id)')
         assert ids and len(ids)==len(set(ids)), 'Missing/duplicate slide IDs'
         self.coverage.append({'run':name,'slides':ids})
         for slide_id in ids:
@@ -295,17 +297,17 @@ class Checker:
         assert viewer.locator('img').get_attribute('alt')=='Synthetic zoom probe'
         assert viewer.locator('img').evaluate('e=>e.complete && e.naturalWidth===800')
         page.keyboard.press('ArrowRight')
-        assert page.locator('.slide.active').get_attribute('id')=='slide-cover'
+        assert page.locator('.slide.active').get_attribute('id')==page.locator('section.slide').first.get_attribute('id')
         page.keyboard.press('Escape')
         assert not viewer.evaluate('e=>e.open')
-        assert page.locator('.zoom').evaluate('e=>document.activeElement===e')
-        page.locator('.zoom').click()
+        assert page.locator('.slide.active .zoom').evaluate('e=>document.activeElement===e')
+        page.locator('.slide.active .zoom').click()
         viewer.locator('.close').click()
         assert not viewer.evaluate('e=>e.open')
 
     def run(self, browser, bases):
         for protocol,base in bases:
-            for width,height in [(1600,900),(1280,720),(390,844)]:
+            for width,height in [(3840,2160),(2560,1440),(1600,900),(390,844)]:
                 context=browser.new_context(viewport={'width':width,'height':height},reduced_motion='reduce')
                 page=context.new_page()
                 page.set_default_timeout(5000)

@@ -18,8 +18,8 @@ def main():
         page=context.new_page();errors=[]
         page.on("pageerror",lambda error:errors.append(str(error)))
         url=args.deck.resolve().as_uri()
-        page.goto(url,wait_until="networkidle")
-        ids=page.locator(".slide").evaluate_all("es=>es.map(e=>e.id)")
+        page.goto(url,wait_until="networkidle");page.wait_for_function("window.paperSlidesReady===true")
+        ids=page.locator("section.slide").evaluate_all("es=>es.map(e=>e.id)")
         assert len(ids)>=3
         def active():return page.locator(".slide.active").get_attribute("id")
         if args.real_time:
@@ -35,7 +35,7 @@ def main():
             page.evaluate("document.querySelector('#dynamic-probe').open=false")
             page.wait_for_function("id=>document.querySelector('.slide.active').id!==id",arg=before,timeout=8000)
             results.append("real 5-second page advancement and dynamic-details hold/resume")
-        page.goto(url,wait_until="networkidle");page.clock.install()
+        page.goto(url,wait_until="networkidle");page.wait_for_function("window.paperSlidesReady===true");page.keyboard.press("Home");page.clock.install()
         def advance(ms):page.clock.run_for(ms)
         assert page.locator("#autoplay").get_attribute("aria-pressed")=="false"
         advance(60001);assert active()==ids[0]

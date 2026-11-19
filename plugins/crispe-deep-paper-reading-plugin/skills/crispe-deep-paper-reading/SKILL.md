@@ -7,7 +7,7 @@ description: >-
   paper reading-to-slides or research reading plans, not a lone bibliographic lookup.
   深度论文阅读编排：有限检索、具名全文授权、逐篇全文分析、跨论文证据关系及幻灯片交接；
   适用于读论文到演示的完整项目、专题精读，不用于单纯元数据查询。
-version: 1.4.3
+version: 2.0.0
 argument-hint: "[论文ID/链接/PDF路径或研究问题 / paper-ids|URLs|PDF-paths|research-question] (可选/optional) -- 指定精读目标或主题、阅读范围及输出语言 / specify reading targets or topic, scope and output language"
 ---
 
@@ -39,7 +39,9 @@ Read [contracts](references/contracts.md) before editing a bundle, [workflow](re
    候选筛选可只读元数据/摘要；每个获批精读目标交分析师逐页读图表、公式、相关工作、参考文献及随文补充材料。保留其报告结构、精确定位和全文标准，不用短摘要或提前评分代替。访问/工具/上下文失败记部分覆盖及未读范围，不伪装完成；必要时分块续读。元数据候选不算精读完成。集合发布前每张卡片必须有证据支持的1–4整数评分；先完成实质审查，剩余缺口另列，不能以暂缓替代评分。
 5. Sequence `crispe-paper-analyst` → `crispe-paper-cross-link` → `crispe-slides-writer`, using one agent-generated `project.<locale>.json` (`project.zh-CN.json` / `project.en-US.json`) and relative reports/assets. Sequential role execution in the same agent is valid; delegate only if authorized and supported. Missing skills do not justify pretending they ran: show original-source guidance, execute the documented role with available tools where possible, and expose any remaining checkpoint failure.
    按分析师→关系构建→幻灯片写作执行，使用各语言对应的智能体项目包 `project.<locale>.json`（`project.zh-CN.json` / `project.en-US.json`） 和相对报告/资源。同一智能体顺序扮演角色即可；仅经允许且宿主支持才委派。缺技能须提示原始来源，能用现有工具履行角色则继续，不能声称已调用；暴露未满足的检查点。
-6. Stop research at the writer boundary. The builder renders deterministically and cannot supply missing research. Hand over verified content and visibly labeled provisional/unresolved items; never upgrade evidence or coverage to make a polished deck.
+6. Check external html-slides availability before the presentation phase, and pass responsibility to crispe-slides-writer for one-way authoring (writer → html-slides); do not generate the same site twice. Read the writer's [integration reference](../crispe-slides-writer/references/html-slides-integration.md). When PDF is requested, first verify HTML then invoke [crispe-slides-to-pdf](../crispe-slides-to-pdf/SKILL.md), preserving approved content and locale scope.
+   呈现前检查外部html-slides可用性，交writer单向调用，不重复生成站点；阅读上述集成约定。需PDF时先验证HTML再交PDF技能，保留内容与语言范围。
+7. Stop research at the writer boundary. The builder renders deterministically and cannot supply missing research. Hand over verified content and visibly labeled provisional/unresolved items; never upgrade evidence or coverage to make a polished deck.
    写作边界处停止研究；构建器确定性呈现，不能补研究。交付已核实内容及显式标记的暂定/未解决事项，不为美观升级证据或覆盖。
 
 ## [Specification] / 输出规范

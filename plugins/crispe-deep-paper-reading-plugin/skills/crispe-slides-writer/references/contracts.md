@@ -1,7 +1,7 @@
 # Portable project bundle contract v1 / 可移植项目包约定 v1
 
-Read before creating or modifying `project.zh-CN.json`. This file is self-contained; no installed companion or external schema is needed to interpret it. The same contract is used by reading orchestration, cross-linking and the slides-writer handoff.
-创建或修改 `project.zh-CN.json` 前阅读本文。本约定自包含，无需安装其他技能或访问外部模式；阅读编排、关系构建及幻灯片写作交接使用同一约定。
+Read before creating or modifying `project.<locale>.json`. This file is self-contained; no installed companion or external schema is needed to interpret it. The same contract is used by reading orchestration, cross-linking and the slides-writer handoff.
+创建或修改 `project.<locale>.json` 前阅读本文。本约定自包含，无需安装其他技能或访问外部模式；阅读编排、关系构建及幻灯片写作交接使用同一约定。
 
 ## Ownership and portability / 职责与可移植性
 
@@ -76,8 +76,8 @@ The writer renders JSON, code and execution records inside labelled semantic pre
 writer 将 JSON、代码及执行记录放入带标签、语法高亮和复制按钮的语义 pre/code 窗口；复制不含行号/工具栏。自动播放须主动开启，每页可选5s/15s/30s/1min；目录/详情/隐藏页签期间暂停推进，末页停止。英文请求要求叙事、实例、记录与控件全英文，不仅翻译标题。
 
 ## Website locale layout / 网页语言目录
-The language field is exactly zh-CN or en-US. Publish root index.html as a bilingual language chooser; all collection indexes and paper pages live under their locale directories (zh-CN/index.html, en-US/index.html, and locale/paper-id.html). Cross-paper links stay within the locale; language links target the sibling locale and retain the current slide anchor. Only these two locales are currently supported. Skill definitions and references remain Chinese/English paired documentation.
-language 字段仅为 zh-CN 或 en-US。根 index.html 是双语语言入口；所有集合与论文页面归入对应语言目录。跨论文导航保留在当前语言内，语言切换跳兄弟语言目录并保留当前页锚点。目前只支持上述两种语言，技能定义及参考文档保持中英文对照。
+The language field is exactly zh-CN or en-US. Root index.html redirects single-locale builds with a visible fallback, or shows a bilingual chooser; all collection indexes and paper pages live under their locale directories (zh-CN/index.html, en-US/index.html, and locale/paper-id.html). Cross-paper links stay within the locale; language links target the sibling locale and retain the current slide anchor. Only these two locales are currently supported. Skill definitions and references remain Chinese/English paired documentation.
+language 字段仅为 zh-CN 或 en-US。根index.html单语言跳转并保留备用入口，双语显示选择；所有集合与论文页面归入对应语言目录。跨论文导航保留在当前语言内，语言切换跳兄弟语言目录并保留当前页锚点。目前只支持上述两种语言，技能定义及参考文档保持中英文对照。
 
 ## Formula strings / 公式字符串
 Author TeX in prose string values with `\(…\)`, `\[…\]` or `$$…$$`; escape backslashes normally when serializing JSON. KaTeX renders only prose, never code/records. A display expression must fit its card or be split into a dedicated slide; it is not raw HTML and must retain its source locator. Single-dollar prices remain literal. Actual PrismJS handles code colors without changing source text.
@@ -105,3 +105,7 @@ Both key narrative figures and reference appendix figures may include figure_not
 
 Adaptive left/right regions each require >=30% of total figure-layout width; top/bottom regions each require >=30% of height. A failing candidate must fall back or report no-fit; never shrink text, distort the artwork or hide notes. figure_notes stays with the figure in either narrative or appendix.
 左右区域各至少整体布局宽度30%，上下各至少高度30%；不合格候选回退或报无可行版，不缩字/变形/藏说明。figure_notes随主线或附录图页。
+
+## External authoring and PDF / 外部写作与PDF
+The writer loads html-slides for reveal.js presentation authoring; the assembler validates/embeds assets and retains this v1 contract. Dependency resolution provenance does not prove execution of authoring instructions. crispe-slides-to-pdf consumes verified deck HTML and does not change research fields. Reveal owns slide navigation/scaling, while Prism and KaTeX retain independent default styles. Printed fragments are combined by default, with one logical slide per PDF page; overflow must be corrected before export.
+writer加载外部技能进行Reveal写作，装配校验/内嵌且保留v1；解析来源不代表执行。PDF技能消费已验证HTML，不改研究字段；Reveal管导航缩放，Prism/KaTeX默认风格独立。打印默认合并步骤且一页一slide，导出前修溢出。

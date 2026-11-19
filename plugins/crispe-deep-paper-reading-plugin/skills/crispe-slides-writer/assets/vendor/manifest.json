@@ -38,7 +38,6 @@
     "license": "MIT",
     "files": {
       "LICENSE": "2b947f0901a7ffcf08a89957da9783c0e9c6e72cb6ce8e959f501ab5409e4d2b",
-      "themes/prism-tomorrow.min.css": "1b15fe2971998a048aebb60f26f6eed76122071db9ef3b995abd003224f52a98",
       "components/prism-bash.min.js": "6260814110e5182f2956e3bd257429548d9dbf2a9b66a63719b26cf9fac966a7",
       "components/prism-clike.min.js": "c76ba4e240932bdc75546be30e550f5ba5e13815ff71511c76e9e27ac3072444",
       "components/prism-core.min.js": "6caad316dd991f24f8004e0b9c19c055cb5829ff65e973fbee406f96d81b8e7e",
@@ -47,6 +46,17 @@
       "components/prism-python.min.js": "ed4385685bcf2d4935c8dbbab4bde16603da1329e092d2bf36c3dadd67e9a85c",
       "components/prism-sql.min.js": "3fc5f8ce69950ec73adc972f061df42aaea78faa4864709134ea2adc083f3a33",
       "themes/prism.css": "87faadabd6d49d76ce3b03f811c6cbb5833d324de241070764067e273e72d164"
+    }
+  },
+  "reveal.js": {
+    "version": "5.2.1",
+    "source": "https://registry.npmjs.org/reveal.js/-/reveal.js-5.2.1.tgz",
+    "archive_sha256": "359b575dd51bbda32f89b2fd4c7dc46ad7389a805572158916c29252f7a27333",
+    "license": "MIT",
+    "files": {
+      "LICENSE": "34014800f4126ac2525e224166f099f26628612e95c41f76d70841b63138c989",
+      "dist/reveal.js": "46538b52db48724192f59bf46f5e851a18e302777c46f4a34c32709d010d6a29",
+      "dist/reveal.css": "68f915a11ebf7203c0446576b7e952ff61c5dd02134a8a226ffaf62ed42136d2"
     }
   }
 }

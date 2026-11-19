@@ -6,7 +6,7 @@ description: >-
   contradicting/similar/independent-replication distinctions, and linked reading decks.
   为论文建立带版本定位证据的类型关系与幻灯片导航；适用于主张图、跨论文比较、引用/扩展/
   支持/矛盾/相似/独立重复验证区分和互链阅读演示。不负责整站 HTML 或自动全文追引。
-version: 1.4.3
+version: 2.0.0
 argument-hint: "[project.<locale>.json路径 / project.<locale>.json-path] (可选/optional) -- 指定已有论文分析项目，核验跨论文证据关系并生成页面连接 / identify an analyzed-paper project to verify evidence relationships and create slide links"
 ---
 

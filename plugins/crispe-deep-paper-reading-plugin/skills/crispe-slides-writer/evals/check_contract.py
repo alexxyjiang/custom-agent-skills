@@ -9,11 +9,12 @@ SKILL = Path(__file__).resolve().parents[1]
 spec = importlib.util.spec_from_file_location("builder", SKILL / "scripts/build_site.py")
 builder = importlib.util.module_from_spec(spec)
 spec.loader.exec_module(builder)
-BASE = ROOT / "examples/deep-paper-reading"
+BASE = Path(__file__).resolve().parent
+FIXTURES = json.loads((BASE / "contract-fixtures.json").read_text())
 
 class ContractChecks(unittest.TestCase):
     def setUp(self):
-        self.data = json.loads((BASE / "project.zh-CN.json").read_text())
+        self.data = json.loads(json.dumps(FIXTURES["zh-CN"]))
 
     def reject(self, mutate):
         mutate(self.data)
@@ -45,12 +46,12 @@ class ContractChecks(unittest.TestCase):
 
     def test_english_bundle(self):
         import re
-        data = json.loads((BASE / "project.en-US.json").read_text())
+        data = json.loads(json.dumps(FIXTURES["en-US"]))
         builder.validate(data, BASE)
         self.assertIsNone(re.search(r"[\u4e00-\u9fff]", json.dumps(data, ensure_ascii=False)))
 
     def test_locale_directory_layout(self):
-        english = json.loads((BASE / "project.en-US.json").read_text())
+        english = json.loads(json.dumps(FIXTURES["en-US"]))
         output = builder.render_site([(self.data, BASE), (english, BASE)])
         self.assertEqual(set(output), {"index.html", "zh-CN/index.html", "zh-CN/react.html", "zh-CN/reflexion.html", "en-US/index.html", "en-US/react.html", "en-US/reflexion.html"})
         self.assertIn('href="zh-CN/index.html"', output["index.html"])
@@ -66,7 +67,7 @@ class ContractChecks(unittest.TestCase):
             builder.render_site([(self.data, BASE), (self.data, BASE)])
 
     def test_translated_anchors_must_match(self):
-        english = json.loads((BASE / "project.en-US.json").read_text())
+        english = json.loads(json.dumps(FIXTURES["en-US"]))
         english["papers"][0]["slides"][0]["id"] = "different-cover"
         with self.assertRaises(ValueError):
             builder.render_site([(self.data, BASE), (english, BASE)])
@@ -93,7 +94,10 @@ class ContractChecks(unittest.TestCase):
         self.reject(lambda d: d["relations"][0]["evidence"][0].update(claim_id="nonexistent"))
 
     def test_verified_needs_both_endpoints(self):
-        self.reject(lambda d: d["relations"][0].update(evidence=[]))
+        self.reject(lambda d: d["relations"][0].update(status="verified", evidence=[]))
+
+    def test_verified_rejects_one_endpoint(self):
+        self.reject(lambda d: d["relations"][0].update(status="verified"))
 
     def test_line_range(self):
         self.reject(lambda d: d["papers"][0]["examples"][0]["steps"][0].update(lines=[999]))
@@ -139,7 +143,9 @@ class RenderingDependencyChecks(unittest.TestCase):
         css = builder.presentation_css()
         urls = re.findall(r"url\(([^)]+)\)", css)
         self.assertTrue(urls)
-        self.assertTrue(all(u.startswith("data:font/woff2;base64,") for u in urls))
+        allowed = ("data:font/woff2;base64,", "data:image/svg+xml", "data:image/gif;base64,")
+        unexpected = [u[:120] for u in urls if not u.strip("\"' " ).startswith(allowed)]
+        self.assertEqual(unexpected, [], "CSS must embed every resource; Reveal includes a GIF loader")
         self.assertIn('"Iosevka Aile","Noto Sans CJK SC",sans-serif', css)
         self.assertIn('"Iosevka Etoile","Noto Serif CJK SC",serif', css)
         self.assertIn('"IosevkaAlexJiang","Noto Sans Mono CJK SC",monospace', css)

@@ -38,7 +38,7 @@
     {
       "name": "crispe-deep-paper-reading-plugin",
       "source": "./plugins/crispe-deep-paper-reading-plugin",
-      "description": "Bilingual paper-reading suite: bounded research orchestration, full-paper analysis with worked examples and teaching functions, evidence-backed cross-paper links, and offline HTML reading slides. 双语论文精读套件：有界研究编排、保留原有阅读要素的单篇分析与教学函数、跨论文证据连接及离线 HTML 幻灯片。 Includes crispe-deep-paper-reading, crispe-paper-analyst, crispe-paper-cross-link, and crispe-slides-writer."
+      "description": "Bilingual paper-reading suite: bounded research, evidence-linked analysis, html-slides/reveal.js authoring with Prism code and KaTeX, and validated PDF export. 双语论文精读套件：有界研究、证据分析、外部html-slides驱动的Reveal网页及PDF导出。"
     }
   ]
 }

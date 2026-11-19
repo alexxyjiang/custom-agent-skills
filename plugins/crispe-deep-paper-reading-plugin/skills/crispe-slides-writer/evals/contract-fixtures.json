@@ -1,0 +1,976 @@
+{
+  "zh-CN": {
+    "schema_version": 1,
+    "title": "论文精读2.0：反馈、代码与证据",
+    "language": "zh-CN",
+    "scope": {
+      "question": "如何把理解转成可查证、可演示的精读材料？",
+      "approved_full_text": [
+        "react",
+        "reflexion"
+      ],
+      "max_metadata_records": 20,
+      "max_full_text": 2,
+      "stop_conditions": [
+        "只复用本会话已有论文阅读；不新增全文。"
+      ],
+      "search_log": [
+        "本轮显式加载html-slides，按其Reveal结构及fragments写作，应用插件视觉约束。"
+      ],
+      "exclusions": []
+    },
+    "papers": [
+      {
+        "id": "react",
+        "title": "ReAct: Synergizing Reasoning and Acting in Language Models",
+        "source_url": "https://arxiv.org/html/2210.03629v3",
+        "version": "arXiv:2210.03629v3",
+        "topic": "反馈与有界记忆",
+        "summary": "ReAct将思考与外部行动反馈交替；Reflexion在执行之外加入评价和跨尝试的有界反思记忆。",
+        "score": {
+          "value": 3,
+          "rationale": "相对CoT/WebGPT和ReAct/Self-Refine/CodeT，机制及受控对照值得精读；效果仍受检索、反馈与预算限制。",
+          "claim_ids": [
+            "mechanism",
+            "results"
+          ]
+        },
+        "read_coverage": {
+          "status": "partial",
+          "read": [
+            "复用此前会话对指定版本正文、相关工作、参考和附录的文本阅读。"
+          ],
+          "unread": [
+            "未全面视觉核验两篇论文的原图和PDF版面。"
+          ]
+        },
+        "claims": [
+          {
+            "id": "mechanism",
+            "text": "ReAct将思考与外部行动反馈交替；Reflexion在执行之外加入评价和跨尝试的有界反思记忆。",
+            "locator": "§2",
+            "url": "https://arxiv.org/html/2210.03629v3#S2",
+            "kind": "paper-claim",
+            "limits": "机制说明，不保证所有任务有效。"
+          },
+          {
+            "id": "results",
+            "text": "ReAct的HotpotQA 27.4低于CoT 29.4；Reflexion的MBPP Python 77.1低于基线80.1。",
+            "locator": "Table 1",
+            "url": "https://arxiv.org/html/2210.03629v3#S3.T1",
+            "kind": "paper-claim",
+            "limits": "原文报告值，非本次模型实测。"
+          }
+        ],
+        "examples": [
+          {
+            "id": "retry",
+            "kind": "teaching",
+            "source_locator": "https://arxiv.org/html/2303.11366v4#S3",
+            "code": "def reflect_retry(actor,evaluate,reflect,max_trials=3,capacity=2):\n    if max_trials<0 or capacity<0:\n        raise ValueError(\"negative budget\")\n    memory=[]\n    for trial in range(1,max_trials+1):\n        answer=actor(tuple(memory))\n        if evaluate(answer):\n            return answer,trial,memory\n        memory.append(reflect(answer))\n        memory=memory[-capacity:] if capacity else []\n    return None,max_trials,memory",
+            "language": "python",
+            "run_command": "python3 -B generate_example.py",
+            "expected_output": "{\"answer\": \"Paris\", \"trials\": 2, \"memory\": [\"Use external evidence\"]}",
+            "actual_output": "{\"answer\": \"Paris\", \"trials\": 2, \"memory\": [\"Use external evidence\"]}",
+            "execution": "passed",
+            "limitations": "脚本策略教学，不是模型复现；有限试次与成功即停是明确的教学控制流。",
+            "steps": [
+              {
+                "lines": [
+                  1,
+                  2,
+                  3,
+                  4
+                ],
+                "explanation": "声明预算与新记忆",
+                "state": "零试次不执行，负数预算拒绝。"
+              },
+              {
+                "lines": [
+                  5,
+                  6,
+                  7,
+                  8
+                ],
+                "explanation": "执行并依据评价停止",
+                "state": "首轮Lyon失败，次轮Paris被接受即返回。"
+              },
+              {
+                "lines": [
+                  9,
+                  10,
+                  11
+                ],
+                "explanation": "保留有界反馈",
+                "state": "只保留最近capacity条；评价接受不等于真值。"
+              }
+            ]
+          }
+        ],
+        "slides": [
+          {
+            "id": "cover",
+            "title": "先阅读，再思考，最后呈现",
+            "chapter": "反馈机制",
+            "lead": "评分3/4；先理解实际机制，再对照证据与失败边界。",
+            "cards": [
+              {
+                "title": "核心机制",
+                "text": "ReAct将思考与外部行动反馈交替；Reflexion在执行之外加入评价和跨尝试的有界反思记忆。",
+                "tone": "indigo"
+              },
+              {
+                "title": "为什么值得读",
+                "text": "相对CoT/WebGPT和ReAct/Self-Refine/CodeT，机制及受控对照值得精读；效果仍受检索、反馈与预算限制。",
+                "tone": "emerald"
+              }
+            ],
+            "claim_ids": [
+              "mechanism"
+            ],
+            "links": [],
+            "appendix": false,
+            "takeaway": ""
+          },
+          {
+            "id": "math",
+            "title": "反馈怎样进入下一轮？",
+            "chapter": "反馈机制",
+            "lead": "同样的机制可以用状态更新解释，但公式不能替代实验。",
+            "cards": [
+              {
+                "title": "状态更新",
+                "text": "\\[m_{t+1}=\\operatorname{tail}_{k}(m_t+[r_t])\\]",
+                "tone": "indigo"
+              },
+              {
+                "title": "预算",
+                "text": "\\(k=2\\)：仅保留两条经验。",
+                "tone": "amber"
+              }
+            ],
+            "claim_ids": [
+              "mechanism"
+            ],
+            "links": [],
+            "appendix": false,
+            "takeaway": ""
+          },
+          {
+            "id": "code",
+            "title": "Pretty Code：从执行到反思",
+            "chapter": "反馈机制",
+            "lead": "用左右按钮或页面内步骤逐行检查状态；复制得到完整源码。",
+            "cards": [],
+            "claim_ids": [
+              "mechanism"
+            ],
+            "links": [],
+            "appendix": false,
+            "takeaway": "",
+            "example_id": "retry"
+          },
+          {
+            "id": "counterexample",
+            "title": "收益和反例一起读",
+            "chapter": "反馈机制",
+            "lead": "结果来自不同任务，不能直接比较两篇论文谁更强。",
+            "cards": [
+              {
+                "title": "反例",
+                "text": "HotpotQA: 27.4 < 29.4；MBPP Python: 77.1 < 80.1。",
+                "tone": "rose"
+              },
+              {
+                "title": "应用判断",
+                "text": "有独立测试的离线编程可做PoC，固定模型与总预算。",
+                "tone": "emerald"
+              }
+            ],
+            "claim_ids": [
+              "mechanism"
+            ],
+            "links": [],
+            "appendix": false,
+            "takeaway": ""
+          },
+          {
+            "id": "limits",
+            "title": "评价器可能错误放行",
+            "chapter": "反馈机制",
+            "lead": "将测试通过、真实正确、可迁移收益分别判断。",
+            "cards": [
+              {
+                "title": "停止条件",
+                "text": "错误放行、额外成本或延迟超预设门槛则停止扩展。",
+                "tone": "amber"
+              }
+            ],
+            "claim_ids": [
+              "mechanism"
+            ],
+            "links": [
+              {
+                "paper_id": "reflexion",
+                "slide_id": "limits",
+                "label": "比较另一篇的边界"
+              }
+            ],
+            "appendix": false,
+            "takeaway": ""
+          },
+          {
+            "id": "evidence",
+            "title": "证据与复查范围",
+            "chapter": "反馈机制",
+            "lead": "原始来源保留定位，当前论文不重复跳回全文。",
+            "cards": [
+              {
+                "title": "范围",
+                "text": "复用会话已有阅读；本轮检验网页与PDF，不运行模型基准。",
+                "tone": "indigo"
+              }
+            ],
+            "claim_ids": [
+              "mechanism"
+            ],
+            "links": [],
+            "appendix": false,
+            "takeaway": ""
+          }
+        ]
+      },
+      {
+        "id": "reflexion",
+        "title": "Reflexion: Language Agents with Verbal Reinforcement Learning",
+        "source_url": "https://arxiv.org/html/2303.11366v4",
+        "version": "arXiv:2303.11366v4",
+        "topic": "反馈与有界记忆",
+        "summary": "ReAct将思考与外部行动反馈交替；Reflexion在执行之外加入评价和跨尝试的有界反思记忆。",
+        "score": {
+          "value": 3,
+          "rationale": "相对CoT/WebGPT和ReAct/Self-Refine/CodeT，机制及受控对照值得精读；效果仍受检索、反馈与预算限制。",
+          "claim_ids": [
+            "mechanism",
+            "results"
+          ]
+        },
+        "read_coverage": {
+          "status": "partial",
+          "read": [
+            "复用此前会话对指定版本正文、相关工作、参考和附录的文本阅读。"
+          ],
+          "unread": [
+            "未全面视觉核验两篇论文的原图和PDF版面。"
+          ]
+        },
+        "claims": [
+          {
+            "id": "mechanism",
+            "text": "ReAct将思考与外部行动反馈交替；Reflexion在执行之外加入评价和跨尝试的有界反思记忆。",
+            "locator": "§3",
+            "url": "https://arxiv.org/html/2303.11366v4#S3",
+            "kind": "paper-claim",
+            "limits": "机制说明，不保证所有任务有效。"
+          },
+          {
+            "id": "results",
+            "text": "ReAct的HotpotQA 27.4低于CoT 29.4；Reflexion的MBPP Python 77.1低于基线80.1。",
+            "locator": "Table 1",
+            "url": "https://arxiv.org/html/2303.11366v4#S4.T1",
+            "kind": "paper-claim",
+            "limits": "原文报告值，非本次模型实测。"
+          }
+        ],
+        "examples": [
+          {
+            "id": "retry",
+            "kind": "teaching",
+            "source_locator": "https://arxiv.org/html/2303.11366v4#S3",
+            "code": "def reflect_retry(actor,evaluate,reflect,max_trials=3,capacity=2):\n    if max_trials<0 or capacity<0:\n        raise ValueError(\"negative budget\")\n    memory=[]\n    for trial in range(1,max_trials+1):\n        answer=actor(tuple(memory))\n        if evaluate(answer):\n            return answer,trial,memory\n        memory.append(reflect(answer))\n        memory=memory[-capacity:] if capacity else []\n    return None,max_trials,memory",
+            "language": "python",
+            "run_command": "python3 -B generate_example.py",
+            "expected_output": "{\"answer\": \"Paris\", \"trials\": 2, \"memory\": [\"Use external evidence\"]}",
+            "actual_output": "{\"answer\": \"Paris\", \"trials\": 2, \"memory\": [\"Use external evidence\"]}",
+            "execution": "passed",
+            "limitations": "脚本策略教学，不是模型复现；有限试次与成功即停是明确的教学控制流。",
+            "steps": [
+              {
+                "lines": [
+                  1,
+                  2,
+                  3,
+                  4
+                ],
+                "explanation": "声明预算与新记忆",
+                "state": "零试次不执行，负数预算拒绝。"
+              },
+              {
+                "lines": [
+                  5,
+                  6,
+                  7,
+                  8
+                ],
+                "explanation": "执行并依据评价停止",
+                "state": "首轮Lyon失败，次轮Paris被接受即返回。"
+              },
+              {
+                "lines": [
+                  9,
+                  10,
+                  11
+                ],
+                "explanation": "保留有界反馈",
+                "state": "只保留最近capacity条；评价接受不等于真值。"
+              }
+            ]
+          }
+        ],
+        "slides": [
+          {
+            "id": "cover",
+            "title": "先阅读，再思考，最后呈现",
+            "chapter": "反馈机制",
+            "lead": "评分3/4；先理解实际机制，再对照证据与失败边界。",
+            "cards": [
+              {
+                "title": "核心机制",
+                "text": "ReAct将思考与外部行动反馈交替；Reflexion在执行之外加入评价和跨尝试的有界反思记忆。",
+                "tone": "indigo"
+              },
+              {
+                "title": "为什么值得读",
+                "text": "相对CoT/WebGPT和ReAct/Self-Refine/CodeT，机制及受控对照值得精读；效果仍受检索、反馈与预算限制。",
+                "tone": "emerald"
+              }
+            ],
+            "claim_ids": [
+              "mechanism"
+            ],
+            "links": [],
+            "appendix": false,
+            "takeaway": ""
+          },
+          {
+            "id": "math",
+            "title": "反馈怎样进入下一轮？",
+            "chapter": "反馈机制",
+            "lead": "同样的机制可以用状态更新解释，但公式不能替代实验。",
+            "cards": [
+              {
+                "title": "状态更新",
+                "text": "\\[m_{t+1}=\\operatorname{tail}_{k}(m_t+[r_t])\\]",
+                "tone": "indigo"
+              },
+              {
+                "title": "预算",
+                "text": "\\(k=2\\)：仅保留两条经验。",
+                "tone": "amber"
+              }
+            ],
+            "claim_ids": [
+              "mechanism"
+            ],
+            "links": [],
+            "appendix": false,
+            "takeaway": ""
+          },
+          {
+            "id": "code",
+            "title": "Pretty Code：从执行到反思",
+            "chapter": "反馈机制",
+            "lead": "用左右按钮或页面内步骤逐行检查状态；复制得到完整源码。",
+            "cards": [],
+            "claim_ids": [
+              "mechanism"
+            ],
+            "links": [],
+            "appendix": false,
+            "takeaway": "",
+            "example_id": "retry"
+          },
+          {
+            "id": "counterexample",
+            "title": "收益和反例一起读",
+            "chapter": "反馈机制",
+            "lead": "结果来自不同任务，不能直接比较两篇论文谁更强。",
+            "cards": [
+              {
+                "title": "反例",
+                "text": "HotpotQA: 27.4 < 29.4；MBPP Python: 77.1 < 80.1。",
+                "tone": "rose"
+              },
+              {
+                "title": "应用判断",
+                "text": "有独立测试的离线编程可做PoC，固定模型与总预算。",
+                "tone": "emerald"
+              }
+            ],
+            "claim_ids": [
+              "mechanism"
+            ],
+            "links": [],
+            "appendix": false,
+            "takeaway": ""
+          },
+          {
+            "id": "limits",
+            "title": "评价器可能错误放行",
+            "chapter": "反馈机制",
+            "lead": "将测试通过、真实正确、可迁移收益分别判断。",
+            "cards": [
+              {
+                "title": "停止条件",
+                "text": "错误放行、额外成本或延迟超预设门槛则停止扩展。",
+                "tone": "amber"
+              }
+            ],
+            "claim_ids": [
+              "mechanism"
+            ],
+            "links": [
+              {
+                "paper_id": "react",
+                "slide_id": "limits",
+                "label": "比较另一篇的边界"
+              }
+            ],
+            "appendix": false,
+            "takeaway": ""
+          },
+          {
+            "id": "evidence",
+            "title": "证据与复查范围",
+            "chapter": "反馈机制",
+            "lead": "原始来源保留定位，当前论文不重复跳回全文。",
+            "cards": [
+              {
+                "title": "范围",
+                "text": "复用会话已有阅读；本轮检验网页与PDF，不运行模型基准。",
+                "tone": "indigo"
+              }
+            ],
+            "claim_ids": [
+              "mechanism"
+            ],
+            "links": [],
+            "appendix": false,
+            "takeaway": ""
+          }
+        ]
+      }
+    ],
+    "relations": [
+      {
+        "id": "fixture-relation",
+        "from": "react",
+        "to": "reflexion",
+        "type": "similar",
+        "statement": "Synthetic relation for contract validation only",
+        "status": "provisional",
+        "evidence": [
+          {
+            "paper_id": "react",
+            "claim_id": "mechanism"
+          }
+        ],
+        "comparability": {
+          "status": "not-assessed",
+          "reason": "Synthetic contract fixture"
+        },
+        "navigation": {
+          "from_slide": "cover",
+          "to_slide": "cover"
+        }
+      }
+    ]
+  },
+  "en-US": {
+    "schema_version": 1,
+    "title": "Paper reading 2.0: feedback, code and evidence",
+    "language": "en-US",
+    "scope": {
+      "question": "How can understanding become verifiable reading presentations?",
+      "approved_full_text": [
+        "react",
+        "reflexion"
+      ],
+      "max_metadata_records": 20,
+      "max_full_text": 2,
+      "stop_conditions": [
+        "Reuse session paper reading; no additional full texts."
+      ],
+      "search_log": [
+        "Explicitly loaded html-slides and applied its Reveal structure/fragments under plugin visual constraints."
+      ],
+      "exclusions": []
+    },
+    "papers": [
+      {
+        "id": "react",
+        "title": "ReAct: Synergizing Reasoning and Acting in Language Models",
+        "source_url": "https://arxiv.org/html/2210.03629v3",
+        "version": "arXiv:2210.03629v3",
+        "topic": "Feedback and bounded memory",
+        "summary": "ReAct interleaves reasoning and external actions; Reflexion adds evaluation and bounded cross-trial reflection memory.",
+        "score": {
+          "value": 3,
+          "rationale": "Mechanisms and controlled comparisons relative to CoT/WebGPT and ReAct/Self-Refine/CodeT reward close reading; retrieval, feedback and budgets limit gains.",
+          "claim_ids": [
+            "mechanism",
+            "results"
+          ]
+        },
+        "read_coverage": {
+          "status": "partial",
+          "read": [
+            "Reuse prior session reading of pinned main text, related work, references and appendices."
+          ],
+          "unread": [
+            "Original figures and PDF layouts of both papers were not fully visually reviewed."
+          ]
+        },
+        "claims": [
+          {
+            "id": "mechanism",
+            "text": "ReAct interleaves reasoning and external actions; Reflexion adds evaluation and bounded cross-trial reflection memory.",
+            "locator": "§2",
+            "url": "https://arxiv.org/html/2210.03629v3#S2",
+            "kind": "paper-claim",
+            "limits": "Mechanism description, not universal effectiveness."
+          },
+          {
+            "id": "results",
+            "text": "ReAct HotpotQA 27.4 is below CoT 29.4; Reflexion MBPP Python 77.1 is below baseline 80.1.",
+            "locator": "Table 1",
+            "url": "https://arxiv.org/html/2210.03629v3#S3.T1",
+            "kind": "paper-claim",
+            "limits": "Paper-reported values, not rerun here."
+          }
+        ],
+        "examples": [
+          {
+            "id": "retry",
+            "kind": "teaching",
+            "source_locator": "https://arxiv.org/html/2303.11366v4#S3",
+            "code": "def reflect_retry(actor,evaluate,reflect,max_trials=3,capacity=2):\n    if max_trials<0 or capacity<0:\n        raise ValueError(\"negative budget\")\n    memory=[]\n    for trial in range(1,max_trials+1):\n        answer=actor(tuple(memory))\n        if evaluate(answer):\n            return answer,trial,memory\n        memory.append(reflect(answer))\n        memory=memory[-capacity:] if capacity else []\n    return None,max_trials,memory",
+            "language": "python",
+            "run_command": "python3 -B generate_example.py",
+            "expected_output": "{\"answer\": \"Paris\", \"trials\": 2, \"memory\": [\"Use external evidence\"]}",
+            "actual_output": "{\"answer\": \"Paris\", \"trials\": 2, \"memory\": [\"Use external evidence\"]}",
+            "execution": "passed",
+            "limitations": "Scripted teaching policy, not model reproduction; bounded trials and immediate success stop are explicit teaching control flow.",
+            "steps": [
+              {
+                "lines": [
+                  1,
+                  2,
+                  3,
+                  4
+                ],
+                "explanation": "Declare budgets and fresh memory",
+                "state": "Zero trials do nothing; reject negative budgets."
+              },
+              {
+                "lines": [
+                  5,
+                  6,
+                  7,
+                  8
+                ],
+                "explanation": "Act and stop on evaluation",
+                "state": "Lyon fails first; accepted Paris returns on trial two."
+              },
+              {
+                "lines": [
+                  9,
+                  10,
+                  11
+                ],
+                "explanation": "Retain bounded feedback",
+                "state": "Retain only capacity lessons; evaluator acceptance is not truth."
+              }
+            ]
+          }
+        ],
+        "slides": [
+          {
+            "id": "cover",
+            "title": "Read, think, then present",
+            "chapter": "Feedback mechanisms",
+            "lead": "Score 3/4; understand mechanisms, then examine evidence and failures.",
+            "cards": [
+              {
+                "title": "Core mechanism",
+                "text": "ReAct interleaves reasoning and external actions; Reflexion adds evaluation and bounded cross-trial reflection memory.",
+                "tone": "indigo"
+              },
+              {
+                "title": "Why read it",
+                "text": "Mechanisms and controlled comparisons relative to CoT/WebGPT and ReAct/Self-Refine/CodeT reward close reading; retrieval, feedback and budgets limit gains.",
+                "tone": "emerald"
+              }
+            ],
+            "claim_ids": [
+              "mechanism"
+            ],
+            "links": [],
+            "appendix": false,
+            "takeaway": ""
+          },
+          {
+            "id": "math",
+            "title": "How does feedback reach the next trial?",
+            "chapter": "Feedback mechanisms",
+            "lead": "State updates explain the mechanism, not experimental effectiveness.",
+            "cards": [
+              {
+                "title": "State update",
+                "text": "\\[m_{t+1}=\\operatorname{tail}_{k}(m_t+[r_t])\\]",
+                "tone": "indigo"
+              },
+              {
+                "title": "Budget",
+                "text": "\\(k=2\\): retain only two lessons.",
+                "tone": "amber"
+              }
+            ],
+            "claim_ids": [
+              "mechanism"
+            ],
+            "links": [],
+            "appendix": false,
+            "takeaway": ""
+          },
+          {
+            "id": "code",
+            "title": "Pretty Code: from execution to reflection",
+            "chapter": "Feedback mechanisms",
+            "lead": "Use step buttons or fragments to inspect state; copy returns exact source.",
+            "cards": [],
+            "claim_ids": [
+              "mechanism"
+            ],
+            "links": [],
+            "appendix": false,
+            "takeaway": "",
+            "example_id": "retry"
+          },
+          {
+            "id": "counterexample",
+            "title": "Read gains and counterexamples together",
+            "chapter": "Feedback mechanisms",
+            "lead": "Results use different tasks; do not rank the two papers directly.",
+            "cards": [
+              {
+                "title": "Counterevidence",
+                "text": "HotpotQA: 27.4 < 29.4; MBPP Python: 77.1 < 80.1.",
+                "tone": "rose"
+              },
+              {
+                "title": "Application verdict",
+                "text": "Try offline coding with independent tests, fixed model and total budget.",
+                "tone": "emerald"
+              }
+            ],
+            "claim_ids": [
+              "mechanism"
+            ],
+            "links": [],
+            "appendix": false,
+            "takeaway": ""
+          },
+          {
+            "id": "limits",
+            "title": "An evaluator may accept an incorrect answer",
+            "chapter": "Feedback mechanisms",
+            "lead": "Separate test acceptance, real correctness and transferable gains.",
+            "cards": [
+              {
+                "title": "Stop criteria",
+                "text": "Stop expansion when false acceptance, cost or latency exceeds predefined limits.",
+                "tone": "amber"
+              }
+            ],
+            "claim_ids": [
+              "mechanism"
+            ],
+            "links": [
+              {
+                "paper_id": "reflexion",
+                "slide_id": "limits",
+                "label": "Compare limits in the other paper"
+              }
+            ],
+            "appendix": false,
+            "takeaway": ""
+          },
+          {
+            "id": "evidence",
+            "title": "Evidence and inspection scope",
+            "chapter": "Feedback mechanisms",
+            "lead": "Keep source locators without repeated whole-paper navigation.",
+            "cards": [
+              {
+                "title": "Scope",
+                "text": "Reuse session reading; this iteration tests HTML/PDF, not model benchmarks.",
+                "tone": "indigo"
+              }
+            ],
+            "claim_ids": [
+              "mechanism"
+            ],
+            "links": [],
+            "appendix": false,
+            "takeaway": ""
+          }
+        ]
+      },
+      {
+        "id": "reflexion",
+        "title": "Reflexion: Language Agents with Verbal Reinforcement Learning",
+        "source_url": "https://arxiv.org/html/2303.11366v4",
+        "version": "arXiv:2303.11366v4",
+        "topic": "Feedback and bounded memory",
+        "summary": "ReAct interleaves reasoning and external actions; Reflexion adds evaluation and bounded cross-trial reflection memory.",
+        "score": {
+          "value": 3,
+          "rationale": "Mechanisms and controlled comparisons relative to CoT/WebGPT and ReAct/Self-Refine/CodeT reward close reading; retrieval, feedback and budgets limit gains.",
+          "claim_ids": [
+            "mechanism",
+            "results"
+          ]
+        },
+        "read_coverage": {
+          "status": "partial",
+          "read": [
+            "Reuse prior session reading of pinned main text, related work, references and appendices."
+          ],
+          "unread": [
+            "Original figures and PDF layouts of both papers were not fully visually reviewed."
+          ]
+        },
+        "claims": [
+          {
+            "id": "mechanism",
+            "text": "ReAct interleaves reasoning and external actions; Reflexion adds evaluation and bounded cross-trial reflection memory.",
+            "locator": "§3",
+            "url": "https://arxiv.org/html/2303.11366v4#S3",
+            "kind": "paper-claim",
+            "limits": "Mechanism description, not universal effectiveness."
+          },
+          {
+            "id": "results",
+            "text": "ReAct HotpotQA 27.4 is below CoT 29.4; Reflexion MBPP Python 77.1 is below baseline 80.1.",
+            "locator": "Table 1",
+            "url": "https://arxiv.org/html/2303.11366v4#S4.T1",
+            "kind": "paper-claim",
+            "limits": "Paper-reported values, not rerun here."
+          }
+        ],
+        "examples": [
+          {
+            "id": "retry",
+            "kind": "teaching",
+            "source_locator": "https://arxiv.org/html/2303.11366v4#S3",
+            "code": "def reflect_retry(actor,evaluate,reflect,max_trials=3,capacity=2):\n    if max_trials<0 or capacity<0:\n        raise ValueError(\"negative budget\")\n    memory=[]\n    for trial in range(1,max_trials+1):\n        answer=actor(tuple(memory))\n        if evaluate(answer):\n            return answer,trial,memory\n        memory.append(reflect(answer))\n        memory=memory[-capacity:] if capacity else []\n    return None,max_trials,memory",
+            "language": "python",
+            "run_command": "python3 -B generate_example.py",
+            "expected_output": "{\"answer\": \"Paris\", \"trials\": 2, \"memory\": [\"Use external evidence\"]}",
+            "actual_output": "{\"answer\": \"Paris\", \"trials\": 2, \"memory\": [\"Use external evidence\"]}",
+            "execution": "passed",
+            "limitations": "Scripted teaching policy, not model reproduction; bounded trials and immediate success stop are explicit teaching control flow.",
+            "steps": [
+              {
+                "lines": [
+                  1,
+                  2,
+                  3,
+                  4
+                ],
+                "explanation": "Declare budgets and fresh memory",
+                "state": "Zero trials do nothing; reject negative budgets."
+              },
+              {
+                "lines": [
+                  5,
+                  6,
+                  7,
+                  8
+                ],
+                "explanation": "Act and stop on evaluation",
+                "state": "Lyon fails first; accepted Paris returns on trial two."
+              },
+              {
+                "lines": [
+                  9,
+                  10,
+                  11
+                ],
+                "explanation": "Retain bounded feedback",
+                "state": "Retain only capacity lessons; evaluator acceptance is not truth."
+              }
+            ]
+          }
+        ],
+        "slides": [
+          {
+            "id": "cover",
+            "title": "Read, think, then present",
+            "chapter": "Feedback mechanisms",
+            "lead": "Score 3/4; understand mechanisms, then examine evidence and failures.",
+            "cards": [
+              {
+                "title": "Core mechanism",
+                "text": "ReAct interleaves reasoning and external actions; Reflexion adds evaluation and bounded cross-trial reflection memory.",
+                "tone": "indigo"
+              },
+              {
+                "title": "Why read it",
+                "text": "Mechanisms and controlled comparisons relative to CoT/WebGPT and ReAct/Self-Refine/CodeT reward close reading; retrieval, feedback and budgets limit gains.",
+                "tone": "emerald"
+              }
+            ],
+            "claim_ids": [
+              "mechanism"
+            ],
+            "links": [],
+            "appendix": false,
+            "takeaway": ""
+          },
+          {
+            "id": "math",
+            "title": "How does feedback reach the next trial?",
+            "chapter": "Feedback mechanisms",
+            "lead": "State updates explain the mechanism, not experimental effectiveness.",
+            "cards": [
+              {
+                "title": "State update",
+                "text": "\\[m_{t+1}=\\operatorname{tail}_{k}(m_t+[r_t])\\]",
+                "tone": "indigo"
+              },
+              {
+                "title": "Budget",
+                "text": "\\(k=2\\): retain only two lessons.",
+                "tone": "amber"
+              }
+            ],
+            "claim_ids": [
+              "mechanism"
+            ],
+            "links": [],
+            "appendix": false,
+            "takeaway": ""
+          },
+          {
+            "id": "code",
+            "title": "Pretty Code: from execution to reflection",
+            "chapter": "Feedback mechanisms",
+            "lead": "Use step buttons or fragments to inspect state; copy returns exact source.",
+            "cards": [],
+            "claim_ids": [
+              "mechanism"
+            ],
+            "links": [],
+            "appendix": false,
+            "takeaway": "",
+            "example_id": "retry"
+          },
+          {
+            "id": "counterexample",
+            "title": "Read gains and counterexamples together",
+            "chapter": "Feedback mechanisms",
+            "lead": "Results use different tasks; do not rank the two papers directly.",
+            "cards": [
+              {
+                "title": "Counterevidence",
+                "text": "HotpotQA: 27.4 < 29.4; MBPP Python: 77.1 < 80.1.",
+                "tone": "rose"
+              },
+              {
+                "title": "Application verdict",
+                "text": "Try offline coding with independent tests, fixed model and total budget.",
+                "tone": "emerald"
+              }
+            ],
+            "claim_ids": [
+              "mechanism"
+            ],
+            "links": [],
+            "appendix": false,
+            "takeaway": ""
+          },
+          {
+            "id": "limits",
+            "title": "An evaluator may accept an incorrect answer",
+            "chapter": "Feedback mechanisms",
+            "lead": "Separate test acceptance, real correctness and transferable gains.",
+            "cards": [
+              {
+                "title": "Stop criteria",
+                "text": "Stop expansion when false acceptance, cost or latency exceeds predefined limits.",
+                "tone": "amber"
+              }
+            ],
+            "claim_ids": [
+              "mechanism"
+            ],
+            "links": [
+              {
+                "paper_id": "react",
+                "slide_id": "limits",
+                "label": "Compare limits in the other paper"
+              }
+            ],
+            "appendix": false,
+            "takeaway": ""
+          },
+          {
+            "id": "evidence",
+            "title": "Evidence and inspection scope",
+            "chapter": "Feedback mechanisms",
+            "lead": "Keep source locators without repeated whole-paper navigation.",
+            "cards": [
+              {
+                "title": "Scope",
+                "text": "Reuse session reading; this iteration tests HTML/PDF, not model benchmarks.",
+                "tone": "indigo"
+              }
+            ],
+            "claim_ids": [
+              "mechanism"
+            ],
+            "links": [],
+            "appendix": false,
+            "takeaway": ""
+          }
+        ]
+      }
+    ],
+    "relations": [
+      {
+        "id": "fixture-relation",
+        "from": "react",
+        "to": "reflexion",
+        "type": "similar",
+        "statement": "Synthetic relation for contract validation only",
+        "status": "provisional",
+        "evidence": [
+          {
+            "paper_id": "react",
+            "claim_id": "mechanism"
+          }
+        ],
+        "comparability": {
+          "status": "not-assessed",
+          "reason": "Synthetic contract fixture"
+        },
+        "navigation": {
+          "from_slide": "cover",
+          "to_slide": "cover"
+        }
+      }
+    ]
+  }
+}

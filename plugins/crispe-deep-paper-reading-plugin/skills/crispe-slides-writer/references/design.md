@@ -68,3 +68,7 @@ Display math may wrap at KaTeX base-unit boundaries without altering the TeX ann
 ## Locator consistency / 定位一致性
 Captions explain the figure; footer markers carry the verified section/figure/page locator once. Use the same locator for links to that figure inside the deck, e.g. §4.1, Figure 6, p.9-10. Claim-kind/coverage metadata is not visible footer copy. Canonicalization removes PDF prefixes and spacing differences without inventing sections or page ranges. Correct provenance errors only against the pinned source.
 图注解释图意，页底统一一次节/图/页定位，站内链接复用同定位；主张类型/覆盖元数据不写可见页底。规范化只去PDF前缀和空格差异，不造节页；来源错误须按固定原文核对。
+
+## Reveal scale, controls and numbering / Reveal缩放、控件与页码
+Reveal owns proportional scaling at phone, 1600×900, 2560×1440 and 3840×2160 sizes; allow upscaling beyond 1 while preserving the Ivory letterbox. Disable automatic scroll-view activation and duplicate hash handling. Bottom controls must receive real pointer clicks above Reveal's non-interactive slides container. Pad the current page to the total-page digit width in both header and footer: `1 / 4`, `08 / 16`, `004 / 105`.
+Reveal负责手机至4K等比缩放，允许大于1倍放大并保留Ivory留白；禁自动滚动视图及重复hash处理。底栏控件须可真实点击，不被Reveal容器屏蔽。顶底页码按总页数位数补零，格式如上。

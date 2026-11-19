@@ -18,6 +18,8 @@ Record `available`, `missing`, or `installed-but-unusable` with a concrete reaso
 | crispe-paper-analyst | Full-paper reading/report / 全文阅读及报告 | alexxyjiang/custom-agent-skills |
 | crispe-paper-cross-link | Typed evidence graph/navigation / 类型证据图与导航 | alexxyjiang/custom-agent-skills |
 | crispe-slides-writer | Presentation authoring/integration / 呈现写作集成 | alexxyjiang/custom-agent-skills |
+| html-slides | External reveal.js authoring knowledge / 外部Reveal写作知识 | claude-office-skills/skills |
+| crispe-slides-to-pdf | Verified PDF export / PDF导出验证 | alexxyjiang/custom-agent-skills |
 | literature-review | Bounded synthesis / 有界综合 | K-Dense-AI/scientific-agent-skills |
 | citation-management | Metadata identity, deduplication and citations / 元数据身份、去重与引用 | K-Dense-AI/scientific-agent-skills |
 | paper-lookup | Scoped scholarly lookup/provenance / 限定学术检索及来源 | K-Dense-AI/scientific-agent-skills |
@@ -43,3 +45,7 @@ Every handoff carries the question, exact named/versioned approved set, remainin
 
 `rigorpilot`'s `ai-research-explore` is experimental candidate discovery, not a reading orchestrator. `frontend-slides` is generic presentation, not an analyst→cross-link→writer reading chain. They are not required dependencies or substitutes for evidence/approval checkpoints. Do not repeat this research unless the user requests updated discovery.
 `rigorpilot` 的 `ai-research-explore` 是实验性候选发现而非阅读编排；`frontend-slides` 是通用呈现而非分析师→互链→写作链。二者不是必需依赖，也不替代证据/授权检查点；除非用户要求更新发现，否则不重复调研。
+
+## Presentation chain / 呈现链路
+Load html-slides explicitly through the host or a readable local definition; its published description may be incomplete. The writer owns the only call and enforces the design/evidence contract. Use the writer's integration reference for conflicts and original-source install guidance; do not copy the whole external skill or treat office-mcp as required. Missing dependencies permit analysis/handoff but not a claim that external generation succeeded. PDF delivery is routed to crispe-slides-to-pdf only after HTML checks.
+显式加载外部定义，描述可能不全；writer唯一调用并落实设计/证据。冲突及安装按集成参考，不复制外部全文、不强制MCP。缺依赖可交分析，不宣称生成；PDF仅HTML检查后交导出技能。

@@ -161,12 +161,12 @@ def presentation_css():
     # Keep only modern WOFF2 sources; no relative font request survives embedding.
     css = re.sub(r"url\(([^)]+)\)\s*format\([^)]+\),?", embed_font, css)
     prism = (vendor / "prismjs/themes/prism.css").read_text()
-    return css + "\n" + prism + "\n" + (ROOT / "assets/style.css").read_text()
+    return (vendor / "reveal.js/dist/reveal.css").read_text() + "\n" + css + "\n" + prism + "\n" + (ROOT / "assets/style.css").read_text()
 
 def presentation_js():
     vendor = ROOT / "assets/vendor"
-    paths = ["prismjs/components/prism-core.min.js", "prismjs/components/prism-clike.min.js", "prismjs/components/prism-javascript.min.js", "prismjs/components/prism-python.min.js", "prismjs/components/prism-json.min.js", "prismjs/components/prism-bash.min.js", "prismjs/components/prism-sql.min.js", "katex/dist/katex.min.js", "katex/dist/contrib/auto-render.min.js"]
-    licenses = "\n".join("/* " + (vendor / package / "LICENSE").read_text().replace("*/", "* /") + " */" for package in ["katex", "prismjs"])
+    paths = ["reveal.js/dist/reveal.js", "prismjs/components/prism-core.min.js", "prismjs/components/prism-clike.min.js", "prismjs/components/prism-javascript.min.js", "prismjs/components/prism-python.min.js", "prismjs/components/prism-json.min.js", "prismjs/components/prism-bash.min.js", "prismjs/components/prism-sql.min.js", "katex/dist/katex.min.js", "katex/dist/contrib/auto-render.min.js"]
+    licenses = "\n".join("/* " + (vendor / package / "LICENSE").read_text().replace("*/", "* /") + " */" for package in ["katex", "prismjs", "reveal.js"])
     runtime = licenses + "\nwindow.Prism={manual:true};\n" + "\n;\n".join((vendor / path).read_text() for path in paths)
     runtime += "\n;\n" + (ROOT / "assets/code.js").read_text()
     # Inline scripts must never be terminated by library source text.
@@ -337,7 +337,7 @@ def render_paper(paper, data, base, alternate=None):
         nav = "".join(f'<a class="cross-link" href="{text(l["paper_id"])}.html#slide-{text(l["slide_id"])}">{text(figure_link_label(l, data))}</a>' for l in links)
         tag = ("附录 · " if zh else "Appendix · ") if slide["appendix"] else ""
         heading = f'{tag}{slide.get("chapter", "")}・{slide_source(paper)}'
-        sections.append(f'<section class="slide" data-slide-heading="{text(heading)}" id="slide-{sid}" aria-label="{text(slide["title"])}"><header><span class="badge">{text(heading)}</span><span>{number:02} / {len(paper["slides"])}</span></header><h1>{text(slide["title"])}</h1><p class="lead">{text(slide.get("lead", ""))}</p><div class="slide-body">{body}{nav}</div><p class="takeaway">{text(slide.get("takeaway", ""))}</p><footer>{refs}</footer></section>')
+        sections.append(f'<section class="slide" data-slide-heading="{text(heading)}" id="slide-{sid}" aria-label="{text(slide["title"])}"><header><span class="badge">{text(heading)}</span><span>{str(number).zfill(len(str(len(paper["slides"]))))} / {len(paper["slides"])}</span></header><h1>{text(slide["title"])}</h1><p class="lead">{text(slide.get("lead", ""))}</p><div class="slide-body">{body}{nav}</div><p class="takeaway">{text(slide.get("takeaway", ""))}</p><footer>{refs}</footer></section>')
     template = (ROOT / "assets/deck.html").read_text()
     replacements = {"LANG": data["language"], "TITLE": text(paper["title"]), "SLIDES": "".join(sections), "TOC": "".join(toc), "CSS": presentation_css(), "JS": (ROOT / "assets/deck.js").read_text(), "SUMMARY": text(paper["summary"]), "HOME": "论文集合" if zh else "Collection", "CONTENTS": "目录" if zh else "Contents", "CLOSE": "关闭" if zh else "Close", "PREV": "上一页" if zh else "Previous", "NEXT": "下一页" if zh else "Next", "PLAY": "自动播放" if zh else "Autoplay", "SPEED": "每页时长" if zh else "Time per slide", "LANGUAGE": language_link(alternate, paper["id"])}
     replacements["JS"] = presentation_js() + "\n" + (ROOT / "assets/figure-layout.js").read_text() + "\n" + (ROOT / "assets/math-layout.js").read_text() + "\n" + replacements["JS"]
@@ -426,10 +426,16 @@ def main():
     parser.add_argument("--translation", type=Path, action="append", default=[], help="Translated project bundle (currently zh-CN and en-US only)")
     parser.add_argument("--output", type=Path, help="Site root; language folders and entry index.html are generated automatically")
     parser.add_argument("--check", action="store_true")
+    parser.add_argument("--html-slides", type=Path, help="Resolved external html-slides directory/SKILL.md when outside common skill roots")
     args = parser.parse_args()
     try:
+        from resolve_html_slides import resolve
+        dependency = resolve(args.html_slides) if not args.check else None
         bundles = [(json.loads(path.read_text()), path.parent) for path in [args.bundle, *args.translation]]
         rendered = render_site(bundles)
+        if dependency:
+            provenance = '<meta name="authoring-skill" content="html-slides"><meta name="authoring-skill-sha256" content="' + dependency["sha256"] + '">'
+            rendered = {name: page.replace('<meta charset="utf-8">', '<meta charset="utf-8">' + provenance, 1) for name, page in rendered.items()}
         if not args.check:
             require(args.output is not None, "Supply --output or --check")
             args.output.mkdir(parents=True, exist_ok=True)
