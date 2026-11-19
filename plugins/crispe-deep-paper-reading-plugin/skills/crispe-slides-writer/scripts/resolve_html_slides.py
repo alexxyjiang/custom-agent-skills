@@ -15,7 +15,7 @@ def resolve(explicit=None):
             source=path.read_text()
             if "name: html-slides" not in source:continue
             return {"name":"html-slides","path":str(path.resolve()),"sha256":hashlib.sha256(source.encode()).hexdigest(),"runtime":"reveal.js","status":"definition-readable"}
-    raise ValueError("html-slides not found. Load from the host registry/configured roots or install on explicit request: npx skills add claude-office-skills/skills --skill html-slides -g -a claude-code -a github-copilot -a opencode")
+    raise ValueError("html-slides not found. Load from the host registry/configured roots or review an immutable claude-office-skills/skills checkout and installer before explicit setup")
 
 if __name__=="__main__":
     parser=argparse.ArgumentParser(description=__doc__);parser.add_argument("--path");args=parser.parse_args()

@@ -22,4 +22,4 @@
 **中文请求：** “把获批论文做互链演示；一篇附录页无法读取，且 slides writer 不可用。”
 
 **Expected:** retain `partial`, enumerate unread appendix pages/reasons, preserve the analyst's full-reading requirement and mark its checkpoint incomplete. Use only supported narrow relations, show missing writer original-source guidance before handoff, and deliver an honestly limited bundle/pending presentation status. Do not call it full reading or completed HTML, fabricate replication, or use builder success as evidence.
-**预期：** 保留部分覆盖，列未读附录页及原因，保留全文义务并标检查点未完成；只建证据充分窄边，交接前提示 writer 原始来源安装命令，交有限包并标待呈现。不冒称全文完成/HTML 完成、不编复现、不把构建当证据。
+**预期：** 保留部分覆盖，列未读附录页及原因，保留全文义务并标检查点未完成；只建证据充分窄边，交接前提示 writer 原始来源及固定版本审查要求，交有限包并标待呈现。不冒称全文完成/HTML 完成、不编复现、不把构建当证据。
