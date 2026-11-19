@@ -15,8 +15,8 @@ Systematically read modules and generate capability, design, data/state and modi
 按以下七阶段执行，逐模块分别跟踪阅读、编写、验证进度。Reader 分析；Author 独占模块／支持／索引 skill 编写与修复；Coordinator 核查证据、维护题库、评分和发布。
 Follow the seven phases in order, tracking reading, authoring and verification separately per module. Reader analyzes; Author alone writes/repairs module, support and index skills; Coordinator checks evidence, maintains banks, grades and publishes.
 
-使用宿主原生技能编写指南；不可用时使用本流程模板：有效 YAML `name` / `description`、聚焦正文和相对支持链接。默认 CRISPE，模块与索引均适用。
-Use native skill-authoring guidance when available; otherwise use the workflow templates: valid YAML `name` / `description`, focused body and relative support links. Default to CRISPE for modules and index alike.
+使用宿主原生技能编写指南；不可用时使用本流程模板：有效 YAML `name` / `description`、聚焦正文和相对支持链接。按前缀使用COSTAR/CRISPE，两个coach可豁免；其他默认CRISPE，模块和索引一致。
+Use native skill-authoring guidance when available; otherwise use the workflow templates: valid YAML `name` / `description`, focused body and relative support links. Use COSTAR/CRISPE according to the name prefix, with the two coach exemptions; default others to CRISPE for modules and indexes alike.
 
 ## 阶段 1：准备 / Phase 1: Prepare
 

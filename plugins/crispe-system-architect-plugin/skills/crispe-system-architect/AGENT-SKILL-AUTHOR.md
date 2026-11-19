@@ -45,10 +45,13 @@ Jobs additionally follow the supplied QUICK-MODE.md pipeline profile: contracts,
 可整合 Quick 发现，但 Quick 文档本身不是证据；Verifier 不应依赖外部 Quick 文档或私有 Reader 交接。
 Integrate useful Quick findings, but Quick documents alone are not proof; Verifier must not need external Quick documents or private Reader handoffs.
 
-## 默认 CRISPE 与格式 / Default CRISPE and Format
+## 前缀框架与格式 / Prefix Framework and Format
 
-新模块／组件和 DR 索引默认在标准 YAML 后使用 CRISPE；用户明确格式优先，但保留有效 SKILL.md 元数据、完整知识和验证要求。不得为标题削弱内容或虚构示例。
-New module/component and DR index skills default to CRISPE after standard YAML. Explicit user format overrides retain valid SKILL.md metadata, complete knowledge and verification; do not weaken content for headings or invent examples.
+新模块/组件及DR索引在标准YAML后，costar前缀用COSTAR、crispe前缀用CRISPE，其他默认CRISPE；costar-coach/crispe-coach可豁免。用户格式在此前缀约束内适用，保留元数据、完整知识和验证要求。不得为标题削弱内容或虚构示例。
+After standard YAML, use COSTAR for costar-prefixed skills, CRISPE for crispe-prefixed skills, and default other module/component/index skills to CRISPE; the two coach skills may be exempt. Apply user format within this prefix rule while retaining valid metadata, complete knowledge and verification; do not weaken content for headings or invent examples.
+
+COSTAR uses Context / Objective / Style / Tone / Audience / Response; the following table specifies CRISPE.
+COSTAR采用上述六段，下表为CRISPE。
 
 | 章节 / Section | 内容 / Content |
 | --- | --- |
