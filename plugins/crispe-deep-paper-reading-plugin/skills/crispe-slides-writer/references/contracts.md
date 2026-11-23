@@ -20,13 +20,13 @@ All fields below are required except those explicitly marked optional. Arrays ma
 |---|---|
 | root | `schema_version`: integer exactly `1`; `title`: string; `language`: `zh-CN` or `en-US`; `scope`: object below; `papers`: paper array; `relations`: relation array |
 | scope | `question`: string; `approved_full_text`: string array of paper ids mapped to exact versions; `max_metadata_records`: nonnegative integer; `max_full_text`: nonnegative integer; `stop_conditions`: string array; `search_log`: string array; `exclusions`: string array |
-| paper | `id`: safe slug; `title`: string; `source_url`: versioned HTTP(S) URL; `version`: string; `publication_source`: optional verified conference/journal label string (e.g. ICLR 2026); `archive_source`: optional verified preprint/archive label including identifier/version; `topic`: string; `summary`: string; `score`: score object below; `read_coverage`: object below; `report_path`: optional relative path string; `claims`: claim array; `examples`: example array; `slides`: slide array |
+| paper | `id`: safe slug; `title`: string; `source_url`: versioned HTTP(S) URL; `version`: string; `publication_source`: optional verified conference/journal label string (e.g. ICLR 2026); `archive_source`: optional verified preprint/archive label including identifier/version; `topic`: string; `summary`: string; `score`: score object below; `read_coverage`: object below; `report_path`: optional relative path string; `claims`: claim array; `visuals`: optional original figure/table dependency inventory (required when a selected main point depends on one; see below); `examples`: example array; `slides`: slide array |
 | score | `value`: integer 1–4 (required, never null/deferred); `rationale`: nonempty string; `claim_ids`: nonempty array referencing this paper's evidence claims |
 | read_coverage | `status`: `full-text`, `partial`, or `metadata-only`; `read`: string array of inspected page/section/figure/table/equation locators; `unread`: string array of outstanding locators and reasons |
 | claim | `id`: string unique within its paper; `text`: string; `locator`: string; `url`: HTTP(S) string; `kind`: `paper-claim`, `external-evidence`, or `analyst-inference`; `limits`: string |
 | example | `id`: string unique within its paper; `kind`: `teaching`, `original`, or `reproduction`; `source_locator`: string; `code`: string; `language`: string; `run_command`: string; `expected_output`: string; `actual_output`: string; `execution`: `passed`, `not-run`, or `failed`; `limitations`: string; `steps`: step array |
 | step | `lines`: array of 1-based integers into the example's `code`; `explanation`: string; `state`: string |
-| slide | `id`: safe slug unique within its paper; `title`: string; `chapter`: string; `lead`: string; `cards`: card array; `claim_ids`: string array referring to this paper's claims; `example_id`: optional reference to this paper's example; `appendix`: boolean; `takeaway`: optional string; `links`: link array; `figure`: optional figure object; `figure_role`: optional `key`/`reference`; `figure_notes`: optional card array; `figure_layout`: optional `auto`/`left`/`right`/`top`/`bottom`/`full` |
+| slide | `id`: safe slug unique within its paper; `aliases`: optional array of unique safe slugs for removed legacy ids (no collisions with canonical ids or other aliases); `title`: string; `chapter`: string; `lead`: string; `cards`: card array; `claim_ids`: string array referring to this paper's claims; `example_id`: optional reference to this paper's example; `appendix`: boolean; `takeaway`: optional string; `links`: link array; `figure`: optional figure object; `figures`: optional array of 1–3 figure objects (mutually exclusive with figure); `figure_group_context`: required nonempty string for figures; `figure_role`: optional `key`/`reference`; `figure_notes`: optional card array; `figure_layout`: optional `auto`/`left`/`right`/`top`/`bottom`/`full`; `visual_refs`: optional visual-id array; `text_scroll_reason`: optional reviewed hard-layout exception string |
 | card | `title`: string; `text`: string; `tone`: `indigo`, `emerald`, `amber`, or `rose` |
 | link | `paper_id`: existing paper id; `slide_id`: existing slide id in that paper; `label`: string |
 | figure | `src`: relative asset path string; `alt`: string; `caption`: string; `source_url`: HTTP(S) string; `locator`: string; `original_caption`: optional complete verbatim caption provenance (not rendered separately) string |
@@ -80,8 +80,8 @@ The language field is exactly zh-CN or en-US. Root index.html redirects single-l
 language 字段仅为 zh-CN 或 en-US。根index.html单语言跳转并保留备用入口，双语显示选择；所有集合与论文页面归入对应语言目录。跨论文导航保留在当前语言内，语言切换跳兄弟语言目录并保留当前页锚点。目前只支持上述两种语言，技能定义及参考文档保持中英文对照。
 
 ## Formula strings / 公式字符串
-Author TeX in prose string values with `\(…\)`, `\[…\]` or `$$…$$`; escape backslashes normally when serializing JSON. KaTeX renders only prose, never code/records. A display expression must fit its card or be split into a dedicated slide; it is not raw HTML and must retain its source locator. Single-dollar prices remain literal. Actual PrismJS handles code colors without changing source text.
-正文字符串使用上述TeX定界符，JSON按标准转义反斜线。KaTeX仅渲染正文，不渲染代码/记录；独立公式应适配卡片或单独成页，不允许原始HTML，并保留来源定位。单美元价格保持原样，真实PrismJS负责代码配色且不改源码。
+Author TeX in prose string values with `\(…\)`, `\[…\]`, `$$…$$`, or paired symbolic `$…$` (numeric-leading expressions use explicit `\(…\)`); escape backslashes normally when serializing JSON. KaTeX renders only prose, never code/records. A display expression must fit its card or be split into a dedicated slide; it is not raw HTML and must retain its source locator. Single-dollar prices remain literal. Actual PrismJS handles code colors without changing source text.
+正文字符串使用上述TeX定界符；单美元仅符号表达式，数字开头用显式反斜线括号，JSON按标准转义反斜线。KaTeX仅渲染正文，不渲染代码/记录；独立公式应适配卡片或单独成页，不允许原始HTML，并保留来源定位。单美元价格保持原样，真实PrismJS负责代码配色且不改源码。
 
 ## Locale-qualified bundle filenames / 按语言命名项目包
 Name each generated bundle `project.<locale>.json`: `project.zh-CN.json` for Chinese and `project.en-US.json` for English. The suffix must agree with the bundle's language field. A single-language project still includes its locale in the filename; do not generate unqualified or shortened locale filenames.
@@ -109,3 +109,31 @@ Adaptive left/right regions each require >=30% of total figure-layout width; top
 ## External authoring and PDF / 外部写作与PDF
 The writer loads html-slides for reveal.js presentation authoring; the assembler validates/embeds assets and retains this v1 contract. Dependency resolution provenance does not prove execution of authoring instructions. crispe-slides-to-pdf consumes verified deck HTML and does not change research fields. Reveal owns slide navigation/scaling, while Prism and KaTeX retain independent default styles. Printed fragments are combined by default, with one logical slide per PDF page; overflow must be corrected before export.
 writer加载外部技能进行Reveal写作，装配校验/内嵌且保留v1；解析来源不代表执行。PDF技能消费已验证HTML，不改研究字段；Reveal管导航缩放，Prism/KaTeX默认风格独立。打印默认合并步骤且一页一slide，导出前修溢出。
+
+## Original visual dependency metadata / 原文图表依赖元数据
+Before authoring slides, the analyst inventories every figure/table supporting a selected main point in optional paper.visuals (required whenever such a dependency exists). Each entry has id, kind (figure/table), locator, reason, claim_ids, status (ready/missing), and slide_id. Each dependent slide lists visual_refs (inventory ids). A ready target uses the existing slide.figure raster/provenance fields. Missing extraction/verification keeps status=missing and blocks final presentation handoff; report the gap rather than delete the dependency. Formula-only explanation does not automatically require a screenshot; evidence from an actual figure/table does.
+生成前分析师将支撑主线重点的图表写入paper.visuals；存在依赖时必填。条目含id、kind、locator、reason、claim_ids、status及slide_id；依赖页写visual_refs。就绪目标沿用slide.figure原图及溯源字段；缺图记missing并阻断最终交接，不得删除依赖蒙混。仅解释公式不强制截图，但依赖真实图表的论点必须引用。
+
+A key figure/table is shown completely on the dependent main slide, or on an immediately relevant linked main continuation (figure_role=key, appendix=false). Shared originals occur once with explicit links from every dependent page; appendix-only links and bare source locators do not satisfy main evidence. Explicit Figure/Fig./Table numbers in main claim locators or narrative are also checked, so omitting visual_refs does not bypass known dependencies. The builder cannot discover semantically unrecorded dependencies; the analyst/writer must audit those before handoff.
+关键图完整放本页或相关主线续页，key且非附录；同图唯一展示，每个依赖页显式链接。只放附录或写图号不足以支撑主线。校验也检查主张定位和正文明确图号，漏写visual_refs不能绕过已知依赖；未记录的语义依赖仍须分析师/writer审查，构建器不能自动研究发现。
+
+Example / 示例：
+```json
+{"visuals":[{"id":"fig-1","kind":"figure","locator":"Figure 1, p.2","reason":"Primary preference comparison / 核心偏好比较","claim_ids":["c1"],"status":"ready","slide_id":"preference-evidence"}]}
+```
+The dependent slide includes visual_refs:["fig-1"] and a link to preference-evidence unless it is that target itself.
+依赖页加入上述引用及指向目标的链接；目标页自身无需自链接。
+
+## Non-code text fit / 非代码文字适配
+Main prose, steps, notes, captions and cards should have no horizontal or vertical scrolling. Reflow/split dense material into linked consecutive slides before generation; keep source claims, original figures, anchors and type sizes. Code pre blocks may scroll. Only a genuinely difficult layout may use slide.text_scroll_reason (nonempty explanation) as an explicit reviewed exception; this is not a routine density escape. Dialog TOC/zoom controls are separate reader UI, not main narrative.
+正文、步骤、图注、卡片默认横纵均无滚动；生成前重排或拆连续页，保留主张、原图、锚点及字号。代码pre可滚动，确实困难时才用非空text_scroll_reason记录已审例外，不作日常塞内容手段。目录/放大弹窗属于独立阅读UI，不同于主线正文。
+
+## Related visual groups / 关联图表组合
+A slide may use figures (an array of one to three complete original figure objects) instead of figure. Never use both. Record figure_group_context explaining their shared question, experiment, mechanism or comparison; unrelated artwork must stay separate. Each original keeps its own localized caption, provenance and zoom, and appears only once in the deck. visual_refs may map several inventory items to this one group slide.
+单页可用figures数组代替figure，含一至三张完整原图，不可两字段并用。figure_group_context说明共同问题、实验、机制或比较，无上下文关联不可拼图。每图保留独立本地化图注、溯源及放大，全站仅唯一展示；多个visual_refs可映射同一组合页。
+For left/right image-text modes, stack the related originals vertically inside the image region; for top/bottom modes, arrange them horizontally. The image region and prose region still each require >=30% of total layout width/height respectively; this is a region-level minimum, not a license to make individual figures unreadable. Preserve ratio, complete artwork and font sizes; fall back or split if captions, labels or notes do not fit. No prose scrolling as a routine fallback.
+左右图文时图区上下排，上下图文时图区左右排，最多三张。图文区原先各至少30%宽/高不变；这针对区域，不代表允许单图不可读。保留比例、完整图及字号，图注标签说明放不下则回退/拆页，不以文字滚动常规兜底。
+
+### Co-locate grouped explanations / 多图说明同页
+When related originals share a slide, place their shared context and per-figure explanations together in figure_notes, stacking short cards in the available text region. Use the existing blank space before adding a separate text-only continuation. Split only if complete artwork and readable prose cannot fit without scrolling; old removed slide ids may be retained as aliases on the merged target.
+关联图表同页时，将共同背景和各图说明合入figure_notes，在可用文字区叠放短卡片；先利用留白，不额外创建只有说明的续页。完整图与可读文字确实无法无滚动适配才拆页；被合并旧页id可在目标aliases中保留跳转。

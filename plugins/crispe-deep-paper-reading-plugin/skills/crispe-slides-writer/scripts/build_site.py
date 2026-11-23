@@ -36,6 +36,46 @@ def keyed(items, label):
         result[key] = item
     return result
 
+def slide_figures(slide):
+    return slide.get("figures", [slide["figure"]] if slide.get("figure") else [])
+
+
+def visual_labels(value):
+    """Explicit figure/table locators are a deterministic omission signal."""
+    return {(kind.lower().replace("fig.", "figure"), number) for kind, number in re.findall(r"\b(Figure|Fig\.|Table)\s*(\d+)\b", str(value), re.I)}
+
+
+def validate_visuals(paper):
+    slides=keyed(paper["slides"], "slide")
+    claims=keyed(paper["claims"], "claim")
+    inventory=keyed(paper.get("visuals", []), "visual")
+    grouped_assets=[(slide,figure) for slide in slides.values() if "figures" in slide for figure in slide_figures(slide)]
+    for grouped_slide,figure in grouped_assets:
+        require(sum(other.get("src")==figure.get("src") and other.get("source_url")==figure.get("source_url") for candidate in slides.values() for other in slide_figures(candidate))==1, "Grouped original must have one unique occurrence; link to its existing target")
+    for visual in inventory.values():
+        require(visual.get("kind") in {"figure", "table"}, "Visual kind must be figure/table")
+        require(bool(visual.get("locator")) and bool(visual.get("reason")), "Visual needs locator and relevance reason")
+        require(visual.get("status") in {"ready", "missing"}, "Visual status must be ready/missing")
+        require(isinstance(visual.get("claim_ids"), list) and all(c in claims for c in visual["claim_ids"]), "Unknown visual claim")
+        target=slides.get(visual.get("slide_id"))
+        require(visual["status"]=="ready" and target is not None and bool(slide_figures(target)), "Required original visual missing; handoff is pending")
+        require(bool(visual_labels(visual["locator"]) & set().union(*(visual_labels(f["locator"]) for f in slide_figures(target)))), "Visual target locator mismatch")
+    for slide in slides.values():
+        refs=slide.get("visual_refs", [])
+        require(isinstance(refs,list) and all(v in inventory for v in refs), "Unknown slide visual_refs")
+        if slide["appendix"]:continue
+        labels=set().union(*(visual_labels(claims[c]["locator"]) for c in slide["claim_ids"])) if slide["claim_ids"] else set()
+        labels |= visual_labels(" ".join([slide.get("lead", ""), *[c.get("text", "") for c in slide.get("cards", [])]]))
+        for label in labels:
+            targets=[s for s in slides.values() if slide_figures(s) and any(label in visual_labels(f["locator"]) for f in slide_figures(s))]
+            require(any(not t["appendix"] and t.get("figure_role")=="key" for t in targets), f"{paper['id']}/{slide['id']}: main argument references {label}; embed the original as a key narrative figure/table")
+            require(any(t is slide or any(link["paper_id"]==paper["id"] and link["slide_id"]==t["id"] for link in slide["links"]) for t in targets if not t["appendix"] and t.get("figure_role")=="key"), "Referenced main visual needs an explicit target link")
+        for vid in refs:
+            visual=inventory[vid];target=slides[visual["slide_id"]]
+            require(not target["appendix"] and target.get("figure_role")=="key", "Main visual dependency must target a key narrative slide")
+            require(target is slide or any(link["paper_id"]==paper["id"] and link["slide_id"]==target["id"] for link in slide["links"]), "Main slide needs an explicit link to its shared visual target")
+
+
 def validate(data, base):
     require(data.get("schema_version") == 1, "schema_version must equal 1")
     require(data.get("language") in LOCALES, "language must be zh-CN or en-US")
@@ -77,6 +117,12 @@ def validate(data, base):
         examples = keyed(paper["examples"], f"{pid} example")
         slides = keyed(paper["slides"], f"{pid} slide")
         require(bool(slides), f"{pid}: no slides")
+        aliases=set()
+        for entry in slides.values():
+            require(isinstance(entry.get("aliases",[]),list), "Slide aliases must be a list")
+            for alias in entry.get("aliases",[]):
+                require(isinstance(alias,str) and SLUG.fullmatch(alias) and alias not in slides and alias not in aliases, "Invalid or duplicate slide alias")
+                aliases.add(alias)
         for claim in claims.values():
             require(claim.get("kind") in {"paper-claim", "external-evidence", "analyst-inference"}, "Invalid claim kind")
             require(bool(claim.get("text")) and bool(claim.get("locator")) and "limits" in claim, "Claim needs text, locator and limits")
@@ -100,6 +146,8 @@ def validate(data, base):
                 require(cid in claims, f"Unknown claim: {pid}/{cid}")
             if "example_id" in slide:
                 require(slide["example_id"] in examples, f"Unknown example: {pid}/{slide['example_id']}")
+            if "text_scroll_reason" in slide:
+                require(isinstance(slide["text_scroll_reason"],str) and bool(slide["text_scroll_reason"].strip()), "Text scrolling exception requires a reason")
             for card in slide.get("cards", []):
                 require(card.get("tone", "indigo") in {"indigo", "emerald", "amber", "rose"}, "Invalid card tone")
             if "figure_role" in slide:
@@ -111,14 +159,17 @@ def validate(data, base):
                 for note in slide["figure_notes"]:
                     require(isinstance(note, dict) and isinstance(note.get("title"), str) and isinstance(note.get("text"), str), "Figure note needs title and text")
                     require(note.get("tone", "indigo") in {"indigo", "emerald", "amber", "rose"}, "Invalid figure note tone")
-            if "figure" in slide:
-                fig = slide["figure"]
+            if "figures" in slide:
+                require("figure" not in slide and isinstance(slide["figures"],list) and 1 <= len(slide["figures"]) <= 3, "Use figure or one-to-three figures, not both")
+                require(isinstance(slide.get("figure_group_context"),str) and bool(slide["figure_group_context"].strip()), "Grouped originals require shared figure_group_context")
+            for fig in slide_figures(slide):
                 require(all(fig.get(k) for k in ["src", "alt", "caption", "source_url", "locator"]), "Incomplete figure provenance")
                 asset = (base / fig["src"]).resolve()
                 require(not Path(fig["src"]).is_absolute() and asset.is_relative_to(base.resolve()), "Figure must be a relative asset inside bundle")
                 require(asset.is_file() and asset.suffix.lower() in {".png", ".jpg", ".jpeg", ".webp", ".gif"}, "Figure asset missing or unsupported (use raster)")
                 url(fig["source_url"])
     for pid, paper in papers.items():
+        validate_visuals(paper)
         for slide in paper["slides"]:
             for link in slide.get("links", []):
                 target = papers.get(link.get("paper_id"))
@@ -223,9 +274,9 @@ def figure_link_label(link, data):
     if label.startswith(("查看图表：", "View figure: ")):
         paper = next((p for p in data["papers"] if p["id"] == link["paper_id"]), None)
         target = next((s for s in paper["slides"] if s["id"] == link["slide_id"]), None) if paper else None
-        if target and target.get("figure"):
+        if target and slide_figures(target):
             prefix = "查看图表：" if label.startswith("查看图表：") else "View figure: "
-            return prefix + format_locator(target["figure"]["locator"])
+            return prefix + "; ".join(format_locator(f["locator"]) for f in slide_figures(target))
     return label
 
 def render_reference(label, source, paper, limits=""):
@@ -308,21 +359,24 @@ def render_paper(paper, data, base, alternate=None):
         body = f'<div class="cards">{cards}</div>' if cards else ""
         if "example_id" in slide:
             body += render_example(examples[slide["example_id"]], zh)
-        if "figure" in slide:
-            fig = slide["figure"]
-            asset = base / fig["src"]
-            mime = mimetypes.guess_type(asset.name)[0]
-            encoded = base64.b64encode(asset.read_bytes()).decode()
-            # Render one semantic caption only; original text remains available as
-            # provenance when a localized caption is supplied by the author.
-            artwork = f'<figure class="paper-figure"><button class="zoom" type="button" aria-label="{text(fig["alt"])}"><img src="data:{mime};base64,{encoded}" alt="{text(fig["alt"])}"></button><figcaption><span class="figure-caption">{text(fig["caption"])}</span></figcaption></figure>'
+        if slide_figures(slide):
+            artworks=[]
+            for fig in slide_figures(slide):
+                asset = base / fig["src"]
+                mime = mimetypes.guess_type(asset.name)[0]
+                encoded = base64.b64encode(asset.read_bytes()).decode()
+                # Render one semantic caption only; original text remains available as
+                # provenance when a localized caption is supplied by the author.
+                artwork = f'<figure class="paper-figure"><button class="zoom" type="button" aria-label="{text(fig["alt"])}"><img src="data:{mime};base64,{encoded}" alt="{text(fig["alt"])}"></button><figcaption><span class="figure-caption">{text(fig["caption"])}</span></figcaption></figure>'
+                artworks.append(artwork)
+            artwork = "".join(artworks)
+            if "figures" in slide:artwork = '<div class="figure-gallery" style="--figure-count:'+str(len(artworks))+'">'+artwork+'</div>'
             notes = slide.get("figure_notes", slide.get("cards", []))
             note_cards = "".join(f'<article class="card {text(c.get("tone", "indigo"))}"><h3>{text(c["title"])}</h3><p>{text(c["text"])}</p></article>' for c in notes)
             preference = slide.get("figure_layout", "auto")
             body = f'<div class="figure-layout" data-preference="{text(preference)}" data-layout="full" data-has-notes="{str(bool(notes)).lower()}">{artwork}<div class="figure-notes"><div class="cards">{note_cards}</div></div></div>'
         reference_items = []
-        if slide.get("figure"):
-            figure = slide["figure"]
+        for figure in slide_figures(slide):
             reference_items.append((format_locator(figure["locator"]), figure["source_url"], ""))
         for cid in slide.get("claim_ids", []):
             claim = claims[cid]
@@ -337,7 +391,8 @@ def render_paper(paper, data, base, alternate=None):
         nav = "".join(f'<a class="cross-link" href="{text(l["paper_id"])}.html#slide-{text(l["slide_id"])}">{text(figure_link_label(l, data))}</a>' for l in links)
         tag = ("附录 · " if zh else "Appendix · ") if slide["appendix"] else ""
         heading = f'{tag}{slide.get("chapter", "")}・{slide_source(paper)}'
-        sections.append(f'<section class="slide" data-slide-heading="{text(heading)}" id="slide-{sid}" aria-label="{text(slide["title"])}"><header><span class="badge">{text(heading)}</span><span>{str(number).zfill(len(str(len(paper["slides"]))))} / {len(paper["slides"])}</span></header><h1>{text(slide["title"])}</h1><p class="lead">{text(slide.get("lead", ""))}</p><div class="slide-body">{body}{nav}</div><p class="takeaway">{text(slide.get("takeaway", ""))}</p><footer>{refs}</footer></section>')
+        scroll_exception = ' data-text-scroll-exception="true"' if slide.get("text_scroll_reason") else ""
+        sections.append(f'<section class="slide"{scroll_exception} data-slide-heading="{text(heading)}" data-slide-aliases="{text(json.dumps(slide.get('aliases', [])))}" id="slide-{sid}" aria-label="{text(slide["title"])}"><header><span class="badge">{text(heading)}</span><span>{str(number).zfill(len(str(len(paper["slides"]))))} / {len(paper["slides"])}</span></header><h1>{text(slide["title"])}</h1><p class="lead">{text(slide.get("lead", ""))}</p><div class="slide-body">{body}{nav}</div><p class="takeaway">{text(slide.get("takeaway", ""))}</p><footer>{refs}</footer></section>')
     template = (ROOT / "assets/deck.html").read_text()
     replacements = {"LANG": data["language"], "TITLE": text(paper["title"]), "SLIDES": "".join(sections), "TOC": "".join(toc), "CSS": presentation_css(), "JS": (ROOT / "assets/deck.js").read_text(), "SUMMARY": text(paper["summary"]), "HOME": "论文集合" if zh else "Collection", "CONTENTS": "目录" if zh else "Contents", "CLOSE": "关闭" if zh else "Close", "PREV": "上一页" if zh else "Previous", "NEXT": "下一页" if zh else "Next", "PLAY": "自动播放" if zh else "Autoplay", "SPEED": "每页时长" if zh else "Time per slide", "LANGUAGE": language_link(alternate, paper["id"])}
     replacements["JS"] = presentation_js() + "\n" + (ROOT / "assets/figure-layout.js").read_text() + "\n" + (ROOT / "assets/math-layout.js").read_text() + "\n" + replacements["JS"]

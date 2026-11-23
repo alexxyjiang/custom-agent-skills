@@ -24,8 +24,21 @@
     code.replaceChildren(...rows);
     code.dataset.highlighter = grammar ? "prismjs" : "plain";
   });
+  // Normalize paired single-dollar math without treating prices as delimiters.
+  function normalizeInlineDollars(element) {
+    const walker=document.createTreeWalker(element,NodeFilter.SHOW_TEXT);
+    const nodes=[];
+    while(walker.nextNode())if(!walker.currentNode.parentElement.closest("pre,code,script,style,.katex"))nodes.push(walker.currentNode);
+    nodes.forEach(node=>{
+      node.textContent=node.textContent.replace(/(?<![\\$])\$(?![$\d])([^$\n]+?)(?<!\\)\$(?![$\d])/g,(whole,tex)=>{
+        if(tex!==tex.trim() || /^\d[\d,.]*(?:\s*(?:USD|EUR|CNY))?$/i.test(tex))return whole;
+        return "\\("+tex+"\\)";
+      });
+    });
+  }
   // Render only authored prose, never source code, JSON, controls or raw records.
-  document.querySelectorAll(".slide h1,.slide .lead,.card p,.takeaway,.steps .step span,.paper-card p,.collection .intro").forEach(element => {
+  document.querySelectorAll(".slide h1,.slide .lead,.card p,.takeaway,.steps .step strong,.steps .step span,.paper-card p,.collection .intro").forEach(element => {
+    normalizeInlineDollars(element);
     renderMathInElement(element, {
       delimiters: [{left:"$$",right:"$$",display:true},{left:"\\[",right:"\\]",display:true},{left:"\\(",right:"\\)",display:false}],
       throwOnError:false, trust:false, strict:"ignore",

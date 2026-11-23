@@ -11,10 +11,10 @@ description: >-
   full texts. 窄范围事实查询不触发 / Exclude narrow factual lookups.
   Opt-in worked examples and teaching code/functions; structured orchestrator handoff.
   按需提供具体示例、教学代码/函数与面向编排器的结构化交接。
-version: 2.0.1
+version: 2.0.2
 argument-hint: "[PDF路径/pdf-path|arxiv-id|arxiv-url] (可选/optional) -- 指定论文；省略时询问或解析下一篇 / identify paper or resolve next paper"
 metadata:
-  version: "2.0.1"
+  version: "2.0.2"
 compatibility: "Claude Code and OpenCode; PDF reading and local file access; HTTP retrieval for requested papers; optional reviewed local research companions. / 需要PDF阅读及本地文件能力，可获取用户指定论文，按需使用已审本地研究技能。"
 ---
 
@@ -278,6 +278,12 @@ companion offers them. Respect the user's offline or paper-only scope and the ho
 7. **On request, add code/examples or a structured handoff** using [references/code-examples.md](references/code-examples.md); preserve the existing report and reading requirements.
 
 仅在请求示例/函数或编排器交接时，按上述参考追加示例或结构化交接；保留现有报告与阅读要求。
+
+Before slides handoff, inventory original figures/tables tied to each selected main point in paper.visuals and map claims/slides via visual_refs per the writer contract. Record locator, relevance, target slide and ready/missing state; a figure-based main claim without its original visual is an incomplete handoff.
+交slides前按writer契约在paper.visuals清点主线重点依赖原图表，以visual_refs映射主张及页面，记录定位、理由、目标及就绪/缺失；主线图表论点缺原图属于交接未完成。
+
+For each visual dependency, record the shared experiment/question and what each chart actually measures, including metric, direction, baseline, uncertainty and prompt/data conditions. Distinguish Likert ratings from preference win rates. Recommend related groups of at most three without forcing one chart per slide; leave visual arrangement to the writer.
+逐项图表依赖记录共同实验/问题及各图实际指标、方向、基线、不确定性、提示/数据条件，区分Likert评分与偏好胜率。可建议最多三张关联组合，不强制一图一页；排版交writer。
 
 ## [Specification] / 输出规范
 

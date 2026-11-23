@@ -14,5 +14,5 @@
     "bilingual"
   ],
   "description": "Bilingual paper-reading suite: bounded research, evidence-linked analysis, html-slides/reveal.js authoring with Prism code and KaTeX, and validated PDF export. 双语论文精读套件：有界研究、证据分析、外部html-slides驱动的Reveal网页及PDF导出。",
-  "version": "2.0.1"
+  "version": "2.0.2"
 }

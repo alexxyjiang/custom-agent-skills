@@ -34,3 +34,7 @@ Supply the requested `project.<locale>.json` and all relative reports/assets to 
 
 Checkpoints are explicit recorded quality states, not repeated permission prompts. Pause for a user decision at new full-text/scope approvals, ambiguous targets, or a genuine blocker; proceed through satisfied checkpoints using existing authorization.
 检查点是显式质量记录，不是重复权限提示；只有新全文/范围授权、目标歧义或真实阻塞才暂停请求用户决定，已满足检查点沿用授权继续。
+
+## Visual and layout checkpoints / 图表与版式检查点
+C1 records paper.visuals before writer generation: selected main point → claim → original figure/table locator → target slide → ready/missing. C3 reconciles visual_refs and actual assets, and blocks missing originals for figure-based main arguments. Shared figures require a key main target and explicit dependent links. Review main text fit before building: no non-code scrolling by default, reflow or add consecutive pages instead; hard exceptions require text_scroll_reason.
+C1在生成前记录重点→主张→原图表定位→目标页→就绪/缺失；C3核对引用和实际资源，主线依赖缺图阻断。同图须主线关键目标及依赖链接。构建前审文字适配，非代码默认无滚动，优先重排/连续页，困难例外记录原因。

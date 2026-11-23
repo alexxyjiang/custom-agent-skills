@@ -7,10 +7,10 @@ description: >-
   paper reading-to-slides or research reading plans, not a lone bibliographic lookup.
   深度论文阅读编排：有限检索、具名全文授权、逐篇全文分析、跨论文证据关系及幻灯片交接；
   适用于读论文到演示的完整项目、专题精读，不用于单纯元数据查询。
-version: 2.0.1
+version: 2.0.2
 argument-hint: "[论文ID/链接/PDF路径或研究问题 / paper-ids|URLs|PDF-paths|research-question] (可选/optional) -- 指定精读目标或主题、阅读范围及输出语言 / specify reading targets or topic, scope and output language"
 metadata:
-  version: "2.0.1"
+  version: "2.0.2"
 compatibility: "Claude Code and OpenCode; paper/PDF reading and local file access; web lookup when in scope; reviewed local companion skills for selected phases. / 需要论文/PDF阅读及本地文件能力，按范围使用网页检索及已审本地协作技能。"
 ---
 
@@ -54,6 +54,12 @@ Read [contracts](references/contracts.md) before editing a bundle, [workflow](re
    呈现前检查外部html-slides可用性，交writer单向调用，不重复生成站点；阅读上述集成约定。需PDF时先验证HTML再交PDF技能，保留内容与语言范围。
 7. Stop research at the writer boundary. The builder renders deterministically and cannot supply missing research. Hand over verified content and visibly labeled provisional/unresolved items; never upgrade evidence or coverage to make a polished deck.
    写作边界处停止研究；构建器确定性呈现，不能补研究。交付已核实内容及显式标记的暂定/未解决事项，不为美观升级证据或覆盖。
+
+At C1/C3 require the original visual dependency inventory and verify every figure/table-based main point has a key narrative visual target, not only a source citation or appendix.
+C1/C3须检查原图表依赖清单，每个图表相关主线重点都有关键主线图页，不能仅写引用或放附录。
+
+Carry visual dependencies and grouping rationale through C1–C3. Acceptance includes grouped originals with same-page explanations, every teaching-step state without routine prose scrolling, and canonical navigation plus legacy aliases after merging. Do not equate independent page count or a successful build with completeness.
+C1至C3传递图表依赖及组合理由；验收包括关联原图与说明同页、教学每步无常规文字滚动、合并后正式导航及旧锚点兼容。页数或构建成功不等于内容完整。
 
 ## [Specification] / 输出规范
 Return the bundle location, approved targets and actual depths, candidate decisions and actual budget use, report/evidence/navigation checks, unresolved gaps and the last completed checkpoint. Use the user's language; retain identifiers and locators literally. Documentation is bilingual; a generated project uses one primary locale with optional bilingual strings. Never label partial reading as completed deep reading.

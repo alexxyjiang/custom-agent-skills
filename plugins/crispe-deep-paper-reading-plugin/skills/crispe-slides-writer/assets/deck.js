@@ -3,7 +3,7 @@ const slides = [...document.querySelectorAll("section.slide")];
 const stage = document.querySelector("#deck-stage");
 const printMode = new URLSearchParams(location.search).has("print-pdf");
 let revealReady = false;
-function initialIndex() { const id = location.hash.replace(/^#\/?/, ""); const index = slides.findIndex(s=>s.id===id); return index<0?0:index; }
+function initialIndex() { const id = location.hash.replace(/^#\/?/, ""); const index = slides.findIndex(s=>s.id===id || JSON.parse(s.dataset.slideAliases || "[]").some(alias=>"slide-"+alias===id)); return index<0?0:index; }
 const startupIndex = initialIndex();
 const toc = document.querySelector("#toc");
 const viewer = document.querySelector("#image-view");
@@ -149,6 +149,13 @@ document.querySelectorAll(".example").forEach(root => {
     root.querySelectorAll(":scope > .code-panel .code-line").forEach(line=>line.classList.toggle("highlight",numbers.includes(Number(line.dataset.line))));
     const pre = code.querySelector("pre"), line = code.querySelector(`.code-line[data-line="${numbers[0]}"]`);
     if (line) pre.scrollTop = Math.max(0,line.offsetTop - pre.offsetTop - pre.clientHeight/3);
+    const rail=root.querySelector(".steps"), selected=buttons[step];
+    if(selected && !printMode){
+      const railBox=rail.getBoundingClientRect(), selectedBox=selected.getBoundingClientRect();
+      const scale=railBox.height/rail.offsetHeight || 1;
+      if(selectedBox.bottom>railBox.bottom)rail.scrollTop+=(selectedBox.bottom-railBox.bottom)/scale+8;
+      else if(selectedBox.top<railBox.top)rail.scrollTop-=(railBox.top-selectedBox.top)/scale+8;
+    }
     state.textContent = zh ? `第 ${step+1}/${buttons.length} 步` : `Step ${step+1}/${buttons.length}`;
   }
   function seek(index) {

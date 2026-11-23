@@ -6,10 +6,10 @@ description: >-
   contradicting/similar/independent-replication distinctions, and linked reading decks.
   为论文建立带版本定位证据的类型关系与幻灯片导航；适用于主张图、跨论文比较、引用/扩展/
   支持/矛盾/相似/独立重复验证区分和互链阅读演示。不负责整站 HTML 或自动全文追引。
-version: 2.0.1
+version: 2.0.2
 argument-hint: "[project.<locale>.json路径 / project.<locale>.json-path] (可选/optional) -- 指定已有论文分析项目，核验跨论文证据关系并生成页面连接 / identify an analyzed-paper project to verify evidence relationships and create slide links"
 metadata:
-  version: "2.0.1"
+  version: "2.0.2"
 compatibility: "Claude Code and OpenCode; local JSON/report read/write access; optional scoped scholarly lookup and reviewed local companions. / 需要本地JSON及报告读写，按需使用限定学术检索和已审本地协作技能。"
 ---
 
@@ -47,6 +47,9 @@ Read [contracts](references/contracts.md), then [relation rules](references/rela
    建稳定双端页锚点与带状态链接；起点页属于来源论文，终点页属于目标。来源页链接填目标论文及页 id；不确定性用可见文字而非仅靠颜色。反向导航不代表反向科学边。缺合适页时建有实质内容的关系/覆盖附录，或先放报告等锚点齐备。
 6. Validate ids, endpoints, evidence, coverage, links, comparability and path portability per the local contract. Return the updated bundle, a concise relation review table (edge/type/status/evidence/comparability/gap/navigation), and unresolved actions. Pass presentation integration to `crispe-slides-writer`; the builder is deterministic presentation, never research or evidence verification.
    按本地约定核查 id、端点、证据、覆盖、链接、可比和路径。返回更新包、简洁关系复核表（边/类型/状态/证据/可比/缺口/导航）和待办；呈现集成交 writer。构建器仅确定性呈现，不研究也不核实证据。
+
+Preserve paper.visuals and slide.visual_refs when adding evidence links. When figure pages merge, retarget active slide/relation navigation to the canonical merged id; retain the old id only as an alias, not a second explanation-only slide. Shared visual placement never implies a new scientific relationship.
+增补证据链接时保留图表清单及依赖；合并图页后更新页面/关系导航为正式合并id，旧id仅作alias，不保留重复纯说明页；共页展示不等于新增科学关系。
 
 ## [Specification] / 输出规范
 Return the updated project.<locale>.json and a compact review table: edge, type, status, endpoint evidence, comparability, remaining gap and source/target slide anchors. Use cites/extends/supports/contradicts/similar/replicates with verified/provisional/unresolved status; follow the exact local contract. No whole-site HTML output is required from this role.

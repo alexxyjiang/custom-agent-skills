@@ -72,3 +72,23 @@ Captions explain the figure; footer markers carry the verified section/figure/pa
 ## Reveal scale, controls and numbering / Reveal缩放、控件与页码
 Reveal owns proportional scaling at phone, 1600×900, 2560×1440 and 3840×2160 sizes; allow upscaling beyond 1 while preserving the Ivory letterbox. Disable automatic scroll-view activation and duplicate hash handling. Bottom controls must receive real pointer clicks above Reveal's non-interactive slides container. Pad the current page to the total-page digit width in both header and footer: `1 / 4`, `08 / 16`, `004 / 105`.
 Reveal负责手机至4K等比缩放，允许大于1倍放大并保留Ivory留白；禁自动滚动视图及重复hash处理。底栏控件须可真实点击，不被Reveal容器屏蔽。顶底页码按总页数位数补零，格式如上。
+
+## Walkthrough rail bounds and inline math / 步骤轨道边界与内联公式
+A walkthrough shares the body with cards and links; budget badges, all step headings, the longest selected state, limitations, sources, record summary and controls at their natural heights. Keep min-height:0, but do not use scrolling or clipping as a publication fix. Reflow or split formula/code lessons first. Only a slide with an explicitly reviewed text_scroll_reason may use a bounded scrolling rail. Verify every step and execution-record state against body/footer/navigation bounds without shrinking type.
+步骤与卡片/链接共享正文，按标签、全部步骤标题、最长选中状态、局限、来源、记录摘要及控件的自然高度占位。保持min-height:0，但不以滚动/裁切作为发布修法；先重排或拆公式/代码页。仅已记录text_scroll_reason的困难例外可用受限滚动轨道。逐步及记录展开/收起均检查正文/页脚/底栏边界，不缩字号。
+Support paired single-dollar inline TeX in authored prose (including step explanations), e.g. $r_\theta(x,y)$, while preserving escaped dollars, $$display math$$, price text such as $5 and $10, and code. To avoid ambiguous currency parsing, numeric-leading expressions use explicit \( ... \) delimiters instead of single dollars. Keep KaTeX trust:false and ignore pre/code and execution records; verify original annotations after rendering.
+支持正文和步骤说明的单美元内联TeX，同时保留转义美元、双美元独立公式、价格及源码。为避免与货币混淆，数字开头表达式使用显式反斜线括号，不用单美元。KaTeX保持trust:false，不扫描pre/code及运行记录，渲染后核对原公式注释。
+
+## Prefer no scrolling for prose / 正文优先无滚动
+Outside source-code pre blocks, avoid both horizontal and vertical scrollbars in main content, including steps and figure notes. Budget the whole slide (headers, leads, cards, steps, caption, links, takeaway, footer and navigation gap); use full-width rows or split coherent continuations while preserving readable fonts. A bounded scrolling rail is only a temporary containment fallback or an explicitly reasoned hard-layout exception, never the default publication fix.
+源码pre以外，主内容含步骤及图旁说明尽量无横纵滚动条。按整页头/导语/卡片/步骤/图注/链接/要点/页脚/底栏留白计算占位，优先全宽行或连贯拆页，保持字号。有限滚动轨道仅作临时防溢出或有理由困难例外，不能作为默认发布修法。
+
+## Related visual groups / 关联图表组合
+A slide may use figures (an array of one to three complete original figure objects) instead of figure. Never use both. Record figure_group_context explaining their shared question, experiment, mechanism or comparison; unrelated artwork must stay separate. Each original keeps its own localized caption, provenance and zoom, and appears only once in the deck. visual_refs may map several inventory items to this one group slide.
+单页可用figures数组代替figure，含一至三张完整原图，不可两字段并用。figure_group_context说明共同问题、实验、机制或比较，无上下文关联不可拼图。每图保留独立本地化图注、溯源及放大，全站仅唯一展示；多个visual_refs可映射同一组合页。
+For left/right image-text modes, stack the related originals vertically inside the image region; for top/bottom modes, arrange them horizontally. The image region and prose region still each require >=30% of total layout width/height respectively; this is a region-level minimum, not a license to make individual figures unreadable. Preserve ratio, complete artwork and font sizes; fall back or split if captions, labels or notes do not fit. No prose scrolling as a routine fallback.
+左右图文时图区上下排，上下图文时图区左右排，最多三张。图文区原先各至少30%宽/高不变；这针对区域，不代表允许单图不可读。保留比例、完整图及字号，图注标签说明放不下则回退/拆页，不以文字滚动常规兜底。
+
+### Co-locate grouped explanations / 多图说明同页
+When related originals share a slide, place their shared context and per-figure explanations together in figure_notes, stacking short cards in the available text region. Use the existing blank space before adding a separate text-only continuation. Split only if complete artwork and readable prose cannot fit without scrolling; old removed slide ids may be retained as aliases on the merged target.
+关联图表同页时，将共同背景和各图说明合入figure_notes，在可用文字区叠放短卡片；先利用留白，不额外创建只有说明的续页。完整图与可读文字确实无法无滚动适配才拆页；被合并旧页id可在目标aliases中保留跳转。

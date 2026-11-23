@@ -1,8 +1,8 @@
 # Original paper figures and screenshots / 论文原图与截图
 
 ## Selection / 选择
-Inventory every figure/table mentioned in the narrative or used as evidence. Make slides self-contained: embed a key original figure/table directly with its main argument, or place a reference-only figure on one appendix slide, rather than asking the reader to open the paper. Use one unique figure/table per appendix page; reuse its target for repeated references and provide return links. Source links and a complete appendix supplement this presentation rather than replace it. Prioritize exact-version original assets, then embedded PDF artwork, then a faithful PDF region/page screenshot. HTML figure screenshots are a fallback when a PDF/asset is unavailable. Use host tools already available; the helper below optionally requires PyMuPDF. Do not fetch other paper full texts or silently install dependencies.
-清点叙事中提及或作为证据的每个图表。为让slides独立阅读，将重点完整图直接嵌入主论点，参考级图才放附录并从正文链接，不要求打开论文；每个唯一图表仅一页，重复引用复用目标并提供回链。来源链接和完整附录是补充，不能代替当前讲解所需的图表。优先同版本原始资源，其次PDF内嵌图，再次忠实区域/整页截图；PDF/资源不可得才用HTML图截图。可用宿主工具，辅助脚本可选依赖PyMuPDF；不因此取其他全文或静默安装依赖。
+Inventory every figure/table mentioned in the narrative or used as evidence. Make slides self-contained: embed a key original figure/table directly with its main argument, or place a reference-only figure on one appendix slide, rather than asking the reader to open the paper. Use one unique occurrence per original; related groups of up to three may share an appendix page; reuse its target for repeated references and provide return links. Source links and a complete appendix supplement this presentation rather than replace it. Prioritize exact-version original assets, then embedded PDF artwork, then a faithful PDF region/page screenshot. HTML figure screenshots are a fallback when a PDF/asset is unavailable. Use host tools already available; the helper below optionally requires PyMuPDF. Do not fetch other paper full texts or silently install dependencies.
+清点叙事中提及或作为证据的每个图表。为让slides独立阅读，将重点完整图直接嵌入主论点，参考级图才放附录并从正文链接，不要求打开论文；每图唯一展示，可将至多三张关联图表组合一页，重复引用复用目标并提供回链。来源链接和完整附录是补充，不能代替当前讲解所需的图表。优先同版本原始资源，其次PDF内嵌图，再次忠实区域/整页截图；PDF/资源不可得才用HTML图截图。可用宿主工具，辅助脚本可选依赖PyMuPDF；不因此取其他全文或静默安装依赖。
 
 ## Extract / 提取
 First inspect the pinned PDF page and caption. Physical PDF page indices are 1-based and may differ from printed article pages. The image inventory gives bboxes; image index alone is not semantic evidence. Confirm the figure number, caption and surrounding text visually. Embedded artwork can omit vector/text overlays: if any labels, axes, legends or panels are missing, render the full region instead. Keep all panels/units/labels; do not redraw quantitative data with a generative model.
@@ -42,3 +42,17 @@ Use a neutral #ffffff background for paper figure surfaces, including full-resol
 ## Narrative and reference figures / 主线与参考图表
 Set figure_role=key for figures essential to the argument and embed them in the main narrative with meaningful notes. Set reference for supplemental lookup figures collected in the appendix. Keep one complete occurrence, shared references and return links; do not create caption-only narrative placeholders. Adaptive layouts apply to both roles, with image/text regions each >=30% of width (left/right) or height (top/bottom).
 论点关键图设key，在主线配实质说明；补充查阅图设reference放附录。保持唯一完整图、共享引用与回链，不造仅复述图注的正文占位。两类均自适应，左右图文各至少30%宽，上下各至少30%高。
+
+## Mandatory main-point gate / 主线重点强制门槛
+When a selected main point explains or relies on an original figure/table, including qualitative trends, comparisons or the method pipeline, carry that original into the main deck. Inventory it before generation in paper.visuals and map each dependent page with visual_refs. Missing assets are a pending handoff, not permission to publish text-only evidence. Keep one original target and explicit links when several main pages share it; reference-only appendix treatment is reserved for genuinely supplemental visuals.
+主线重点解释或依赖原图表（趋势、比较、方法流程均含）时，原图必须进入主线；生成前清单化并映射依赖。缺资源交接待完成，不允许只发文字证据。多页共享同图则唯一主线目标加明确链接，真正补充图才放附录。
+
+## Related visual groups / 关联图表组合
+A slide may use figures (an array of one to three complete original figure objects) instead of figure. Never use both. Record figure_group_context explaining their shared question, experiment, mechanism or comparison; unrelated artwork must stay separate. Each original keeps its own localized caption, provenance and zoom, and appears only once in the deck. visual_refs may map several inventory items to this one group slide.
+单页可用figures数组代替figure，含一至三张完整原图，不可两字段并用。figure_group_context说明共同问题、实验、机制或比较，无上下文关联不可拼图。每图保留独立本地化图注、溯源及放大，全站仅唯一展示；多个visual_refs可映射同一组合页。
+For left/right image-text modes, stack the related originals vertically inside the image region; for top/bottom modes, arrange them horizontally. The image region and prose region still each require >=30% of total layout width/height respectively; this is a region-level minimum, not a license to make individual figures unreadable. Preserve ratio, complete artwork and font sizes; fall back or split if captions, labels or notes do not fit. No prose scrolling as a routine fallback.
+左右图文时图区上下排，上下图文时图区左右排，最多三张。图文区原先各至少30%宽/高不变；这针对区域，不代表允许单图不可读。保留比例、完整图及字号，图注标签说明放不下则回退/拆页，不以文字滚动常规兜底。
+
+### Co-locate grouped explanations / 多图说明同页
+When related originals share a slide, place their shared context and per-figure explanations together in figure_notes, stacking short cards in the available text region. Use the existing blank space before adding a separate text-only continuation. Split only if complete artwork and readable prose cannot fit without scrolling; old removed slide ids may be retained as aliases on the merged target.
+关联图表同页时，将共同背景和各图说明合入figure_notes，在可用文字区叠放短卡片；先利用留白，不额外创建只有说明的续页。完整图与可读文字确实无法无滚动适配才拆页；被合并旧页id可在目标aliases中保留跳转。

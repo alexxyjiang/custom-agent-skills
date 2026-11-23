@@ -6,10 +6,10 @@ description: >-
   turn this analysis into slides, or match a supplied reading template. 生成论文精读幻灯片、论文阅读网页、
   把分析做成 slides、按模板生成论文网页；支持中文与英文。 Consumes analysis; does not replace full-paper reading.
   消费已完成的分析，不代替全文阅读；普通 UI 开发、单纯论文总结或 PPT 转换不触发。
-version: 2.0.1
+version: 2.0.2
 argument-hint: "[project.<locale>.json路径 / project.<locale>.json-path] (可选/optional) -- 指定论文分析项目；可附模板路径、输出目录及中英文要求 / specify an analyzed-paper project, optional template path, output directory and Chinese/English preference"
 metadata:
-  version: "2.0.1"
+  version: "2.0.2"
 compatibility: "Claude Code and OpenCode; Python 3.9+ for the stdlib builder; reviewed local html-slides definition for generation; Chrome/Chromium and Playwright for browser checks. / 标准库构建器需Python 3.9+，生成需已审本地html-slides定义，浏览器检查需Chrome/Chromium及Playwright。"
 ---
 
@@ -49,6 +49,12 @@ python3 <skill-dir>/scripts/build_site.py project.zh-CN.json --translation proje
 python3 <skill-dir>/scripts/build_site.py project.zh-CN.json --check
 ```
 
+Before building, reconcile paper.visuals and slides.visual_refs with main claims and original assets. Embed key originals beside the argument or in linked main continuations; reject missing dependencies. Main text should not scroll; reflow/split first and record text_scroll_reason only for a genuinely difficult reviewed exception.
+构建前核对图表清单/依赖、主线主张及原图；关键图随论点或互链主线续页，缺图拒绝交付。正文默认不滚动，先重排/拆页，只有确实困难的已审例外才记text_scroll_reason。
+
+Group up to three context-related originals with figures and figure_group_context: stack images vertically for left/right image-text layouts and horizontally for top/bottom layouts. Keep each image/text region >=30%, independent captions/zoom and complete originals. Co-locate shared and per-figure explanations in figure_notes before considering a continuation; preserve merged anchors with aliases and update all active links to canonical ids.
+figures最多组合三张有关联的原图，figure_group_context说明共同上下文；左右图文时图上下排，上下图文时图左右排，图文各>=30%，每图独立图注/放大且完整。共同及逐图说明先合入figure_notes，确实放不下才拆页；合并用aliases保留旧锚点，活跃引用更新为正式id。
+
 ## [Specification] / 输出规范
 Maintain paired Chinese/English skill/reference prose and exactly zh-CN/en-US presentation locales. Explicit output language wins; otherwise mirror the user. Deliver locale-qualified project bundles, reports/assets, root index.html (single-locale redirect with fallback or multilingual chooser), locale/index.html and locale/paper-id.html. Language switching retains the current slide. The collection requires evidence-backed numeric scores; TOC reuses paper.summary.
 技能及参考双语配对，目前只支持中英两地区语言。指定语言优先否则跟随用户；交付语言项目、报告资源、根入口、语言集合及论文页，切换保留当前页。集合必需有依据数值评分，目录复用summary。
@@ -59,6 +65,9 @@ The [design reference](references/design.md) is authoritative for all palette/fo
 ## [Performance] / 质量标准
 Verify actual reveal.js initialization, no duplicate presentation/timer/highlighter engines, exact source copying, multiline Prism tokens and Pretty Code step/line/state synchronization. Test 5s/15s/30s/1min page timing including a real five-second interval, countdown/hold recovery, dialogs/details/hidden tabs, final stop/restart. Validate figure and formula fitting after fonts/math/images settle at 3840×2160, 2560×1440, 1600×900 and phone sizes over file/HTTP; verify proportional upscaling, actual bottom-control clicks and total-width page-number padding. Any clipped formula or overlapping card/takeaway/footer is a failure; try safe math breaks/full-width rows or split the explanation without shrinking text or altering evidence. See [adaptive layouts](references/adaptive-figure-layouts.md). Report actual checks and gaps, never equate a successful build to scientific validity.
 核查真实Reveal初始化、无双引擎/计时器/高亮器、准确源码复制、多行Prism及Pretty Code步骤行状态联动。四档含真实5秒播放、倒计时/等待恢复、弹窗/详情/隐藏页签、末页重启。字体公式图片稳定后检查4K/1440p/桌面/手机及file/HTTP，核对等比放大、底栏真实点击及按总页位数补零，公式裁切和卡片/要点/页脚重叠均失败；安全折行/全宽纵排或拆说明，不缩字/改证据。记录实际检查及缺口，构建成功非科学证明。
+
+Check every walkthrough step, not only its initial state, and execution-record open/closed states after fonts/math settle. Non-code scrolling, hidden overflow and overlap are failures unless an explicit hard-layout exception is recorded; shorten redundant copy, separate formula/code pages or split coherent lessons without dropping evidence. Render paired single-dollar symbolic TeX while preserving prices, escapes, code and exact annotations; numeric-leading TeX uses explicit backslash-parenthesis delimiters.
+字体/公式稳定后逐步检查所有教学状态及运行记录展开/收起，不只看初始页。非代码滚动、隐藏越界或重叠均失败，除非明确记录困难例外；精简赘述、分开公式代码或拆连贯教学，不删证据。单美元符号公式正常渲染，同时保留价格、转义、源码和原公式注释；数字开头公式用显式反斜线括号。
 
 ## [Example] / 示例
 **中文：**“使用这两篇已完成分析生成中英文精读slides，带代码逐行讲解，并导出PDF。”

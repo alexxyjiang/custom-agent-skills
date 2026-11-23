@@ -3,26 +3,26 @@
   const modes = ["left", "right", "top", "bottom"];
   function measure(root, mode) {
     root.dataset.layout = mode;
-    const image = root.querySelector("img");
-    const zoom = root.querySelector(".zoom");
     const notes = root.querySelector(".figure-notes");
-    image.style.width = "0px";
-    image.style.height = "0px";
-    const style = getComputedStyle(zoom);
-    const width = Math.max(0, zoom.clientWidth - parseFloat(style.paddingLeft) - parseFloat(style.paddingRight));
-    const height = Math.max(0, zoom.clientHeight - parseFloat(style.paddingTop) - parseFloat(style.paddingBottom));
-    const scale = Math.min(width / image.naturalWidth, height / image.naturalHeight);
-    const renderedWidth = image.naturalWidth * scale;
-    const renderedHeight = image.naturalHeight * scale;
-    image.style.width = `${Math.max(0, renderedWidth)}px`;
-    image.style.height = `${Math.max(0, renderedHeight)}px`;
+    let renderedWidth=Infinity, renderedHeight=Infinity, area=0;
+    root.querySelectorAll(".paper-figure").forEach(figure=>{
+      const image=figure.querySelector("img"), zoom=figure.querySelector(".zoom");
+      image.style.width="0px";image.style.height="0px";
+      const style=getComputedStyle(zoom);
+      const width=Math.max(0,zoom.clientWidth-parseFloat(style.paddingLeft)-parseFloat(style.paddingRight));
+      const height=Math.max(0,zoom.clientHeight-parseFloat(style.paddingTop)-parseFloat(style.paddingBottom));
+      const scale=Math.min(width/image.naturalWidth,height/image.naturalHeight);
+      const w=image.naturalWidth*scale,h=image.naturalHeight*scale;
+      image.style.width=`${Math.max(0,w)}px`;image.style.height=`${Math.max(0,h)}px`;
+      renderedWidth=Math.min(renderedWidth,w);renderedHeight=Math.min(renderedHeight,h);area+=w*h;
+    });
     const box = root.getBoundingClientRect();
     const tolerance = Math.max(0.5, box.width / root.offsetWidth * 2);
     const visible = [...root.querySelectorAll(".paper-figure,figcaption,.figure-notes,.card,.card h3,.card p")]
       .filter(e => getComputedStyle(e).display !== "none");
     let overflow = 0;
     if (mode !== "full" && root.dataset.hasNotes === "true") {
-      const imageRegion = root.querySelector(".paper-figure").getBoundingClientRect();
+      const imageRegion = root.querySelector(".figure-gallery,.paper-figure").getBoundingClientRect();
       const noteRegion = notes.getBoundingClientRect();
       const horizontal = mode === "left" || mode === "right";
       const span = horizontal ? box.width : box.height;
@@ -43,11 +43,11 @@
       const card = element.closest(".card").getBoundingClientRect();
       for (const rect of range.getClientRects()) overflow += Math.max(0, rect.bottom - card.bottom - tolerance) + Math.max(0, rect.right - card.right - tolerance);
     });
-    return {mode, overflow, area:renderedWidth * renderedHeight, width:renderedWidth, height:renderedHeight};
+    return {mode, overflow, area, width:renderedWidth, height:renderedHeight};
   }
   function fit(root) {
     const image = root.querySelector("img");
-    if (!image.complete || !image.naturalWidth || !root.clientHeight) return;
+    if ([...root.querySelectorAll("img")].some(img=>!img.complete||!img.naturalWidth) || !root.clientHeight) return;
     const hasNotes = root.dataset.hasNotes === "true";
     const ratio = image.naturalWidth / image.naturalHeight;
     const count = root.querySelectorAll(".card").length;

@@ -8,7 +8,7 @@
 /* Keep code explanations within their allocated reading panel. */
 .example{flex:1;max-height:100%;grid-template-rows:minmax(0,1fr)}.example>pre{min-height:0;font-size:16px;line-height:1.45}.steps{min-height:0;overflow:auto;padding:3px 8px 3px 3px}.step{font-size:17px;padding:10px;flex-shrink:0}.step span{font-size:15px;margin-top:5px}.steps .badge{align-self:flex-start}.steps small{font-size:13px}.steps details{flex-shrink:0}
 
-.steps{position:relative;overflow:visible}.step:not([aria-pressed=true]) span{display:none}.steps>p:not(.badge){font-size:15px;line-height:1.4}.steps details[open]{position:absolute;inset:0;z-index:2;background:#ffffff;border:1px solid #b0c4de;border-radius:12px;padding:18px;overflow:auto}.steps details[open] pre{max-height:calc(100% - 35px);margin-top:16px;white-space:pre-wrap;overflow-wrap:anywhere}
+.steps{position:relative;gap:10px;overflow:auto;overscroll-behavior:contain;scrollbar-gutter:stable}.steps>*{flex-shrink:0}.step:not([aria-pressed=true]) span{display:none}.steps>p:not(.badge){font-size:15px;line-height:1.4}.steps details[open]{position:absolute;inset:0;z-index:2;background:#ffffff;border:1px solid #b0c4de;border-radius:12px;padding:18px;overflow:auto}.steps details[open] pre{max-height:calc(100% - 35px);margin-top:16px;white-space:pre-wrap;overflow-wrap:anywhere}
 
 .steps:has(details[open])>:not(details){visibility:hidden;pointer-events:none}
 
@@ -113,3 +113,14 @@ html.print-pdf .reveal .slides .pdf-page>section.slide{display:flex!important;po
 /* Reveal sets a body background inline; preserve the authored outer surface. */
 body:has(>#viewport.reveal){background:var(--outer)!important}
 html.print-pdf .reveal .slides .pdf-page,html.print-pdf .reveal .slides .pdf-page>section.slide{background:var(--paper)!important}
+
+/* Related originals share one >=30% image region; never more than three. */
+.figure-gallery{display:grid;grid-template-columns:minmax(0,1fr);grid-template-rows:repeat(var(--figure-count),minmax(0,1fr));gap:12px;min-width:0;min-height:0;height:100%}
+.figure-layout[data-layout=top]>.figure-gallery,.figure-layout[data-layout=bottom]>.figure-gallery,.figure-layout[data-layout=full]>.figure-gallery{grid-template-columns:repeat(var(--figure-count),minmax(0,1fr));grid-template-rows:minmax(0,1fr)}
+.figure-layout[data-layout=right]>.figure-gallery{grid-column:2;grid-row:1}.figure-layout[data-layout=bottom]>.figure-gallery{grid-row:2}
+.figure-gallery>.paper-figure{display:flex;flex-direction:column;min-width:0;min-height:0;height:100%;gap:8px}
+.figure-gallery>.paper-figure>.zoom{display:flex;justify-content:center;align-items:center;width:100%;height:0;flex:1 1 0;min-height:0;max-height:none;padding:8px;border:1px solid var(--border);border-radius:12px;background:#ffffff}
+.figure-gallery>.paper-figure img{display:block;flex:none;max-width:100%;max-height:100%;object-fit:contain;background:#ffffff}
+.figure-gallery figcaption{flex:none;font-size:14px;line-height:1.45;text-align:center;overflow-wrap:anywhere;max-width:100%}
+/* Prose never scrolls merely because a rail reserved a scrollbar gutter. */
+section.slide:not([data-text-scroll-exception=true]) .steps{overflow:visible;scrollbar-gutter:auto}

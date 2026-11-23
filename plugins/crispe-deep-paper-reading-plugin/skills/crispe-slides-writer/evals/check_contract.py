@@ -111,6 +111,27 @@ class ContractChecks(unittest.TestCase):
     def test_report_traversal(self):
         self.reject(lambda d: d["papers"][0].update(report_path="../../README.md"))
 
+    def test_more_than_three_grouped_figures_rejected(self):
+        def change(d):
+            d["papers"][0]["slides"][0].update(figures=[{}]*4,figure_group_context="Same experiment")
+        self.reject(change)
+
+    def test_grouped_figures_need_context(self):
+        self.reject(lambda d:d["papers"][0]["slides"][0].update(figures=[{}]))
+
+    def test_alias_collision_rejected(self):
+        self.reject(lambda d:d["papers"][0]["slides"][0].update(aliases=[d["papers"][0]["slides"][1]["id"]]))
+
+    def test_duplicate_alias_rejected(self):
+        self.reject(lambda d:d["papers"][0]["slides"][0].update(aliases=["old-id","old-id"]))
+
+    def test_merged_alias_is_embedded(self):
+        paper=self.data["papers"][0]
+        paper["slides"][0]["aliases"]=["old-figure-page"]
+        builder.validate(self.data,BASE)
+        rendered=builder.render_paper(paper,self.data,BASE)
+        self.assertIn('data-slide-aliases="[&quot;old-figure-page&quot;]"',rendered)
+
     def test_remote_figure_rejected(self):
         def change(d):
             d["papers"][0]["slides"][0]["figure"] = dict(src="https://example.com/image.png", alt="x", caption="x", source_url="https://example.com", locator="Fig.1")
@@ -125,6 +146,34 @@ class ContractChecks(unittest.TestCase):
 
     def test_unsafe_evidence_url(self):
         self.reject(lambda d: d["papers"][0]["claims"][0].update(url="javascript:alert(1)"))
+
+class VisualDependencyChecks(unittest.TestCase):
+    def paper(self):
+        import copy
+        return copy.deepcopy(FIXTURES["en-US"]["papers"][0])
+
+    def test_main_figure_claim_without_artwork_rejected(self):
+        paper=self.paper();paper["claims"][0]["locator"]="Figure 3, p.11"
+        with self.assertRaisesRegex(ValueError,"embed the original"):
+            builder.validate_visuals(paper)
+
+    def test_appendix_only_cannot_replace_main_visual(self):
+        paper=self.paper();paper["claims"][0]["locator"]="Figure 3, p.11"
+        paper["slides"][-1].update(figure={"locator":"Figure 3, p.11"},appendix=True,figure_role="reference")
+        with self.assertRaises(ValueError):builder.validate_visuals(paper)
+
+    def test_missing_inventory_asset_blocks_handoff(self):
+        paper=self.paper();paper["visuals"]=[dict(id="fig-3",kind="figure",locator="Figure 3",reason="Main evidence",claim_ids=["mechanism"],status="missing",slide_id="cover")]
+        with self.assertRaisesRegex(ValueError,"handoff is pending"):builder.validate_visuals(paper)
+
+    def test_shared_main_target_requires_link(self):
+        paper=self.paper();paper["slides"][-1].update(figure={"locator":"Figure 3"},appendix=False,figure_role="key")
+        paper["visuals"]=[dict(id="fig-3",kind="figure",locator="Figure 3",reason="Main evidence",claim_ids=["mechanism"],status="ready",slide_id=paper["slides"][-1]["id"])]
+        paper["slides"][0]["visual_refs"]=["fig-3"]
+        with self.assertRaisesRegex(ValueError,"explicit link"):builder.validate_visuals(paper)
+        paper["slides"][0]["links"].append(dict(paper_id=paper["id"],slide_id=paper["slides"][-1]["id"],label="Original visual"))
+        builder.validate_visuals(paper)
+
 
 class RenderingDependencyChecks(unittest.TestCase):
     def test_pinned_vendor_integrity(self):
