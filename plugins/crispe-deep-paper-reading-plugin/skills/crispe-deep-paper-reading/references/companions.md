@@ -15,8 +15,8 @@ Check the host registry/skill loader first and host-configured project/user skil
 For scientific companions, optionally check a user-configured scientific-skills checkout, or `~/OpenProjects/scientific-agent-skills/skills/<name>/SKILL.md` if present (also allow `<checkout>/<name>/SKILL.md` when that is the checkout layout). This is a local read-only reuse source, not a required clone, installation destination or proof of runtime capability. On this task, literature-review and citation-management are partially reusable for synthesis and bibliographic identity; neither supplies this contract's typed claim graph plus HTML navigation.
 科学协作技能可选查用户配置检出目录，或存在时查 `~/OpenProjects/scientific-agent-skills/skills/<name>/SKILL.md`（若布局如此也支持根下 `<name>/SKILL.md`）。该路径仅为本地只读复用来源，不是必需克隆、安装目标或运行能力证明。本任务中综述及引用管理可部分复用综合与书目信息，但都不提供本约定的有类型主张图及 HTML 导航。
 
-Record `available`, `missing`, or `installed-but-unusable` with a concrete reason. File presence does not imply scripts, packages, credentials or network work. Load selected definitions before invoking them. Do not recursively route skills back into the orchestrator; use same-agent role execution unless authorized delegation is available.
-记录可用、缺失、已安装但不可用及具体原因。文件存在不代表脚本/包/凭据/网络可用；调用前读选中定义，避免递归回调编排器。没有获准且可用的委派则同一智能体顺序执行。
+Record `available`, `missing`, or `installed-but-unusable` with a concrete reason. File presence does not imply scripts, packages, credentials or network work. Load selected definitions before invoking them. Do not recursively route skills back into the orchestrator; use bounded parallel per-paper execution when host agents are available, following workflow.md; otherwise use same-agent sequential fallback.
+记录可用、缺失、已安装但不可用及具体原因。文件存在不代表脚本/包/凭据/网络可用；调用前读选中定义，避免递归回调编排器。宿主支持时按工作流有界并行逐篇执行，否则同agent顺序回退。
 
 ## Original repositories / 原始仓库
 

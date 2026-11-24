@@ -38,3 +38,25 @@ Checkpoints are explicit recorded quality states, not repeated permission prompt
 ## Visual and layout checkpoints / 图表与版式检查点
 C1 records paper.visuals before writer generation: selected main point → claim → original figure/table locator → target slide → ready/missing. C3 reconciles visual_refs and actual assets, and blocks missing originals for figure-based main arguments. Shared figures require a key main target and explicit dependent links. Review main text fit before building: no non-code scrolling by default, reflow or add consecutive pages instead; hard exceptions require text_scroll_reason.
 C1在生成前记录重点→主张→原图表定位→目标页→就绪/缺失；C3核对引用和实际资源，主线依赖缺图阻断。同图须主线关键目标及依赖链接。构建前审文字适配，非代码默认无滚动，优先重排/连续页，困难例外记录原因。
+
+## Bounded parallel execution / 有界并行执行
+The coordinator owns the approved version set, global budgets/log, final project.<locale>.json and collection output. Use available host agents concurrently for independent approved papers; default to at most three workers, lower when host/network/memory constraints require. Dispatch each with only the relevant skill/references, pinned paper, question, locale, remaining scope, assigned budgets and exact private output directory. Do not send the full conversation or every companion definition.
+主控独占授权版本集、全局预算/日志、最终项目及集合输出。独立获批论文用宿主agent并行，默认最多三worker，受宿主/网络/内存限制则降低。每worker仅传相关技能参考、固定论文、问题、语言、范围、分配预算及私有准确输出目录，不发送完整会话或所有协作定义。
+
+Before dispatch, reserve each named full text once globally (the existing approved-version cap is not multiplied per worker). Partition metadata/query/time budgets so assigned allowances never exceed the remaining total. Workers report actual use and cannot borrow others' allowances, fetch new full texts, install dependencies or spawn nested agents. The coordinator may reallocate unused allowance after results arrive, without increasing total limits. A paper failure stays partial and does not cancel unrelated successful work or silently increase scope.
+派发前每具名全文在全局预留一次，原上限不能按worker倍增。元数据/查询/时间额度分区，分配合计不超剩余总预算；worker回报实际用量，不借他人额度、不扩全文/装依赖/嵌套派发。主控收到结果后可转移未用额度，但不增加总限。单篇失败保持partial，不取消独立成功任务或暗扩范围。
+
+Workers write reports/<paper-id>.md and namespaced assets in assigned staging roots, plus a paper-object fragment and budget/evidence summary. Fragments are intermediate data, not alternative final per-paper project bundles. No worker writes the shared project, search log, collection, shared cache or another worker's files. The coordinator merges by stable paper/claim/visual ids, rejects duplicate/colliding outputs, aggregates budget use and freezes the merged input before generation/verification. Final coverage and scientific scores require the same reading/appraisal checks as sequential work.
+worker在指定暂存根写论文报告、带论文命名空间的资源、paper对象片段及预算/证据摘要；片段仅中间数据，不替代最终统一项目。不得写共享项目/日志/集合/缓存或他人文件。主控按稳定id合并、拒绝碰撞、汇总用量，再冻结生成/验证输入；并行不降低覆盖及评分标准。
+
+| Stage / 阶段 | Parallel unit / 并行单元 | Dependency / 前置与汇总 |
+|---|---|---|
+| Analyst reading / 精读 | one approved paper per worker / 每worker一篇获批论文 | source/scope/budget frozen first; coordinator merges reports / 先冻结来源范围预算，再主控合并 |
+| Original extraction / 原图提取 | independent reviewed PDF crops / 独立已核实PDF裁图 | page/locator checked; distinct asset paths; one visual review owner / 先核对页定位、独立路径、统一视觉核验 |
+| Cross-link review / 互链 | preselected independent endpoint pairs / 已选独立双端关系 | both reports ready; edge fragments only; do not generate all pairs blindly / 双端就绪仅交边片段，不为并行盲增全配对 |
+| Deck authoring / 论文页写作 | independent papers/locales after evidence merge / 合并证据后的独立论文语言 | immutable bundle/anchor plan; coordinator integrates once / 固定项目锚点，主控只集成一次 |
+| Rendered verification / 渲染验证 | independent deck/locale checks / 独立deck/语言 | generated site frozen; each worker separate cache/report / 站点冻结，各自缓存报告 |
+| PDF export / PDF导出 | one verified deck per export / 每次一份已验deck | distinct PDF/report paths; cap browser workers for memory / 输出独立，浏览器并发受内存约束 |
+
+Only dispatch work whose inputs are ready and output paths are disjoint. Reuse fingerprint-passed results before dispatch; do not duplicate a worker's active work. Integrating the final collection, updating canonical links/aliases, merging budgets/evidence or writing shared caches is serialized. Cancel/stop cleanly at user scope changes and preserve completed artifacts. Report actual concurrent workers and elapsed time; do not claim parallel execution when only documenting the plan.
+仅派发输入就绪且输出不冲突任务；先复用指纹通过结果，不重复worker正在做的工作。最终集合、正式链接/alias、预算证据合并及共享缓存写入顺序执行。用户改范围时干净停派并保留完成产物，报告真实并发worker和耗时，不把文档计划称为实际并行执行。

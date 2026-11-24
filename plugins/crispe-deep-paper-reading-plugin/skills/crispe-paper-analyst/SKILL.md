@@ -11,10 +11,10 @@ description: >-
   full texts. 窄范围事实查询不触发 / Exclude narrow factual lookups.
   Opt-in worked examples and teaching code/functions; structured orchestrator handoff.
   按需提供具体示例、教学代码/函数与面向编排器的结构化交接。
-version: 2.0.2
+version: 2.1.0
 argument-hint: "[PDF路径/pdf-path|arxiv-id|arxiv-url] (可选/optional) -- 指定论文；省略时询问或解析下一篇 / identify paper or resolve next paper"
 metadata:
-  version: "2.0.2"
+  version: "2.1.0"
 compatibility: "Claude Code and OpenCode; PDF reading and local file access; HTTP retrieval for requested papers; optional reviewed local research companions. / 需要PDF阅读及本地文件能力，可获取用户指定论文，按需使用已审本地研究技能。"
 ---
 
@@ -134,13 +134,8 @@ GitHub maturity review defaults to repository-owned files at a pinned revision a
 
 ### Skill collaboration / 技能协作
 
-Read [references/skill-collaboration.md](references/skill-collaboration.md) before the first
-analysis in a session. Check the four companion skills there once per session, rechecking after
-installation or a load failure. Use the host skill loader when available; otherwise read the
-resolved local `SKILL.md` and the references needed for the specific subtask. File presence is not
-proof that scripts, network, or credentials work. Resolve scripts relative to that loaded skill.
-
-会话首次分析前阅读协作参考，检查四个技能；安装后或加载失败时重查。优先宿主加载工具，否则读取已解析的本地定义及所需参考。文件存在不代表依赖可用；脚本相对实际加载目录解析。
+Read [references/skill-collaboration.md](references/skill-collaboration.md) only when selecting collaboration. Check selected companions once per session/revision, rechecking after installation or a load failure. Prefer the host loader; otherwise read the resolved local definition and only needed references. File presence does not prove scripts/network/credentials work; resolve helpers from the loaded skill.
+仅选择协作时读协作参考，所选技能每会话/版本检查一次，安装或加载失败后重查。优先宿主加载，否则只读已解析定义及所需参考；文件存在不证明脚本/网络/凭据可用，辅助脚本相对已加载技能解析。
 
 This skill owns the paper-reading workflow, score, and final report. Apply companion workflows
 only to the bounded subtask; merge findings into section 2 rather than appending four independent
@@ -212,21 +207,24 @@ companion offers them. Respect the user's offline or paper-only scope and the ho
 
    至少点名本文参考文献的一至两项先前工作，说明本文是增量改进、补足缺口，还是结合了不同研究路线。
 
-   **Calibration anchors (from the user's own past scoring)** -- use these as a sanity check on where a
-   new paper should land, not as the only valid reference points:
+   **Calibration anchors / 历史评分校准** -- use these as a sanity check, not the only valid references. / 用于评分合理性检查，不是唯一比较依据：
    - **4** -- arXiv:1301.3781, *Efficient Estimation of Word Representations in Vector Space* (word2vec):
      made dense word embeddings practically trainable at scale and became the foundation nearly every
      later representation-learning paper built on or compared against -- paradigm-defining, not just
      a strong result.
+      中文：word2vec让稠密词向量可大规模实用训练，成为后续表示学习的基础；4分看范式影响，不只看效果强。
    - **3** -- arXiv:1804.07461, *GLUE*: an evaluation benchmark/platform, not a new method, but it became
      the de facto standard protocol the NLP field evaluated against for years -- genuinely worth reading,
      though its contribution is "shared infrastructure" rather than a novel mechanism.
+      中文：GLUE是评测平台而非新方法，长期成为领域标准；3分体现共享基础设施价值。
    - **2** -- arXiv:1912.08258, *Xor Filters*: a solid, well-executed improvement to a specific data
      structure (faster/smaller than Bloom/Cuckoo filters) -- valuable if you're actually implementing
      that kind of filter, but narrow enough that it's not a priority outside that use case.
+      中文：Xor Filters是扎实的特定数据结构改进，适合实现该过滤器时阅读，非相关场景优先级有限。
    - **1** -- arXiv:2406.12023, *LiLiuM: eBay's Large Language Models for e-commerce*: an industry
      technical report on an internally trained model family -- useful mainly as a case study of one
      company's LLM pipeline, with little method-level novelty that transfers elsewhere.
+      中文：LiLiuM主要作为企业LLM管线案例，能迁移到其他场景的方法级新意有限。
 
    以下来自用户历史评分的校准锚点用于合理性检查，不是唯一比较对象。
 
@@ -284,6 +282,9 @@ Before slides handoff, inventory original figures/tables tied to each selected m
 
 For each visual dependency, record the shared experiment/question and what each chart actually measures, including metric, direction, baseline, uncertainty and prompt/data conditions. Distinguish Likert ratings from preference win rates. Recommend related groups of at most three without forcing one chart per slide; leave visual arrangement to the writer.
 逐项图表依赖记录共同实验/问题及各图实际指标、方向、基线、不确定性、提示/数据条件，区分Likert评分与偏好胜率。可建议最多三张关联组合，不强制一图一页；排版交writer。
+
+When dispatched as a parallel paper worker, stay within the assigned paper/version and budget, write only assigned report/assets and the paper-object fragment, and return actual usage/read gaps. Do not edit the shared project or dispatch further agents; the coordinator merges results.
+作为并行逐篇worker时仅处理分配论文版本/额度，只写指定报告资源及paper片段，返回实际用量/覆盖缺口；不改共享项目或嵌套派发，合并交主控。
 
 ## [Specification] / 输出规范
 

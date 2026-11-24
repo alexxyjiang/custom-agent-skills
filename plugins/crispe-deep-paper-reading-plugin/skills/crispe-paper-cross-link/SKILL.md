@@ -6,10 +6,10 @@ description: >-
   contradicting/similar/independent-replication distinctions, and linked reading decks.
   为论文建立带版本定位证据的类型关系与幻灯片导航；适用于主张图、跨论文比较、引用/扩展/
   支持/矛盾/相似/独立重复验证区分和互链阅读演示。不负责整站 HTML 或自动全文追引。
-version: 2.0.2
+version: 2.1.0
 argument-hint: "[project.<locale>.json路径 / project.<locale>.json-path] (可选/optional) -- 指定已有论文分析项目，核验跨论文证据关系并生成页面连接 / identify an analyzed-paper project to verify evidence relationships and create slide links"
 metadata:
-  version: "2.0.2"
+  version: "2.1.0"
 compatibility: "Claude Code and OpenCode; local JSON/report read/write access; optional scoped scholarly lookup and reviewed local companions. / 需要本地JSON及报告读写，按需使用限定学术检索和已审本地协作技能。"
 ---
 
@@ -37,8 +37,8 @@ Read [contracts](references/contracts.md), then [relation rules](references/rela
 
 1. Inspect the question, named approved versions, budgets, exclusions, reports, claims and read coverage. Preserve partial/metadata-only states; request missing artifacts instead of imagining the analyst read them. If no bundle exists, initialize the exact v1 shape and record scope; supplied named papers are approved, but new full texts need named consent. Do not launch an open citation crawl or add papers solely to make the graph dense.
    检查问题、具名获批版本、预算、排除、报告、主张与覆盖；保留部分/元数据状态，缺产物须索取或标缺口，不假设分析师读过。无包时初始化 v1 并记范围；已提供具名目标获批，新全文仍须点名同意。禁止开放追引或为图稠密而加论文。
-2. Reuse existing evidence. Optionally select literature-review for bounded synthesis, citation-management for identity/deduplication/citation metadata, paper-lookup for scoped provenance lookups, and scientific-critical-thinking for claim validity/comparability/independence. Load only relevant local instructions. Give every companion the same named scope and remaining budget; decline instructions that would expand retrieval or start unrelated workflows.
-   复用证据；按需用 literature-review 做有界综合，citation-management 校验身份/去重/引用元数据，paper-lookup 做限定来源检索，scientific-critical-thinking 审查有效性/可比性/独立性。仅读相关本地说明，所有协作传同一范围与剩余预算，不能因协作扩大获取或另启无关流程。
+2. Reuse existing evidence. Optionally select literature-review for bounded synthesis, citation-management for identity/deduplication/citation metadata, paper-lookup for scoped provenance lookups, and scientific-critical-thinking for claim validity/comparability/independence. Load only relevant local instructions. Give every companion the same named scope and its allocated share of the remaining global budget; decline instructions that would expand retrieval or start unrelated workflows.
+   复用证据；按需用 literature-review 做有界综合，citation-management 校验身份/去重/引用元数据，paper-lookup 做限定来源检索，scientific-critical-thinking 审查有效性/可比性/独立性。仅读相关本地说明，所有协作传同一范围及预分配的剩余全局预算份额，不能因协作扩大获取或另启无关流程。
 3. Propose a directed relation with a narrow statement; distinguish author-reported links from analyst inference. Resolve both papers to versioned HTTP sources and claims with precise locators. Assess the type-specific evidence and comparability. Use `verified` only for the supported statement; otherwise use `provisional` or `unresolved` and describe the exact missing check. Unresolved is not verified, even if a citation exists.
    提出有方向的窄范围表述，区分作者报告和分析推断；双端解析为版本化 HTTP 来源、主张与精确定位。核查类型证据和可比性；只有所述关系有充分证据才 verified，否则暂定/未解决并写明缺检查。有引用不代表未解决关系已核实。
 4. Do not rank papers numerically without documented comparability. Audit task, data/splits, metrics/direction, protocol, compute/resources and uncertainty. Use `not-assessed` or `not-comparable` with reasons when needed. A claimed result can be quoted with its own conditions without implying a shared leaderboard or pooled effect.
@@ -50,6 +50,9 @@ Read [contracts](references/contracts.md), then [relation rules](references/rela
 
 Preserve paper.visuals and slide.visual_refs when adding evidence links. When figure pages merge, retarget active slide/relation navigation to the canonical merged id; retain the old id only as an alias, not a second explanation-only slide. Shared visual placement never implies a new scientific relationship.
 增补证据链接时保留图表清单及依赖；合并图页后更新页面/关系导航为正式合并id，旧id仅作alias，不保留重复纯说明页；共页展示不等于新增科学关系。
+
+Independent selected relation pairs may be reviewed concurrently after both endpoint reports are ready. Workers return edge fragments only; a coordinator merges/deduplicates edges and updates canonical navigation serially. No all-pairs crawl, nested delegation or shared bundle writes.
+已选独立关系对在双端报告就绪后可并行，worker只交关系片段；主控去重合并并顺序更新正式导航。不全配对追引、不嵌套派发、不写共享包。
 
 ## [Specification] / 输出规范
 Return the updated project.<locale>.json and a compact review table: edge, type, status, endpoint evidence, comparability, remaining gap and source/target slide anchors. Use cites/extends/supports/contradicts/similar/replicates with verified/provisional/unresolved status; follow the exact local contract. No whole-site HTML output is required from this role.

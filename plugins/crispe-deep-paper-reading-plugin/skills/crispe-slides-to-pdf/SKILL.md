@@ -5,10 +5,10 @@ description: >-
   formulas, code and original figures. Use for export slides to PDF, print reading deck,
   save presentation as PDF, 导出论文slides为PDF、打印精读网页、生成演示PDF。
   Does not read papers or redesign slide content / 不负责论文阅读或重新设计内容。
-version: 2.0.2
+version: 2.1.0
 argument-hint: "[deck.html|URL] --output <file.pdf> (可选/optional) -- 指定论文演示网页和PDF输出 / identify the paper deck and PDF output"
 metadata:
-  version: "2.0.2"
+  version: "2.1.0"
 compatibility: "Claude Code and OpenCode; Python 3.9+, Playwright, pypdf and an installed sandbox-capable Chrome/Chromium; verified self-contained HTML deck. / 需要Python 3.9+、Playwright、pypdf、支持沙箱的已安装Chrome/Chromium及已核实自包含HTML演示。"
 ---
 
@@ -53,6 +53,9 @@ python <skill-dir>/scripts/export_pdf.py paper.html --chrome /path/to/chrome --o
 
 Verify each original and its own caption in grouped-figure print pages, with the shared/per-figure explanations on the same page. Combined fragments reveal all step states, which may be taller than interactive HTML; recheck every printed prose/step panel for clipping or scroll-dependent content and return no-fit cases to the writer. Legacy HTML aliases are not automatically PDF destinations.
 多图打印逐图核对原图及独立图注，共同/各图说明尽量同页。合并fragments后所有步骤说明同时显示，可能比交互网页高，须重测打印正文/步骤是否裁切或依赖滚动，放不下交writer修。HTML旧锚点alias不自动成为PDF目标。
+
+Batch exports of independent verified decks may run concurrently with a bounded browser worker count and unique PDF/report paths. Do not merge PDFs or write a shared export report concurrently; the coordinator collects actual per-deck results.
+独立已验deck批量PDF可有限浏览器并行，PDF/报告路径唯一；不并发合并PDF或写共享报告，主控汇总逐份实际结果。
 
 ## [Specification] / 输出规范
 Deliver the PDF, its .export.json report, source HTML path/URL, locale, actual slide/page counts, dimensions, browser method and any remaining gaps. English requests receive English output, Chinese requests Chinese; this skill/reference remains bilingual. Do not alter analysis scores, source claims or paper versions. Export does not prove scientific replication.
