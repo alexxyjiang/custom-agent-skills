@@ -16,6 +16,11 @@
       "description": "Use when asked to convert to CRISPE, make this a CRISPE prompt, rewrite / improve / structure this prompt, or mentions the CRISPE framework, to turn a plain description into a well-structured prompt using the CRISPE methodology (Context, Role, Instruction, Specification, Performance, Example). 支持中文触发，如转成CRISPE格式、用CRISPE框架改写、优化/结构化这个提示词等同类表达。"
     },
     {
+      "name": "rtf-coach-plugin",
+      "source": "./plugins/rtf-coach-plugin",
+      "description": "Use when asked to convert to RTF, make this an RTF prompt, rewrite / improve / structure this prompt, or mentions the RTF framework, to turn a plain description into a well-structured prompt using the RTF methodology (Role, Task, Format). 支持中文触发，如转成RTF格式、用RTF框架改写、优化/结构化这个提示词等同类表达。"
+    },
+    {
       "name": "auto-skill-update-plugin",
       "source": "./plugins/auto-skill-update-plugin",
       "description": "Use when asked to update, extend, or fix a skill definition -- e.g. update the skill to cover X / add this case to skill / the skill missed this case / fix the skill, or any phrasing about correcting a skill. 支持中文触发，如更新这个skill、给skill加上这个情况、skill漏了这个情况等同类表达。Invoke immediately on these signals; the worthiness assessment and confirmation happen inside the skill, not before invoking."
@@ -23,7 +28,7 @@
     {
       "name": "prompt-convert-trigger-plugin",
       "source": "./plugins/prompt-convert-trigger-plugin",
-      "description": "Use proactively when a request would benefit from structured prompt engineering -- involves complexity, vagueness, multi-step work, or spans multiple concerns -- converting it into a COSTAR or CRISPE prompt before executing; don't wait for an explicit ask. 支持中文触发信号，如多目标表达（修复X同时让Y也能工作）、不确定表达（我不确定怎么、可能是）、模糊动词（改进、优化）等同类情况。"
+      "description": "Use proactively when a request would benefit from structured prompt engineering -- involves complexity, vagueness, multi-step work, or spans multiple concerns -- converting it into a COSTAR, CRISPE or RTF prompt before executing; don't wait for an explicit ask. 支持中文触发信号，如多目标表达（修复X同时让Y也能工作）、不确定表达（我不确定怎么、可能是）、模糊动词（改进、优化）等同类情况。"
     },
     {
       "name": "crispe-system-architect-plugin",

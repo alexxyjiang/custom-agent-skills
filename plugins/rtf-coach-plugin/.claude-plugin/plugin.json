@@ -1,0 +1,19 @@
+{
+  "author": {
+    "name": "alexxyjiang (Alex Jiang)",
+    "email": "alexxyjiang@gmail.com"
+  },
+  "name": "rtf-coach-plugin",
+  "description": "Use when asked to convert to RTF, make this an RTF prompt, rewrite / improve / structure this prompt, or mentions the RTF framework, to turn a plain description into a well-structured prompt using the RTF methodology (Role, Task, Format). 支持中文触发，如转成RTF格式、用RTF框架改写、优化/结构化这个提示词等同类表达。",
+  "keywords": [
+    "rtf",
+    "prompt-engineering",
+    "prompt-optimization",
+    "prompt-framework",
+    "prompt-coach",
+    "role",
+    "task",
+    "format"
+  ],
+  "version": "1.0.0"
+}
